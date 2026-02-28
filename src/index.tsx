@@ -233,6 +233,118 @@ IMPORTANT: Reponds en JSON:
   }
 })
 
+// ─── Claude AI Rapport Strategique Complet pour le medecin ───
+app.post('/api/ai/rapport', async (c) => {
+  try {
+    const body = await c.req.json()
+    const { scores, biologie, profil, contexte } = body
+
+    const systemPrompt = `Tu es un medecin expert en endocrinologie, obesite et metabolisme, specialise dans la medecine de precision et l'aide a la decision clinique.
+
+Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.0 (architecture CLEO).
+
+CONTEXTE ALGORITHMIQUE:
+- Score sf = wDecl × sD + wBio × bioNorm (0-100)
+- sD = C(clinique, 0-50) + E(exposome, 0-45) + O(occupationnel, 0-10) + L(lifestyle, 0-10)
+- CTI = Chronicity Trajectory Index (0-100) : mesure le degre d'installation de l'obesite
+- GRI = GLP-1 Response Index : predit la reponse au traitement GLP-1
+- SII = Sous-Index Inflammatoire (0-7) : 7 criteres binaires
+- K = Score de comorbidites (0-50)
+- bioNorm = score biologique normalise (0-100) calcule par z-scores ponderes
+
+TON RAPPORT DOIT CONTENIR:
+1. diagnostic_resume: Resume diagnostique en 3-4 phrases, incluant le profil de risque global et les elements determinants
+2. synthese_clinique: Synthese clinique detaillee (5-8 phrases) integrant l'interpretation des scores C, E, O, L, le CTI, le GRI, les comorbidites, et la biologie si disponible
+3. points_positifs: [tableau] Elements favorables du profil (min 2, max 5)
+4. risques_identifies: [tableau] Risques principaux hierarchises par urgence (min 2, max 6)
+5. plan_therapeutique: [tableau] Plan d'action concret en 5-8 etapes, ordonne par priorite, avec temporalite
+6. recommandation_pharmacologique: Texte sur la pharmacologie recommandee (GLP-1, chirurgie, etc.) en fonction du CTI et GRI. Si GRI faible et CTI eleve → chirurgie. Si GRI bon → Semaglutide/Tirzepatide.
+7. suivi_propose: Calendrier de suivi precis (frequence, examens, objectifs)
+8. conseils_patient: [tableau] 3-5 conseils personnalises et actionables pour le patient
+9. attention_medicale: Points de vigilance pour le medecin (ou null si rien d'urgent)
+10. tone: "reassuring" | "cautious" | "urgent"
+
+REGLES:
+- Sois precis, utilise les chiffres du patient
+- Adapte le ton a la gravite (sf < 30 = rassurant, 30-59 = prudent, >= 60 = urgent)
+- Mentionne les references scientifiques quand pertinent (ADA 2024, SCORE2, etc.)
+- N'invente pas de donnees biologiques si elles ne sont pas fournies
+- Si biologie non disponible, indique l'importance de la realiser
+- Redige en francais medical professionnel mais comprehensible
+
+IMPORTANT: Reponds UNIQUEMENT en JSON valide, sans texte avant ou apres.`
+
+    const userMsg = `DONNEES PATIENT:
+
+SCORES:
+- Score final (sf): ${scores.sf}/100 — Classification: ${scores.classification}
+- Score declaratif (sD): ${scores.sD}/100 — Classification declarative: ${scores.classDecl}
+  - C (clinique): ${scores.scoreC}/50
+  - E (exposome): ${scores.scoreE}/45
+  - O (occupationnel): ${scores.scoreO}/10
+  - L (lifestyle): ${scores.scoreL}/10
+- CTI (chronicite): ${scores.cti}/100
+- GRI (reponse GLP-1): ${scores.gri}
+- SII (inflammatoire): ${scores.sii}/7
+- K (comorbidites): ${scores.bmn_k}/50
+- Panel bio prescrit: P${scores.panelLvl}
+${scores.bInflam ? '- bInflam (triade inflammatoire): ' + scores.bInflam : ''}
+
+PROFIL:
+- Age: ${profil.age} ans | Sexe: ${profil.sexe === 'f' ? 'Femme' : 'Homme'} | Ethnie: ${profil.ethnie}
+- IMC: ${profil.imc} kg/m2 | Taille: ${profil.taille_cm} cm | Poids: ${profil.poids_kg} kg | Tour de taille: ${profil.tt_cm} cm
+- Comorbidites: ${profil.comorbidites?.length ? profil.comorbidites.join(', ') : 'Aucune declaree'}
+- PSS-10 (stress): ${profil.pss10}/40 | PHQ-9 (depression): ${profil.phq9}/27 | BES: ${profil.bes}/8 | ISI: ${profil.isi}
+- Tabac: ${profil.tabac_cig} | Alcool: ${profil.alcool}
+
+BIOLOGIE:
+${biologie.present ? 'bioNorm = ' + biologie.bioNorm + '/100 (wDecl=' + biologie.wDecl + ', wBio=' + biologie.wBio + ')\nMarqueurs: ' + JSON.stringify(biologie.marqueurs) : 'Non disponible — prescrire panel ' + scores.panelLvl}
+
+CONTEXTE:
+- Prescription: ${contexte.prescription_bio}
+- Strategies algorithmiques: ${contexte.strategies?.join(', ')}
+- P(obesite 10 ans): ${contexte.prob_obesite_10ans}
+- Localisation: ${contexte.geo || 'Non renseignee'} | Expo air: ${contexte.expo_air ?? 'N/A'}
+
+Redige le rapport strategique complet.`
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': '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',
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    })
+
+    if (!response.ok) {
+      const errText = await response.text()
+      return c.json({ error: 'AI API error', details: errText }, 500)
+    }
+
+    const data: any = await response.json()
+    const text = data.content?.[0]?.text || '{}'
+
+    let parsed
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/)
+      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { diagnostic_resume: text }
+    } catch {
+      parsed = { diagnostic_resume: text }
+    }
+
+    return c.json(parsed)
+  } catch (e: any) {
+    return c.json({ error: e.message || 'Unknown error' }, 500)
+  }
+})
+
 // ─── Main page ───
 app.get('/', (c) => {
   return c.html(`<!DOCTYPE html>
