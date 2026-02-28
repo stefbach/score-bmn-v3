@@ -5,7 +5,109 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '5.0', name: 'Score BMN v2.0 AI-Powered' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v2.0 AI+Geo' }))
+
+// ─── GEO PROXY: Geocoding via Nominatim ───
+app.get('/api/geo/search', async (c) => {
+  const q = c.req.query('q')
+  if (!q) return c.json({ error: 'Missing q parameter' }, 400)
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&accept-language=fr`, {
+      headers: { 'User-Agent': 'ScoreBMN/2.0 (health-assessment-tool)' }
+    })
+    const data: any = await r.json()
+    if (data.length) {
+      return c.json({
+        results: data.map((d: any) => ({
+          lat: +d.lat, lon: +d.lon,
+          name: d.display_name.split(',').slice(0, 3).join(',').trim(),
+          full: d.display_name
+        }))
+      })
+    }
+    return c.json({ results: [] })
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// ─── GEO PROXY: Reverse geocode ───
+app.get('/api/geo/reverse', async (c) => {
+  const lat = c.req.query('lat'), lon = c.req.query('lon')
+  if (!lat || !lon) return c.json({ error: 'Missing lat/lon' }, 400)
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr`, {
+      headers: { 'User-Agent': 'ScoreBMN/2.0 (health-assessment-tool)' }
+    })
+    const d: any = await r.json()
+    return c.json({
+      name: d.display_name ? d.display_name.split(',').slice(0, 3).join(',').trim() : `${(+lat).toFixed(3)}, ${(+lon).toFixed(3)}`,
+      full: d.display_name || '',
+      city: d.address?.city || d.address?.town || d.address?.village || '',
+      country: d.address?.country || ''
+    })
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// ─── GEO PROXY: IP geolocation (multiple fallbacks) ───
+app.get('/api/geo/ip', async (c) => {
+  // Try multiple free IP geolocation services
+  const services = [
+    async () => {
+      const r = await fetch('https://get.geojs.io/v1/ip/geo.json')
+      const d: any = await r.json()
+      if (d.latitude && d.longitude) return { lat: +d.latitude, lon: +d.longitude, name: `${d.city || ''}, ${d.region || ''}, ${d.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, '').trim() }
+      return null
+    },
+    async () => {
+      const r = await fetch('https://ipwho.is/')
+      const d: any = await r.json()
+      if (d.latitude && d.longitude) return { lat: d.latitude, lon: d.longitude, name: `${d.city || ''}, ${d.region || ''}, ${d.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, '').trim() }
+      return null
+    },
+    async () => {
+      const r = await fetch('http://ip-api.com/json/?fields=status,city,regionName,country,lat,lon')
+      const d: any = await r.json()
+      if (d.status === 'success') return { lat: d.lat, lon: d.lon, name: `${d.city || ''}, ${d.regionName || ''}, ${d.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, '').trim() }
+      return null
+    }
+  ]
+  for (const svc of services) {
+    try {
+      const result = await svc()
+      if (result) return c.json(result)
+    } catch (e) { /* try next */ }
+  }
+  return c.json({ error: 'IP geolocation failed' }, 500)
+})
+
+// ─── GEO PROXY: Air Quality (Open-Meteo) ───
+app.get('/api/geo/air', async (c) => {
+  const lat = c.req.query('lat'), lon = c.req.query('lon')
+  if (!lat || !lon) return c.json({ error: 'Missing lat/lon' }, 400)
+  try {
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,uv_index&timezone=auto`
+    const r = await fetch(url)
+    return c.json(await r.json())
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
+
+// ─── GEO PROXY: Weather (Open-Meteo) ───
+app.get('/api/geo/weather', async (c) => {
+  const lat = c.req.query('lat'), lon = c.req.query('lon')
+  if (!lat || !lon) return c.json({ error: 'Missing lat/lon' }, 400)
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`
+    const r = await fetch(url)
+    return c.json(await r.json())
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500)
+  }
+})
 
 // ─── Claude AI Proxy (keeps API key server-side) ───
 app.post('/api/ai/analyze', async (c) => {
@@ -13,22 +115,22 @@ app.post('/api/ai/analyze', async (c) => {
     const body = await c.req.json()
     const { profile, question } = body
 
-    const systemPrompt = `Tu es un assistant médical expert en obésité, métabolisme et médecine préventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v2.0 (Bach-Manos-Noël).
-Ton rôle:
+    const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
+Tu analyses le profil d'un patient dans le cadre du Score BMN v2.0 (Bach-Manos-Noel).
+Ton role:
 1. Adapter les questions du questionnaire au profil du patient
-2. Expliquer en langage simple les résultats et risques
-3. Fournir des conseils personnalisés basés sur les données
+2. Expliquer en langage simple les resultats et risques
+3. Fournir des conseils personnalises bases sur les donnees
 4. Identifier les facteurs de risque critiques
 
-Références: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES, AUDIT-C, Lancet 2016, SCORE2/Framingham.
+References: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES, AUDIT-C, Lancet 2016, SCORE2/Framingham.
 
-IMPORTANT: Réponds TOUJOURS en JSON valide avec cette structure:
+IMPORTANT: Reponds TOUJOURS en JSON valide avec cette structure:
 {
   "analysis": "texte d'analyse courte (2-3 phrases max)",
-  "risk_flags": ["liste de drapeaux de risque identifiés"],
-  "suggestions": ["suggestions personnalisées courtes"],
-  "adapted_questions": ["questions supplémentaires pertinentes si nécessaire"],
+  "risk_flags": ["liste de drapeaux de risque identifies"],
+  "suggestions": ["suggestions personnalisees courtes"],
+  "adapted_questions": ["questions supplementaires pertinentes si necessaire"],
   "severity": "low|moderate|high|critical"
 }`
 
@@ -58,10 +160,8 @@ IMPORTANT: Réponds TOUJOURS en JSON valide avec cette structure:
     const data: any = await response.json()
     const text = data.content?.[0]?.text || '{}'
     
-    // Parse JSON from Claude response
     let parsed
     try {
-      // Try to extract JSON from the response
       const jsonMatch = text.match(/\{[\s\S]*\}/)
       parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { analysis: text }
     } catch {
@@ -80,17 +180,17 @@ app.post('/api/ai/interpret', async (c) => {
     const body = await c.req.json()
     const { scores, profile } = body
 
-    const systemPrompt = `Tu es un médecin expert en obésité et métabolisme.
-Tu interprètes les résultats du Score BMN v2.0 pour un patient.
-Donne une interprétation personnalisée, empathique et actionnable en français.
-IMPORTANT: Réponds en JSON:
+    const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
+Tu interpretes les resultats du Score BMN v2.0 pour un patient.
+Donne une interpretation personnalisee, empathique et actionnable en francais.
+IMPORTANT: Reponds en JSON:
 {
-  "summary": "résumé en 2-3 phrases",
-  "key_risks": ["risques principaux identifiés"],
-  "priority_actions": ["3 actions prioritaires concrètes"],
+  "summary": "resume en 2-3 phrases",
+  "key_risks": ["risques principaux identifies"],
+  "priority_actions": ["3 actions prioritaires concretes"],
   "positive_points": ["points positifs du profil"],
-  "medical_attention": "ce qui nécessite attention médicale (ou null)",
-  "lifestyle_tips": ["3 conseils mode de vie personnalisés"],
+  "medical_attention": "ce qui necessite attention medicale (ou null)",
+  "lifestyle_tips": ["3 conseils mode de vie personnalises"],
   "tone": "reassuring|cautious|urgent"
 }`
 
@@ -143,9 +243,9 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v2.0 - Évaluez votre risque métabolique avec intelligence artificielle. Questionnaire validé cliniquement.">
-<title>Score BMN v2.0 — Évaluation Métabolique IA</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚕️</text></svg>">
+<meta name="description" content="Score BMN v2.0 - Evaluez votre risque metabolique avec intelligence artificielle.">
+<title>Score BMN v2.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">
 </head>
