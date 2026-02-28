@@ -365,6 +365,52 @@ async function requestAIInterpret(){
   return null;
 }
 
+// Rapport strategique IA complet pour assister le medecin
+async function requestAIReport(){
+  try{
+    const hasBio=(S.bmn_b>0);
+    const bioDetail={};
+    BIO.forEach(m=>{const v=S.bioValues[m.id];if(v!==undefined&&v!==null) bioDetail[m.n]={valeur:v,unite:m.u,normal:m.nr,anormal:m.ar};});
+    const comorbNames=S.comorbIds.map(id=>COMORB.find(c=>c.id===id)?.n).filter(Boolean);
+    const bioPrx=getBioPrescription();
+    const strats=getTherapeuticStrategy();
+    const mk=calcMarkov();
+    const pObes=((mk.prob[4]+mk.prob[5])*100).toFixed(1);
+
+    const payload={
+      type:'rapport_strategique',
+      scores:{
+        sf:S.bmn_t, sD:S.sD, bioNorm:S.bmn_b,
+        scoreC:S.scoreC, scoreE:S.scoreE, scoreO:S.scoreO, scoreL:S.scoreL,
+        cti:S.cti, gri:+S.gri.toFixed(1), sii:S.sii, bmn_k:S.bmn_k,
+        classification:S.classFinal, classDecl:S.classDecl,
+        panelLvl:S.panelLvl, bInflam:S.bInflam?.toFixed(2)
+      },
+      biologie:{present:hasBio, bioNorm:S.bmn_b, marqueurs:bioDetail, wDecl:S.wDecl, wBio:S.wBio},
+      profil:{
+        age:getAge(), sexe:S.sexe, ethnie:ETH[S.ethnie]?.n,
+        imc:S.imc?.toFixed(1), taille_cm:S.taille, poids_kg:S.poids, tt_cm:S.tt,
+        comorbidites:comorbNames,
+        pss10:getPssTotal(), phq9:getPhqTotal(), bes:S.bes, isi:S.isi,
+        tabac_cig:S.tabac, alcool:S.alcool
+      },
+      contexte:{
+        prescription_bio:bioPrx.tier,
+        strategies:strats.map(s=>s.title),
+        prob_obesite_10ans:pObes+'%',
+        geo:S.geo?.name, expo_air:S.expo.air
+      }
+    };
+
+    const r=await fetch('/api/ai/rapport',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(r.ok)return await r.json();
+  }catch(e){console.error('AI report error:',e);}
+  return null;
+}
+
 function renderAIBubble(containerId,data){
   const el=$(containerId);if(!el||!data)return;
   const sev=data.severity||'low';
@@ -1505,6 +1551,7 @@ function doRetro(){
 
 // ════════════════════════════════════════════════════════════════
 // FINAL RESULT — Architecture CLEO : C+E+O+L → sD → Bio → sf
+// Diagnostic complet + CTI/GRI + Strategie + Rapport IA medecin
 // ════════════════════════════════════════════════════════════════
 function renderFinal(){
   const t=S.bmn_t, cls=getClass(t), mk=calcMarkov();
@@ -1515,69 +1562,253 @@ function renderFinal(){
   const pObes=((mk.prob[4]+mk.prob[5])*100).toFixed(1);
   const pssT=getPssTotal(), phqT=getPhqTotal();
   const hasBio=(S.bmn_b>0);
+  const age=getAge();
 
   let r='';
 
-  // ── 1. HERO : SCORE FINAL sf/100 ──
-  r+=`<div class="res-hero" style="background:${cls.bg}">
-    <div class="res-num" style="color:${cls.c}">${t}<span class="res-max">/100</span></div>
-    <div class="res-lv" style="color:${cls.c}">${cls.l}</div>
-    <div class="res-tier" style="color:${cls.c}">${cls.tier}</div>
-    <div class="res-pr" style="font-size:11px">${hasBio?'sf = '+S.wDecl.toFixed(2)+'×sD + '+S.wBio.toFixed(2)+'×bioNorm':'sf = sD (pas de biologie)'} | P(obesite 10a) = ${pObes}%</div>
-  </div>`;
-
-  // ── 2. DECOMPOSITION CLEO ──
-  r+=`<div class="sec"><div class="sec-tt">Decomposition CLEO — Score Declaratif sD = ${S.sD}/100</div>
-    <div class="res-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="res-item"><div class="res-item-l">C</div><div class="res-item-v" style="color:var(--accent)">${S.scoreC}</div><div class="res-item-s">/50 clinique</div></div>
-      <div class="res-item"><div class="res-item-l">E</div><div class="res-item-v" style="color:${S.scoreE>20?'var(--red)':S.scoreE>10?'var(--orange)':'var(--green)'}">${S.scoreE}</div><div class="res-item-s">/45 exposome</div></div>
-      <div class="res-item"><div class="res-item-l">O</div><div class="res-item-v" style="color:${S.scoreO>=6?'var(--red)':S.scoreO>=3?'var(--orange)':'var(--green)'}">${S.scoreO}</div><div class="res-item-s">/10 occup.</div></div>
-      <div class="res-item"><div class="res-item-l">L</div><div class="res-item-v" style="color:${S.scoreL>=6?'var(--red)':S.scoreL>=3?'var(--orange)':'var(--green)'}">${S.scoreL}</div><div class="res-item-s">/10 lifestyle</div></div>
+  // ══════════════════════════════════════════════════════
+  // 1. HERO SCORE — compact, jamais coupe
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;background:${cls.bg};margin:0 0 12px">
+    <div style="text-align:center;min-width:80px">
+      <div style="font-size:48px;font-weight:900;color:${cls.c};line-height:1;font-family:'JetBrains Mono',monospace">${t}</div>
+      <div style="font-size:11px;color:${cls.c};opacity:.6">/100</div>
     </div>
-    <div class="str-desc" style="font-size:11px;color:var(--dim2);margin:6px 0;text-align:center">
-      sD = min(100, C + E + O + L) = min(100, ${S.scoreC} + ${S.scoreE} + ${S.scoreO} + ${S.scoreL}) = <b>${S.sD}</b>
-      → Classification declarative: <b style="color:${getClass(S.sD).c}">${S.classDecl}</b>
+    <div style="flex:1">
+      <div style="font-size:20px;font-weight:800;color:${cls.c}">${cls.l}</div>
+      <div style="font-size:12px;color:${cls.c};opacity:.8;margin:2px 0">${cls.tier}</div>
+      <div style="font-size:10px;color:${cls.c};opacity:.6">${hasBio?'sf = '+S.wDecl.toFixed(2)+'×sD + '+S.wBio.toFixed(2)+'×bioNorm':'sf = sD (sans biologie)'}</div>
     </div>
   </div>`;
 
-  // ── 3. GRILLE SCORES COMPLETS ──
-  r+=`<div class="res-grid">
-    <div class="res-item"><div class="res-item-l">sD</div><div class="res-item-v" style="color:${getClass(S.sD).c}">${S.sD}</div><div class="res-item-s">/100 declaratif</div></div>
-    <div class="res-item"><div class="res-item-l">Bio</div><div class="res-item-v" style="color:${S.bmn_b>0?'var(--teal)':'var(--dim)'}">${S.bmn_b||'--'}</div><div class="res-item-s">/100 biologie</div></div>
-    <div class="res-item"><div class="res-item-l">sf</div><div class="res-item-v" style="color:${cls.c}">${t}</div><div class="res-item-s">/100 final</div></div>
-    <div class="res-item"><div class="res-item-l">K</div><div class="res-item-v" style="color:${S.bmn_k>20?'var(--red)':S.bmn_k>0?'var(--orange)':'var(--green)'}">${S.bmn_k}</div><div class="res-item-s">/50 comorbid.</div></div>
-    <div class="res-item"><div class="res-item-l">CTI</div><div class="res-item-v" style="color:${ctiInfo.c}">${S.cti}</div><div class="res-item-s">${ctiInfo.l}</div></div>
-    <div class="res-item"><div class="res-item-l">GRI</div><div class="res-item-v" style="color:${griInfo.c}">${S.gri.toFixed(1)}</div><div class="res-item-s">${griInfo.l}</div></div>
-    <div class="res-item"><div class="res-item-l">SII</div><div class="res-item-v" style="color:${S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)'}">${S.sii}</div><div class="res-item-s">/7 inflam.</div></div>
-    <div class="res-item"><div class="res-item-l">Panel</div><div class="res-item-v" style="color:${S.panelLvl>=15?'var(--red)':S.panelLvl>=10?'var(--orange)':S.panelLvl>=5?'var(--accent)':'var(--green)'}">${S.panelLvl>0?'P'+S.panelLvl:'Opt.'}</div><div class="res-item-s">prescription</div></div>
+  // ══════════════════════════════════════════════════════
+  // 2. TABLEAU DIAGNOSTIQUE COMPLET — 2 lignes
+  // ══════════════════════════════════════════════════════
+  const gridItem=(lbl,val,sub,col)=>`<div style="text-align:center;padding:8px 4px;background:var(--bg2);border-radius:10px">
+    <div style="font-size:9px;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
+    <div style="font-size:22px;font-weight:800;color:${col};font-family:'JetBrains Mono',monospace;line-height:1.2">${val}</div>
+    <div style="font-size:9px;color:var(--dim3)">${sub}</div></div>`;
+
+  r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+    ${gridItem('C',S.scoreC,'/50 clinique','var(--accent)')}
+    ${gridItem('E',S.scoreE,'/45 exposome',S.scoreE>20?'var(--red)':S.scoreE>10?'var(--orange)':'var(--green)')}
+    ${gridItem('O',S.scoreO,'/10 occup.',S.scoreO>=6?'var(--red)':'var(--green)')}
+    ${gridItem('L',S.scoreL,'/10 lifestyle',S.scoreL>=6?'var(--red)':'var(--green)')}
   </div>`;
 
-  // ── 4. DETAIL CTI et GRI ──
-  r+=`<div class="sec"><div class="sec-tt">Indices de chronicite et reponse therapeutique</div>
-    <div class="str-card" style="border-left-color:${ctiInfo.c}">
-      <div class="str-tt" style="color:${ctiInfo.c}">CTI = ${S.cti}/100 — ${ctiInfo.l}</div>
-      <div class="str-desc">${ctiInfo.d}</div>
-      <div class="str-desc" style="font-size:11px;color:var(--dim2)">CTI = Σ(γ_j × Z_j) × max(amplificateur) | γ: dur 0.185, yoyo 0.249, leptine 0.210, micro 0.180, cortisol 0.195, meta 0.200, enfance 0.240</div>
+  r+=`<div style="text-align:center;font-size:11px;color:var(--dim2);margin-bottom:10px">
+    sD = min(100, ${S.scoreC}+${S.scoreE}+${S.scoreO}+${S.scoreL}) = <b>${S.sD}</b> → <b style="color:${getClass(S.sD).c}">${S.classDecl}</b>
+  </div>`;
+
+  r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+    ${gridItem('sD',S.sD,'/100 declaratif',getClass(S.sD).c)}
+    ${gridItem('Bio',S.bmn_b||'--','/100 biologie',S.bmn_b>0?'var(--teal)':'var(--dim)')}
+    ${gridItem('sf',t,'/100 final',cls.c)}
+    ${gridItem('K',S.bmn_k,'/50 comorb.',S.bmn_k>20?'var(--red)':S.bmn_k>0?'var(--orange)':'var(--green)')}
+  </div>`;
+
+  r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
+    ${gridItem('CTI',S.cti,ctiInfo.l,ctiInfo.c)}
+    ${gridItem('GRI',S.gri.toFixed(1),griInfo.l,griInfo.c)}
+    ${gridItem('SII',S.sii,'/7 inflam.',S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)')}
+    ${gridItem('P(Ob)',pObes+'%','10 ans',parseFloat(pObes)>50?'var(--red)':parseFloat(pObes)>25?'var(--orange)':'var(--green)')}
+  </div>`;
+
+  // ══════════════════════════════════════════════════════
+  // 3. DIAGNOSTIC CTI — Trajectoire de chronicite
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="border:1px solid ${ctiInfo.c};border-radius:12px;padding:12px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:14px;font-weight:700;color:${ctiInfo.c}">CTI = ${S.cti}/100</div>
+      <div style="font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:${ctiInfo.c};color:#fff">${ctiInfo.l}</div>
     </div>
-    <div class="str-card" style="border-left-color:${griInfo.c}">
-      <div class="str-tt" style="color:${griInfo.c}">GRI = ${S.gri.toFixed(1)} — ${griInfo.l}</div>
-      <div class="str-desc">${griInfo.d}</div>
-      <div class="str-desc" style="font-size:11px;color:var(--dim2)">GRI = Σ(δ_k × F_k) − Σ(ε_k × U_k) | Favorable: HOMA-IR +1.07, adiponectine +0.62, TG/HDL +0.55 | Defavorable: CTI>55 −0.65, IMC>40 −0.47</div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:6px">${ctiInfo.d}</div>
+    <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+      <div style="width:${Math.min(S.cti,100)}%;height:100%;background:${ctiInfo.c};border-radius:3px;transition:width .5s"></div>
+    </div>
+    <div style="font-size:10px;color:var(--dim3)">
+      <b>Interpretation :</b> ${S.cti<=20?'Fenetre therapeutique ouverte. Les interventions classiques (nutrition, AP, pharmacologie) ont une efficacite maximale. Agir maintenant.':
+      S.cti<=40?'Debut de chronicisation. L\'efficacite des interventions diminue progressivement. Pharmacologie (GLP-1) a considerer rapidement.':
+      S.cti<=55?'Chronicite avancee. Les mecanismes adaptatifs (leptinoresistance, reponse metabolique) sont installes. GLP-1 haute dose recommande. Chirurgie a evaluer.':
+      'Chronicite installee. Resistance majeure aux interventions conservatrices. Evaluation chirurgicale bariatrique obligatoire. Set-point durablement modifie.'}
     </div>
   </div>`;
 
-  // ── 5. QUANTIFICATION DETAILLEE CLEO ──
-  r+=`<div class="contrib"><div class="contrib-title">Quantification detaillee (sD = ${S.sD}/100)</div>`;
+  // ══════════════════════════════════════════════════════
+  // 4. DIAGNOSTIC GRI — Reponse therapeutique
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="border:1px solid ${griInfo.c};border-radius:12px;padding:12px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:14px;font-weight:700;color:${griInfo.c}">GRI = ${S.gri.toFixed(1)}</div>
+      <div style="font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:${griInfo.c};color:#fff">${griInfo.l}</div>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:6px">${griInfo.d}</div>
+    <div style="font-size:10px;color:var(--dim3)">
+      <b>Decision therapeutique :</b> ${S.gri>=2.5?'Excellent candidat GLP-1 (Semaglutide/Tirzepatide). Reponse attendue >85%. Perte de poids estimee 15-20%.':
+      S.gri>=1.5?'Bon candidat GLP-1. Reponse attendue 60-85%. Associer programme nutritionnel structure.':
+      S.gri>=0.5?'Reponse GLP-1 incertaine. Privilegier approche multimodale (nutrition + AP + suivi psycho). GLP-1 en 2e intention.':
+      'Reponse GLP-1 peu probable. Orienter vers chirurgie bariatrique si CTI > 55. Sinon, programme intensif pluridisciplinaire.'}
+    </div>
+  </div>`;
+
+  // ══════════════════════════════════════════════════════
+  // 5. INTEGRATION BIOLOGIQUE (si bio presente)
+  // ══════════════════════════════════════════════════════
+  if(hasBio){
+    r+=`<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:8px">Integration Biologique — BSD v4.7.1</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+        <div style="text-align:center;flex:1"><div style="font-size:10px;color:var(--dim2)">sD</div><div style="font-size:18px;font-weight:700">${S.sD}</div><div style="font-size:9px;color:var(--dim3)">w=${S.wDecl.toFixed(2)}</div></div>
+        <div style="font-size:16px;color:var(--dim3)">×</div>
+        <div style="text-align:center;flex:1"><div style="font-size:10px;color:var(--dim2)">bioNorm</div><div style="font-size:18px;font-weight:700;color:var(--teal)">${S.bmn_b}</div><div style="font-size:9px;color:var(--dim3)">w=${S.wBio.toFixed(2)}</div></div>
+        <div style="font-size:16px;color:var(--dim3)">=</div>
+        <div style="text-align:center;flex:1"><div style="font-size:10px;color:var(--dim2)">sf</div><div style="font-size:18px;font-weight:700;color:${cls.c}">${t}</div><div style="font-size:9px;color:var(--dim3)">final</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--dim3)">
+        ${S.bmn_b>80?'BioEmergencyFloor actif (bio>80 → sf >= '+Math.round(S.bmn_b*0.85)+') | ':''}
+        ${S.bInflam>0?'bInflam = '+S.bInflam.toFixed(2)+' (E amplifiee +'+Math.round(S.bInflam*15)+'%) | ':''}
+        Gap = ${Math.abs(S.bmn_b-S.sD)} → ${Math.abs(S.bmn_b-S.sD)>20?'Reponderation dynamique':'Poids standards'}
+      </div>
+    </div>`;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // 6. SANTE MENTALE — ligne compacte
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="display:flex;gap:8px;margin-bottom:10px">
+    <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
+      <div style="font-size:9px;color:var(--dim2)">PSS-10</div>
+      <div style="font-size:16px;font-weight:700;color:${pssT>=27?'var(--red)':pssT>=20?'var(--orange)':pssT>=14?'var(--accent)':'var(--green)'}">${pssT}/40</div>
+      <div style="font-size:9px;color:var(--dim3)">${pssT>=27?'Tres eleve':pssT>=20?'Eleve':pssT>=14?'Modere':'Faible'}</div></div>
+    <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
+      <div style="font-size:9px;color:var(--dim2)">PHQ-9</div>
+      <div style="font-size:16px;font-weight:700;color:${phqT>=20?'var(--red)':phqT>=15?'var(--orange)':phqT>=10?'var(--accent)':'var(--green)'}">${phqT}/27</div>
+      <div style="font-size:9px;color:var(--dim3)">${phqT>=20?'Severe':phqT>=15?'Mod-sev.':phqT>=10?'Modere':phqT>=5?'Leger':'Normal'}</div></div>
+    <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
+      <div style="font-size:9px;color:var(--dim2)">BES</div>
+      <div style="font-size:16px;font-weight:700;color:${S.bes>=5?'var(--red)':S.bes>=3?'var(--orange)':'var(--green)'}">${S.bes}/8</div>
+      <div style="font-size:9px;color:var(--dim3)">${S.bes>=5?'Severe':S.bes>=3?'Modere':'Leger'}</div></div>
+    <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
+      <div style="font-size:9px;color:var(--dim2)">SII</div>
+      <div style="font-size:16px;font-weight:700;color:${S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)'}">${S.sii}/7</div>
+      <div style="font-size:9px;color:var(--dim3)">Inflam.</div></div>
+  </div>`;
+
+  // ══════════════════════════════════════════════════════
+  // 7. PROJECTION MARKOV — compact
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:700;color:var(--txt)">Projection Markov — 10 ans</div>
+      <div style="font-size:16px;font-weight:800;color:${parseFloat(pObes)>50?'var(--red)':parseFloat(pObes)>25?'var(--orange)':'var(--green)'}">${pObes}%</div>
+    </div>`;
+  mk.prob.forEach((p,i)=>{
+    const pct=(p*100).toFixed(1);
+    r+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+      <div style="min-width:80px;font-size:10px;color:${colors[i]};font-weight:${i===mk.cs?700:400}">${MK_ST[i]}${i===mk.cs?' •':''}</div>
+      <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]}"></div></div>
+      <div style="min-width:35px;font-size:10px;color:${colors[i]};text-align:right;font-weight:600">${pct}%</div></div>`;
+  });
+  r+=`<div style="font-size:9px;color:var(--dim3);margin-top:4px">Matrice 6x6 × exp(0.68×sf/100) × exp(0.35×K/100) | Leibel 1995, Sumithran 2011</div></div>`;
+
+  // ══════════════════════════════════════════════════════
+  // 8. STRATEGIE THERAPEUTIQUE PERSONNALISEE
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="margin-bottom:10px">
+    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">STRATEGIE THERAPEUTIQUE</div>`;
+  strats.forEach(s=>{
+    r+=`<div style="border-left:3px solid ${s.color};padding:10px 12px;margin-bottom:8px;background:var(--bg2);border-radius:0 12px 12px 0">
+      <div style="font-size:13px;font-weight:700;color:${s.color};margin-bottom:4px">${s.title}</div>
+      ${s.actions?.length?`<ul style="margin:0;padding-left:18px;font-size:11px;color:var(--dim);line-height:1.6">${s.actions.map(a=>'<li>'+a+'</li>').join('')}</ul>`:''}
+      ${s.pharma?`<div style="font-size:11px;margin-top:4px"><span style="color:${s.color};font-weight:600">Pharmacologie:</span> <span style="color:var(--dim)">${s.pharma}</span></div>`:''}
+      <div style="font-size:10px;color:var(--dim3);margin-top:4px"><b>Suivi:</b> ${s.suivi}</div>
+    </div>`;
+  });
+  r+=`</div>`;
+
+  // ══════════════════════════════════════════════════════
+  // 9. RAPPORT IA STRATEGIQUE — aide au medecin
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="margin-bottom:10px">
+    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">RAPPORT IA — AIDE AU MEDECIN</div>
+    <div id="aiFinal" style="min-height:60px">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px;background:var(--bg2);border-radius:12px">
+        <span class="spinner"></span>
+        <span style="font-size:12px;color:var(--dim)">Generation du rapport strategique personnalise...</span>
+      </div>
+    </div>
+  </div>`;
+
+  setTimeout(async()=>{
+    const ai=await requestAIReport();
+    const box=$('aiFinal');
+    if(!box)return;
+    if(ai&&(ai.diagnostic_resume||ai.summary)){
+      const tone=ai.tone||'cautious';
+      const tc=tone==='urgent'?'var(--red)':tone==='cautious'?'var(--orange)':'var(--green)';
+      const tLabel=tone==='urgent'?'URGENT':tone==='cautious'?'ATTENTION':'FAVORABLE';
+      let h2=`<div style="border:1px solid ${tc};border-radius:12px;overflow:hidden">
+        <div style="background:${tc};color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-weight:700;font-size:13px">Rapport IA — Claude</div>
+          <div style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.2)">${tLabel}</div>
+        </div>
+        <div style="padding:14px">`;
+
+      // Diagnostic resume
+      if(ai.diagnostic_resume) h2+=`<div style="font-size:12px;color:var(--txt);line-height:1.6;margin-bottom:12px">${ai.diagnostic_resume}</div>`;
+      else if(ai.summary) h2+=`<div style="font-size:12px;color:var(--txt);line-height:1.6;margin-bottom:12px">${ai.summary}</div>`;
+
+      // Synthese clinique
+      if(ai.synthese_clinique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">SYNTHESE CLINIQUE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.synthese_clinique}</div></div>`;
+
+      // Points positifs
+      const pos=ai.points_positifs||ai.positive_points;
+      if(pos?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">POINTS FAVORABLES</div>${pos.map(p2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">+ ${p2}</div>`).join('')}</div>`;
+
+      // Risques identifies
+      const risks=ai.risques_identifies||ai.key_risks;
+      if(risks?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">RISQUES IDENTIFIES</div>${risks.map(r2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">! ${r2}</div>`).join('')}</div>`;
+
+      // Plan therapeutique IA
+      const plan=ai.plan_therapeutique||ai.priority_actions;
+      if(plan?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">PLAN THERAPEUTIQUE RECOMMANDE</div>${plan.map((a2,i)=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">${i+1}. ${a2}</div>`).join('')}</div>`;
+
+      // Pharmacologie
+      if(ai.recommandation_pharmacologique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px">PHARMACOLOGIE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.recommandation_pharmacologique}</div></div>`;
+
+      // Suivi propose
+      if(ai.suivi_propose) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">SUIVI PROPOSE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.suivi_propose}</div></div>`;
+
+      // Conseils personnalises
+      const tips=ai.conseils_patient||ai.lifestyle_tips;
+      if(tips?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">CONSEILS PATIENT</div>${tips.map(l=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">→ ${l}</div>`).join('')}</div>`;
+
+      // Attention medicale
+      const med=ai.attention_medicale||ai.medical_attention;
+      if(med) h2+=`<div style="padding:8px 10px;background:var(--red-bg);border-radius:8px;font-size:11px;color:var(--red);font-weight:600">${med}</div>`;
+
+      h2+=`</div></div>`;
+      box.innerHTML=h2;
+    } else {
+      box.innerHTML=`<div style="padding:12px;background:var(--bg2);border-radius:10px;font-size:11px;color:var(--dim3);text-align:center">Rapport IA non disponible. Verifiez la connexion.</div>`;
+    }
+  },300);
+
+  // ══════════════════════════════════════════════════════
+  // 10. QUANTIFICATION DETAILLEE (collapse)
+  // ══════════════════════════════════════════════════════
+  r+=`<details style="margin-bottom:10px;background:var(--bg2);border-radius:12px;overflow:hidden">
+    <summary style="padding:12px 14px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer">Quantification detaillee (sD = ${S.sD}/100)</summary>
+    <div style="padding:0 14px 14px">`;
   const dd=S.details;
-  // Afficher par groupe CLEO
   ['C','E','O','L'].forEach(grp=>{
-    const grpLabel = grp==='C'?'Clinique (C = '+S.scoreC+'/50)':grp==='E'?'Exposome (E = '+S.scoreE+'/45)':grp==='O'?'Occupationnel (O = '+S.scoreO+'/10)':'Lifestyle (L = '+S.scoreL+'/10)';
+    const grpLabel=grp==='C'?'Clinique (C='+S.scoreC+'/50)':grp==='E'?'Exposome (E='+S.scoreE+'/45)':grp==='O'?'Occup. (O='+S.scoreO+'/10)':'Lifestyle (L='+S.scoreL+'/10)';
     const grpKeys=Object.keys(dd).filter(k=>dd[k].grp===grp&&!k.startsWith('_'));
-    if(grpKeys.length===0) return;
-    r+=`<div class="contrib-grp" style="margin:10px 0 4px;font-weight:700;color:var(--accent);font-size:13px">${grpLabel}</div>`;
+    if(grpKeys.length===0)return;
+    r+=`<div style="margin:8px 0 4px;font-weight:700;color:var(--accent);font-size:12px">${grpLabel}</div>`;
     grpKeys.sort((a,b)=>dd[b].pts-dd[a].pts);
     grpKeys.forEach(k=>{
-      const v=dd[k]; if(v.max===0) return;
+      const v=dd[k];if(v.max===0)return;
       const pct=Math.round(v.pts/v.max*100);
       const col=pct>=70?'var(--red)':pct>=40?'var(--orange)':'var(--green)';
       r+=`<div class="contrib-row"><div class="contrib-name">${v.label} <span class="contrib-ref">${v.ref||''}</span></div>
@@ -1585,131 +1816,14 @@ function renderFinal(){
         <div class="contrib-pts" style="color:${col}">${v.pts}/${v.max}</div></div>`;
     });
   });
-  r+=`</div>`;
+  r+=`</div></details>`;
 
-  // ── 6. PONDERATION sf (si bio presente) ──
-  if(hasBio){
-    r+=`<div class="sec"><div class="sec-tt">Integration Biologique — sf = ${t}/100</div>
-      <div class="mrow">
-        <div class="mbox"><div class="mbox-lbl">sD</div><div class="mbox-val">${S.sD}</div><div class="mbox-sub">wDecl = ${S.wDecl.toFixed(2)}</div></div>
-        <div class="mbox"><div class="mbox-lbl">bioNorm</div><div class="mbox-val" style="color:var(--teal)">${S.bmn_b}</div><div class="mbox-sub">wBio = ${S.wBio.toFixed(2)}</div></div>
-        <div class="mbox"><div class="mbox-lbl">sf</div><div class="mbox-val" style="color:${cls.c}">${t}</div><div class="mbox-sub">final</div></div>
-      </div>
-      <div class="str-desc" style="font-size:11px;color:var(--dim2);margin:8px 0">
-        sf = ${S.wDecl.toFixed(2)}×${S.sD} + ${S.wBio.toFixed(2)}×${S.bmn_b} = ${(S.wDecl*S.sD+S.wBio*S.bmn_b).toFixed(1)}
-        ${S.bmn_b>80?' | BioEmergencyFloor actif (bio>80 → sf>='+Math.round(S.bmn_b*0.85)+')':''}
-        ${S.bInflam>0?' | bInflam = '+S.bInflam.toFixed(2)+' (amplification E +'+Math.round(S.bInflam*15)+'%)':''}
-      </div>
-    </div>`;
-  }
-
-  // ── 7. SANTE MENTALE ──
-  r+=`<div class="sec"><div class="sec-tt">Sante mentale — detail</div>
-    <div class="mrow">
-      <div class="mbox"><div class="mbox-lbl">PSS-10</div><div class="mbox-val" style="color:${pssT>=27?'var(--red)':pssT>=20?'var(--orange)':pssT>=14?'var(--accent)':'var(--green)'}">${pssT}/40</div>
-        <div class="mbox-sub">${pssT>=27?'Tres eleve':pssT>=20?'Eleve':pssT>=14?'Modere':'Faible'}</div></div>
-      <div class="mbox"><div class="mbox-lbl">PHQ-9</div><div class="mbox-val" style="color:${phqT>=20?'var(--red)':phqT>=15?'var(--orange)':phqT>=10?'var(--accent)':'var(--green)'}">${phqT}/27</div>
-        <div class="mbox-sub">${phqT>=20?'Severe':phqT>=15?'Mod-severe':phqT>=10?'Modere':phqT>=5?'Leger':'Normal'}</div></div>
-      <div class="mbox"><div class="mbox-lbl">BES</div><div class="mbox-val" style="color:${S.bes>=5?'var(--red)':S.bes>=3?'var(--orange)':'var(--green)'}">${S.bes}/8</div>
-        <div class="mbox-sub">${S.bes>=5?'Severe':S.bes>=3?'Modere':'Leger'}</div></div>
-    </div></div>`;
-
-  // ── 8. SII DETAIL ──
-  const siiItems=[
-    {l:'Stress PSS ratio >= 35%', v:(getPssTotal()/40)>=0.35},
-    {l:'Activite physique < 75 min/sem', v:(S.ap.cardio+S.ap.muscu+S.ap.marche*3.5)<75},
-    {l:'IMC >= seuil obesite ethnique', v:S.imc>=(ETH[S.ethnie]||ETH.eu).ob},
-    {l:'Tabagisme actif (>= 10 cig/j)', v:S.tabac>=3},
-    {l:'Alimentation desequilibree (DQI >= 20)', v:(S.alim.ultra+S.alim.sucre_boisson+S.alim.sucre_solide+S.alim.fibres+S.alim.portions+S.alim.repas+S.alim.grignotage+S.alim.fast_food+S.alim.cuisine+S.alim.eau)>=20},
-    {l:'Insomnie moderee+ (ISI >= 15)', v:S.isi>=15},
-    {l:'Tour taille > seuil ethnique', v:S.tt>(S.sexe==='f'?(ETH[S.ethnie]||ETH.eu).tf:(ETH[S.ethnie]||ETH.eu).tm)}
-  ];
-  r+=`<div class="sec"><div class="sec-tt">SII — Sous-Index Inflammatoire (${S.sii}/7)</div>
-    <div class="str-desc">Chaque critere binaire positif = +1 point. SII >= 2 declenche le bilan biologique P5 meme en risque FAIBLE.</div>
-    <div class="sii-grid">
-      ${siiItems.map(x=>`<div class="sii-item ${x.v?'on':'off'}"><span class="sii-dot" style="background:${x.v?'var(--red)':'var(--green)'}"></span>${x.l}</div>`).join('')}
-    </div></div>`;
-
-  // ── 9. PROJECTION MARKOV 10 ANS ──
-  r+=`<div class="sec"><div class="sec-tt">Projection Markov — 10 ans</div>
-    <div class="markov-sub">Matrice 6x6: P_ij × exp(0.68 × sf/100) × exp(0.35 × K_norm/100) | Ref: NEJM 1995 Leibel, NEJM 2011 Sumithran</div>`;
-  mk.prob.forEach((p,i)=>{
-    const pct=(p*100).toFixed(1);
-    r+=`<div class="mk-row"><div class="mk-lbl" style="color:${colors[i]}">${MK_ST[i]}${i===mk.cs?' (actuel)':''}</div>
-      <div class="mk-bar"><div class="mk-fill" style="width:${pct}%;background:${colors[i]}"></div></div>
-      <div class="mk-pct" style="color:${colors[i]}">${pct}%</div></div>`;
-  });
-  r+=`<div class="mk-total">P(obesite a 10 ans) = <b style="color:var(--red)">${pObes}%</b></div></div>`;
-
-  // ── 10. ENVIRONNEMENT & TRAVAIL ──
-  r+=`<div class="sec"><div class="sec-tt">Environnement et travail</div>
-    <div class="mrow c2">
-      <div class="mbox"><div class="mbox-lbl">Exposome auto</div><div class="mbox-val" style="color:${S.scoreE>=20?'var(--red)':S.scoreE>=10?'var(--orange)':'var(--green)'}">${S.scoreE}</div><div class="mbox-sub">/45 (air+temp+UV+trajet+perturbateurs)</div></div>
-      <div class="mbox"><div class="mbox-lbl">Occupationnel</div><div class="mbox-val" style="color:${S.scoreO>=6?'var(--red)':S.scoreO>=3?'var(--orange)':'var(--green)'}">${S.scoreO}</div><div class="mbox-sub">/10 (Karasek/retraite)</div></div>
-    </div>`;
-  if(S.airData){
-    const aq=aqiLabel(S.airData.us_aqi);
-    r+=`<div class="res-aqi"><div class="res-aqi-left"><div class="res-aqi-city">${S.geo?.name||'--'}</div><div class="res-aqi-detail">PM2.5: ${S.airData.pm2_5?.toFixed(1)??'--'} | NO2: ${S.airData.nitrogen_dioxide?.toFixed(1)??'--'} | O3: ${S.airData.ozone?.toFixed(1)??'--'}</div></div>
-      <div class="res-aqi-right"><div class="res-aqi-num" style="color:${aq.c}">${S.airData.us_aqi||'--'}</div><div class="res-aqi-lbl" style="color:${aq.c}">${aq.l}</div></div></div>`;
-  }
-  if(S.commuteDist!=null){
-    r+=`<div class="res-commute">Trajet domicile-travail: <b>${S.commuteDist.toFixed(1)} km</b> | Score distance: ${S.work.dist}/5</div>`;
-  }
-  r+=`</div>`;
-
-  // ── 11. ORDONNANCE BIOLOGIQUE ──
-  r+=`<div class="sec"><div class="sec-tt">Prescription Biologique</div>
-    <div class="str-card" style="border-left-color:${bioPrx.color}">
-      <div class="str-tt" style="color:${bioPrx.color}">${bioPrx.tier}</div>
-      <div class="str-desc">${bioPrx.desc}</div>
-      <div class="str-desc" style="margin-top:4px"><b>Declencheur:</b> sD = ${bioPrx.sD}/100 (${bioPrx.cls}) | SII = ${bioPrx.sii}/7${S.indepCrit?' | Critere independant':''}</div>
-      ${bioPrx.panel.length?`<div class="ordo-panel"><div class="ordo-title">Examens a prescrire :</div>
-        <div class="ordo-list">${bioPrx.panel.map((m,i)=>`<div class="ordo-item"><span class="ordo-num">${i+1}</span>${m}</div>`).join('')}</div></div>`
-        :'<div class="str-desc" style="color:var(--green)">Pas de bilan obligatoire. Envisager P5 si premiere visite ou bilan > 2 ans.</div>'}
-      <div class="str-desc" style="margin-top:4px;font-weight:600">Suivi: ${bioPrx.suivi}</div>
-    </div></div>`;
-
-  // ── 12. STRATEGIE THERAPEUTIQUE ──
-  r+=`<div class="sec"><div class="sec-tt">Strategie Therapeutique Personnalisee</div>`;
-  strats.forEach(s=>{
-    r+=`<div class="str-card" style="border-left-color:${s.color}">
-      <div class="str-tt" style="color:${s.color}">${s.title}</div>
-      ${s.actions?.length?`<ul class="str-list">${s.actions.map(a=>'<li>'+a+'</li>').join('')}</ul>`:''}
-      ${s.pharma?`<div class="str-pharma"><span style="color:${s.color}">Pharmacologie:</span> ${s.pharma}</div>`:''}
-      <div class="str-suivi"><b>Suivi:</b> ${s.suivi}</div>
-    </div>`;
-  });
-  r+=`</div>`;
-
-  // ── 13. INTERPRETATION IA ──
-  r+=`<div id="aiFinal"><div class="ai-loading"><span class="spinner"></span> Interpretation IA personnalisee en cours...</div></div>`;
-  setTimeout(async()=>{
-    const ai=await requestAIInterpret();
-    const box=$('aiFinal');
-    if(!box)return;
-    if(ai&&ai.summary){
-      const tone=ai.tone||'cautious';
-      const tc=tone==='urgent'?'var(--red)':tone==='cautious'?'var(--orange)':'var(--green)';
-      let h2=`<div class="ai-final-card" style="border-color:${tc}">
-        <div class="ai-hd"><span class="ai-tag">Interpretation IA Claude</span></div>
-        <div class="ai-summary">${ai.summary}</div>`;
-      if(ai.positive_points?.length) h2+=`<div class="ai-section"><b style="color:var(--green)">Points positifs</b>${ai.positive_points.map(p2=>`<div class="ai-item green">${p2}</div>`).join('')}</div>`;
-      if(ai.key_risks?.length) h2+=`<div class="ai-section"><b style="color:var(--red)">Risques identifies</b>${ai.key_risks.map(r2=>`<div class="ai-item red">${r2}</div>`).join('')}</div>`;
-      if(ai.priority_actions?.length) h2+=`<div class="ai-section"><b style="color:var(--accent)">Actions prioritaires</b>${ai.priority_actions.map(a2=>`<div class="ai-item blue">${a2}</div>`).join('')}</div>`;
-      if(ai.lifestyle_tips?.length) h2+=`<div class="ai-section"><b style="color:var(--teal)">Conseils personnalises</b>${ai.lifestyle_tips.map(l=>`<div class="ai-item teal">${l}</div>`).join('')}</div>`;
-      if(ai.medical_attention) h2+=`<div class="ai-medical">${ai.medical_attention}</div>`;
-      h2+=`</div>`;
-      box.innerHTML=h2;
-    } else {
-      box.innerHTML='';
-    }
-  },200);
-
-  // ── 14. REFERENCES ──
-  r+=`<div class="res-refs">
-    <div class="res-refs-title">References internationales</div>
-    <div class="res-refs-list">OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES | AUDIT-C | Lancet 2016 (Global BMI Mortality) | BMJ Open 2016 (WHtR) | Lancet 2010 (MetS) | NEJM 1995 (Leibel) | NEJM 2011 (Sumithran) | SCORE2/Framingham | INTERHEART | DPP | DiaRem | Biswas 2015 | Cappuccio 2008 | Aubin 2012 | Lane 2024 | CAMS/Copernicus | Karasek | Brook 2010 | ERFC Lancet 2010 | CTT 2010 | CKD-PC 2010</div>
-    <div class="res-refs-algo">Score BMN v3.0 — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 — Bach | Manos | Noel</div>
+  // ══════════════════════════════════════════════════════
+  // 11. REFERENCES
+  // ══════════════════════════════════════════════════════
+  r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
+    <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | Biswas 2015 | Cappuccio 2008 | Aubin 2012 | CAMS | Brook 2010 | ERFC 2010 | CTT 2010 | CKD-PC 2010<br>
+    <b>Score BMN v3.0</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 — Bach | Manos | Noel
   </div>`;
 
   return r;
