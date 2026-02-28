@@ -5,7 +5,7 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v2.0 AI+Geo' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v3.0 AI+Geo' }))
 
 // ─── GEO PROXY: Geocoding via Nominatim ───
 app.get('/api/geo/search', async (c) => {
@@ -116,7 +116,7 @@ app.post('/api/ai/analyze', async (c) => {
     const { profile, question } = body
 
     const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v2.0 (Bach-Manos-Noel).
+Tu analyses le profil d'un patient dans le cadre du Score BMN v3.0 (Bach-Manos-Noel).
 Ton role:
 1. Adapter les questions du questionnaire au profil du patient
 2. Expliquer en langage simple les resultats et risques
@@ -181,7 +181,7 @@ app.post('/api/ai/interpret', async (c) => {
     const { scores, profile } = body
 
     const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
-Tu interpretes les resultats du Score BMN v2.0 pour un patient.
+Tu interpretes les resultats du Score BMN v3.0 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
 IMPORTANT: Reponds en JSON:
 {
@@ -243,8 +243,8 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v2.0 - Evaluez votre risque metabolique avec intelligence artificielle.">
-<title>Score BMN v2.0</title>
+<meta name="description" content="Score BMN v3.0 - Evaluez votre risque metabolique avec intelligence artificielle.">
+<title>Score BMN v3.0</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">
