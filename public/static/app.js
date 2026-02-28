@@ -688,18 +688,15 @@ const SCR=[
   },
 
   // ════════════════════════════════════════════════════════════════
-  // 15: SCORE DECLARATIF sD + CLASSIFICATION + STRATEGIE BIO
-  // C'est ICI qu'on etablit le premier score et qu'on definit
-  // la strategie de prescription biologique
+  // 15: SCORE DECLARATIF sD + CLASSIFICATION + PRESCRIPTION BIO
+  // Score ESR visible en entier, puis ordonnance biologique
   // ════════════════════════════════════════════════════════════════
   ()=>{
     calc();
     const cls=getClass(S.sD);
     const bioPrx=getBioPrescription();
-    const ctiInfo=getCTILabel(S.cti);
-    const griInfo=getGRILabel(S.gri);
 
-    // SII items detail
+    // SII items
     const e=ETH[S.ethnie]||ETH.eu;
     const ttSeuil=S.sexe==='f'?e.tf:e.tm;
     const apT=S.ap.cardio+S.ap.muscu+S.ap.marche*3.5;
@@ -715,58 +712,70 @@ const SCR=[
     ];
 
     let html=`<div class="s-emoji">sD</div>
-    <div class="s-title">Score Declaratif & Strategie Biologique</div>
-    <div class="s-sub">Votre score declaratif est calcule a partir de vos reponses (C+E+O+L). Il determine votre <b>classification de risque</b> et la <b>strategie de prescription biologique</b>. <span class="ref">BSD v4.9</span></div>`;
+    <div class="s-title">Score Declaratif & Prescription Biologique</div>
+    <div class="s-sub">Score calcule sans biologie (C+E+O+L). Il definit votre <b>niveau de risque</b> et la <b>prescription biologique</b>. <span class="ref">BSD v4.9</span></div>`;
 
-    // HERO sD
-    html+=`<div class="res-hero" style="background:${cls.bg}">
-      <div class="res-num" style="color:${cls.c}">${S.sD}<span class="res-max">/100</span></div>
-      <div class="res-lv" style="color:${cls.c}">${S.classDecl}</div>
-      <div class="res-tier" style="color:${cls.c}">Score Declaratif (sans biologie)</div>
-    </div>`;
-
-    // Decomposition CLEO
-    html+=`<div class="mrow" style="margin:12px 0">
-      <div class="mbox"><div class="mbox-lbl">C</div><div class="mbox-val" style="color:var(--accent)">${S.scoreC}</div><div class="mbox-sub">/50 clinique</div></div>
-      <div class="mbox"><div class="mbox-lbl">E</div><div class="mbox-val" style="color:${S.scoreE>15?'var(--orange)':'var(--green)'}">${S.scoreE}</div><div class="mbox-sub">/45 exposome</div></div>
-      <div class="mbox"><div class="mbox-lbl">O</div><div class="mbox-val">${S.scoreO}</div><div class="mbox-sub">/10 occup.</div></div>
-      <div class="mbox"><div class="mbox-lbl">L</div><div class="mbox-val">${S.scoreL}</div><div class="mbox-sub">/10 lifestyle</div></div>
-    </div>`;
-
-    // SII grille
-    html+=`<div class="sec"><div class="sec-tt">SII — Sous-Index Inflammatoire (${S.sii}/7)</div>
-      <div class="sii-grid">${siiItems.map(x=>`<div class="sii-item ${x.v?'on':'off'}"><span class="sii-dot" style="background:${x.v?'var(--red)':'var(--green)'}"></span>${x.l}</div>`).join('')}</div>
-      ${S.sii>=2?'<div class="auto-filled orange" style="margin-top:8px">SII >= 2 : bilan biologique P5 obligatoire meme en risque FAIBLE</div>':''}
-      ${S.indepCrit?'<div class="auto-filled orange" style="margin-top:4px">Critere independant present (age >= 40, ATCD fam, ou comorbidite) : P5 recommande</div>':''}
-    </div>`;
-
-    // CTI / GRI rapide
-    html+=`<div class="mrow" style="margin:8px 0">
-      <div class="mbox"><div class="mbox-lbl">CTI</div><div class="mbox-val" style="color:${ctiInfo.c}">${S.cti}</div><div class="mbox-sub">${ctiInfo.l}</div></div>
-      <div class="mbox"><div class="mbox-lbl">GRI</div><div class="mbox-val" style="color:${griInfo.c}">${S.gri.toFixed(1)}</div><div class="mbox-sub">${griInfo.l}</div></div>
-      <div class="mbox"><div class="mbox-lbl">K</div><div class="mbox-val" style="color:${S.bmn_k>20?'var(--red)':'var(--orange)'}">${S.bmn_k}</div><div class="mbox-sub">/50 comorb.</div></div>
-    </div>`;
-
-    // ══ ORDONNANCE BIOLOGIQUE ══
-    html+=`<div class="sec"><div class="sec-tt">Prescription Biologique — Ordonnance</div>
-      <div class="str-card" style="border-left-color:${bioPrx.color}">
-        <div class="str-tt" style="color:${bioPrx.color}">${bioPrx.tier}</div>
-        <div class="str-desc">${bioPrx.desc}</div>
-        <div class="str-desc" style="margin-top:4px"><b>Logique :</b> sD = ${S.sD} (${S.classDecl}) | SII = ${S.sii}/7 ${S.indepCrit?'| Critere independant':''}
-          → Panel <b>${S.panelLvl>0?'P'+S.panelLvl:'optionnel'}</b></div>
-        ${bioPrx.panel.length?`<div class="ordo-panel"><div class="ordo-title">Examens a prescrire :</div>
-          <div class="ordo-list">${bioPrx.panel.map((m,i)=>`<div class="ordo-item"><span class="ordo-num">${i+1}</span>${m}</div>`).join('')}</div></div>`
-          :'<div class="str-desc" style="color:var(--green)">Pas de bilan obligatoire. Envisager P5 si premiere visite ou bilan > 2 ans.</div>'}
-        <div class="str-desc" style="margin-top:6px;font-weight:600">Suivi recommande : ${bioPrx.suivi}</div>
+    // ══ HERO SCORE — compact ══
+    html+=`<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:16px;background:${cls.bg};margin:8px 0">
+      <div style="text-align:center;min-width:90px">
+        <div style="font-size:42px;font-weight:800;color:${cls.c};line-height:1">${S.sD}</div>
+        <div style="font-size:12px;color:${cls.c};opacity:.7">/100</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;color:${cls.c};margin-bottom:2px">${S.classDecl}</div>
+        <div style="font-size:11px;color:${cls.c};opacity:.8">Score Declaratif (sans biologie)</div>
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">C ${S.scoreC}/50</span>
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">E ${S.scoreE}/45</span>
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">O ${S.scoreO}/10</span>
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">L ${S.scoreL}/10</span>
+        </div>
       </div>
     </div>`;
 
-    // Explication du flux
-    html+=`<div class="str-desc" style="font-size:11px;color:var(--dim2);margin:8px 0;padding:10px;background:var(--bg2);border-radius:8px">
-      <b>Flux algorithmique :</b> Ce score declaratif (sD) est base uniquement sur vos reponses. 
-      A l'etape suivante, vous pourrez entrer vos resultats biologiques. La biologie sera alors 
-      <b>integree dynamiquement</b> (sf = wDecl×sD + wBio×bioNorm) selon la methodologie BSD v4.7.1, 
-      avec des filets de securite (BioFloor 75%, BioEmergencyFloor 85%) et une triade inflammatoire.
+    // ══ SII compact (une ligne) ══
+    html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:10px;margin:6px 0">
+      <span style="font-weight:700;font-size:12px;color:${S.sii>=3?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)'}">SII ${S.sii}/7</span>
+      <div style="display:flex;gap:3px;flex:1;flex-wrap:wrap">${siiItems.map(x=>`<span style="width:8px;height:8px;border-radius:50%;background:${x.v?'var(--red)':'var(--green)'}" title="${x.l}"></span>`).join('')}</div>
+      ${S.sii>=2?'<span style="font-size:10px;color:var(--orange);font-weight:600">→ Bio P5 obligatoire</span>':''}
+    </div>`;
+
+    // ══ ORDONNANCE BIOLOGIQUE — mise en evidence ══
+    html+=`<div style="margin-top:10px;border:2px solid ${bioPrx.color};border-radius:14px;overflow:hidden">
+      <div style="background:${bioPrx.color};color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:16px;font-weight:800">ORDONNANCE BIOLOGIQUE</div>
+          <div style="font-size:12px;opacity:.9">${bioPrx.tier}</div>
+        </div>
+        <div style="font-size:24px;font-weight:800">P${S.panelLvl>0?S.panelLvl:'0'}</div>
+      </div>
+      <div style="padding:12px 16px">
+        <div style="font-size:12px;color:var(--dim);margin-bottom:8px">${bioPrx.desc}</div>
+        <div style="font-size:11px;color:var(--dim2);margin-bottom:10px"><b>Logique :</b> sD = ${S.sD} (${S.classDecl}) | SII = ${S.sii}/7 ${S.indepCrit?'| Critere independant':''} → Panel <b>P${S.panelLvl>0?S.panelLvl:'optionnel'}</b></div>`;
+
+    if(bioPrx.panel.length){
+      html+=`<div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--txt)">Examens a prescrire :</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">`;
+      bioPrx.panel.forEach((m,i)=>{
+        html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border-radius:6px;font-size:11px">
+          <span style="min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${bioPrx.color};color:#fff;font-size:9px;font-weight:700">${i+1}</span>
+          <span>${m}</span>
+        </div>`;
+      });
+      html+=`</div>`;
+    } else {
+      html+=`<div style="color:var(--green);font-size:12px;padding:8px;background:var(--green-bg);border-radius:8px">Pas de bilan obligatoire. Envisager P5 si premiere visite ou bilan &gt; 2 ans.</div>`;
+    }
+
+    html+=`<div style="margin-top:10px;padding:8px 10px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--dim2)">
+          <b>Suivi recommande :</b> ${bioPrx.suivi}
+        </div>
+      </div>
+    </div>`;
+
+    // Petite note de flux
+    html+=`<div style="font-size:10px;color:var(--dim3);margin-top:8px;text-align:center">
+      Etape suivante → Saisie des resultats biologiques → Integration dynamique (sf = wDecl×sD + wBio×bioNorm)
     </div>`;
 
     html+=`<div id="aiBox15"></div>`;
