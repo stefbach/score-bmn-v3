@@ -309,6 +309,19 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 .sec-tt{font-size:9px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .sec-tt::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
 
+/* ═══ PSS-10 / PHQ-9 ITEMS ═══ */
+.pss-item{padding:14px}
+.pss-q{font-size:13px;color:var(--white);line-height:1.55;margin:4px 0 3px;font-weight:500}
+.pss-tip{font-size:10px;color:var(--dim2);margin-bottom:8px;font-style:italic}
+.pss-opts{display:flex;gap:4px;flex-wrap:wrap}
+.pss-opt{flex:1;min-width:55px;padding:8px 4px;border-radius:10px;background:var(--glass2);border:2px solid var(--border);cursor:pointer;text-align:center;transition:all .15s var(--ease)}
+.pss-opt:active{transform:scale(.94)}
+.pss-opt.sel{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 2px rgba(97,130,248,.08)}
+.pss-opt-n{display:block;font-family:var(--mono);font-size:16px;font-weight:800;color:var(--dim)}
+.pss-opt.sel .pss-opt-n{color:var(--accent2)}
+.pss-opt-l{display:block;font-size:8px;color:var(--dim3);margin-top:1px;line-height:1.2;font-weight:500}
+.pss-opt.sel .pss-opt-l{color:var(--accent)}
+
 /* ═══ SPINNER ═══ */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -322,8 +335,10 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
   .hdr,.bnav,.pgbar{display:none}
   .scr{position:static;padding:20px;overflow:visible;animation:none!important}
   .scr>*{animation:none!important}
-  .fc,.cm-card,.opt{background:#f5f5f5;border-color:#ddd;backdrop-filter:none}
+  .fc,.cm-card,.opt,.pss-item{background:#f5f5f5;border-color:#ddd;backdrop-filter:none}
   .res-hero{background:#eef2ff!important}.res-hero::before{display:none}
   .ai-bubble,.ai-final-card{background:#f0f4ff;border-color:#ccc}
   .ai-loading{display:none}
+  .pss-opt{background:#f0f0f0;border-color:#ccc}
+  .pss-opt.sel{background:#dde5ff;border-color:#6182f8}
 }
