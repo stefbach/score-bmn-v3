@@ -832,16 +832,17 @@ const SCR=[
   },
 
   // ════════════════════════════════════════════════════════════════
-  // 16: BIOLOGIE — Methodologie BSD v4.7.1
-  // z-score lineaire borne [0,1] × poids HR-concordants
-  // bioNorm = (Σ(z_i × w_i) / Σ(w_i)) × 100 (denominateur adaptatif)
-  // Triade inflammatoire : bInflam = moy(z_crphs, z_tghdl, z_homaIR)
-  // Retro-validation en temps reel
+  // 16: BIOLOGIE — Biomarqueurs prescrits + Simulation de profils
+  // Liste = uniquement les marqueurs de l'ordonnance (P5/P10/P15)
+  // Module de simulation pour tester differents profils biologiques
+  // Methodologie BSD v4.7.1 : z-score lineaire, poids HR, bioNorm
   // ════════════════════════════════════════════════════════════════
   ()=>{
     calc();
     const pl=getPanelLvl();
-    const markers=BIO.filter(m=>m.t<=Math.max(5,pl));
+    const bioPrx=getBioPrescription();
+    // Filtrer les BIO par panel prescrit (pas Math.max(5,pl) — uniquement ceux prescrits)
+    const markers=pl>0 ? BIO.filter(m=>m.t<=pl) : BIO.filter(m=>m.t<=5);
 
     // Compute z-scores pour affichage jauge
     const zDisplay={};
@@ -854,70 +855,124 @@ const SCR=[
       zDisplay[m.id]=Math.max(0,Math.min(1,z));
     });
 
-    // Count filled
     const filled=BIO.filter(m=>S.bioValues[m.id]!==undefined&&S.bioValues[m.id]!==null).length;
 
     let html=`<div class="no-rise-children">
     <div class="s-emoji">Bio</div>
-    <div class="s-title">Resultats Biologiques</div>
-    <div class="s-sub">Entrez vos resultats de prise de sang. Chaque marqueur est normalise en z-score [0-1] et pondere par son Hazard Ratio publie.
-      Panel prescrit: <b>${pl<=0?'Optionnel':pl<=5?'P5 ('+markers.length+' marqueurs)':pl<=10?'P10 ('+markers.length+' marqueurs)':'P15 ('+markers.length+' marqueurs)'}</b>.
-      <span class="ref">BSD v4.7.1</span> <span class="ref">SCORE2</span></div>`;
+    <div class="s-title">Fiche Biologique — Biomarqueurs Prescrits</div>
+    <div class="s-sub">Saisissez les resultats de l'ordonnance prescrite a l'etape precedente, ou utilisez la <b>simulation</b> pour tester un profil biologique.
+      <span class="ref">BSD v4.7.1</span></div>`;
 
-    // bioNorm live
+    // ══ RAPPEL ORDONNANCE ══
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1.5px solid ${bioPrx.color};margin-bottom:10px">
+      <div style="min-width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${bioPrx.color};color:#fff;font-weight:800;font-size:14px">P${pl>0?pl:'?'}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:${bioPrx.color}">${bioPrx.tier}</div>
+        <div style="font-size:10px;color:var(--dim2)">${markers.length} biomarqueurs a renseigner | sD = ${S.sD} (${S.classDecl})</div>
+      </div>
+    </div>`;
+
+    // ══ MODULE SIMULATION DE PROFILS ══
+    html+=`<div style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">SIMULATION — Profils biologiques</div>
+      <div style="font-size:10px;color:var(--dim2);margin-bottom:8px">Pre-remplir les ${markers.length} biomarqueurs avec un profil type pour estimer l'impact sur le score final.</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+        <button onclick="applyBioProfile('normal')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
+          Normal<br><span style="font-weight:400;font-size:9px;opacity:.8">Tous dans les normes</span>
+        </button>
+        <button onclick="applyBioProfile('borderline')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
+          Limite<br><span style="font-weight:400;font-size:9px;opacity:.8">Valeurs frontieres</span>
+        </button>
+        <button onclick="applyBioProfile('elevated')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--red);background:var(--red-bg);color:var(--red);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
+          Eleve<br><span style="font-weight:400;font-size:9px;opacity:.8">Marqueurs anormaux</span>
+        </button>
+        <button onclick="applyBioProfile('critical')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--purple);background:var(--purple-bg);color:var(--purple);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
+          Critique<br><span style="font-weight:400;font-size:9px;opacity:.8">Desequilibre majeur</span>
+        </button>
+      </div>
+      <button onclick="applyBioProfile('reset')" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--dim);font-weight:600;font-size:11px;cursor:pointer;font-family:var(--font)">
+        Effacer tout (reset)
+      </button>
+    </div>`;
+
+    // ══ bioNorm LIVE ══
     if(filled>0){
       const cls=getClass(S.bmn_b);
-      html+=`<div class="res-hero" style="background:${cls.bg};padding:12px">
-        <div class="res-num" style="color:${cls.c};font-size:32px">${S.bmn_b}<span class="res-max" style="font-size:14px">/100</span></div>
-        <div class="res-lv" style="color:${cls.c};font-size:13px">bioNorm (${filled} marqueurs renseignes)</div>
-        <div style="font-size:11px;color:var(--dim2);margin-top:4px">bioNorm = (Σ z_i×w_i / Σ w_i) × 100 | Denominateur adaptatif</div>
+      html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:${cls.bg};margin-bottom:10px">
+        <div style="text-align:center;min-width:60px">
+          <div style="font-size:28px;font-weight:800;color:${cls.c};font-family:'JetBrains Mono',monospace;line-height:1">${S.bmn_b}</div>
+          <div style="font-size:9px;color:${cls.c};opacity:.6">/100</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:600;color:${cls.c}">bioNorm (${filled}/${markers.length} renseignes)</div>
+          <div style="font-size:9px;color:var(--dim3)">bioNorm = (Σ z_i×w_i / Σ w_i) × 100</div>
+          ${S.bInflam>0?`<div style="font-size:9px;color:var(--orange);margin-top:2px">bInflam = ${S.bInflam.toFixed(2)} → E amplifiee +${Math.round(S.bInflam*15)}%</div>`:''}
+        </div>
       </div>`;
     }
 
-    // bInflam display
-    if(S.bInflam>0){
-      html+=`<div class="auto-filled ${S.bInflam>0.5?'orange':''}">Triade inflammatoire (bInflam) = ${S.bInflam.toFixed(2)} → Amplification Exposome +${Math.round(S.bInflam*15)}%</div>`;
-    }
-
-    // Markers input with z-score gauge
-    html+=`<div class="fc">`;
-    markers.forEach(m=>{
+    // ══ LISTE DES BIOMARQUEURS PRESCRITS ══
+    html+=`<div style="margin-bottom:8px">`;
+    markers.forEach((m,idx)=>{
       const v=S.bioValues[m.id];
       const z=zDisplay[m.id];
       const hasVal=v!==undefined&&v!==null;
       const zCol=!hasVal?'var(--dim3)':z>=0.7?'var(--red)':z>=0.3?'var(--orange)':'var(--green)';
+      const tierCol=m.t<=5?'var(--red)':m.t<=10?'var(--orange)':'var(--accent)';
 
-      html+=`<div class="bio-row">
-        <div class="bio-inf">
-          <div class="bio-nm">${m.n}${m.u?' <small>('+m.u+')</small>':''} <span style="color:var(--dim2);font-size:10px">w=${m.w}</span></div>
-          <div class="bio-rg">${m.l}: <span class="bio-ok">${m.nr}</span> / <span class="bio-bad">${m.ar}</span></div>
-          ${hasVal?`<div style="margin-top:3px;display:flex;align-items:center;gap:6px">
-            <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
-              <div style="width:${Math.round(z*100)}%;height:100%;background:${zCol};transition:width .3s"></div>
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;background:var(--bg2);border-radius:10px;border-left:3px solid ${tierCol}">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="font-size:12px;font-weight:700;color:var(--txt)">${m.n}</span>
+            ${m.u?`<span style="font-size:9px;color:var(--dim3)">(${m.u})</span>`:''}
+            <span style="font-size:8px;padding:1px 4px;border-radius:3px;background:${tierCol};color:#fff;font-weight:600">P${m.t}</span>
+          </div>
+          <div style="font-size:9px;color:var(--dim2)">${m.l} — Normal: <span style="color:var(--green)">${m.nr}</span> | Anormal: <span style="color:var(--red)">${m.ar}</span> | w=${m.w}</div>
+          ${hasVal?`<div style="margin-top:4px;display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
+              <div style="width:${Math.round(z*100)}%;height:100%;background:${zCol};border-radius:3px;transition:width .3s"></div>
             </div>
-            <span style="font-size:10px;color:${zCol};font-weight:700;min-width:32px">z=${z.toFixed(2)}</span>
+            <span style="font-size:10px;color:${zCol};font-weight:700;min-width:36px">z=${z.toFixed(2)}</span>
           </div>`:''}
         </div>
         <input type="number" class="bio-inp" id="bio_${m.id}" value="${v??''}" step="0.01" placeholder="--"
-          oninput="S.bioValues['${m.id}']=this.value===''?undefined:+this.value;calc();render(S.step,0);doRetro()">
-        <span class="bio-tier" style="background:${m.t<=5?'var(--red-bg);color:var(--red)':m.t<=10?'var(--orange-bg);color:var(--orange)':'var(--accent-bg);color:var(--accent)'}">P${m.t}</span>
+          style="width:72px;min-width:72px" oninput="S.bioValues['${m.id}']=this.value===''?undefined:+this.value;calc();render(S.step,0);doRetro()">
       </div>`;
     });
     html+=`</div>`;
 
-    // Retro-validation
+    // ══ Retro-validation ══
     html+=`<div id="retro"></div>`;
 
-    // Methodologie
-    html+=`<div style="margin-top:12px;padding:10px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--dim2)">
-      <b>Methodologie BSD v4.7.1 :</b><br>
-      • z-score lineaire borne [0,1] : z = (val-normal)/(anormal-normal), cap a 1<br>
-      • Poids (w) proportionnels aux HR publies (>3M participants, CTT, ERFC, CKD-PC, ADA)<br>
-      • bioNorm = (Σ z_i×w_i / Σ w_i) × 100 — denominateur adaptatif<br>
-      • Triade inflammatoire : bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR) → E** = E* × (1+0.15×bInflam)<br>
-      • Integration : sf = wDecl(0.65)×sD + wBio(0.35)×bioNorm, reponderation si gap > 20<br>
-      • BioFloor : sf ≥ 75% bioNorm | BEF : si bio>90, sf ≥ max(80, 85%×bio)
-    </div>`;
+    // ══ Impact sur le score final (preview) ══
+    if(filled>0){
+      const sfPreview=S.bmn_t;
+      const sfCls=getClass(sfPreview);
+      html+=`<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;margin-top:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:4px">Preview score final</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:20px;font-weight:800;color:${sfCls.c};font-family:'JetBrains Mono',monospace">${sfPreview}/100</div>
+          <div style="flex:1;font-size:10px;color:var(--dim2)">
+            sf = ${S.wDecl.toFixed(2)}×${S.sD} + ${S.wBio.toFixed(2)}×${S.bmn_b} = ${(S.wDecl*S.sD+S.wBio*S.bmn_b).toFixed(1)}
+            ${Math.abs(S.bmn_b-S.sD)>20?' (reponderation dynamique)':''}<br>
+            Classification: <b style="color:${sfCls.c}">${sfCls.l}</b>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // ══ Methodologie ══
+    html+=`<details style="margin-top:10px;background:var(--bg2);border-radius:10px;overflow:hidden">
+      <summary style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--dim2);cursor:pointer">Methodologie BSD v4.7.1</summary>
+      <div style="padding:0 14px 10px;font-size:10px;color:var(--dim3);line-height:1.5">
+        z-score lineaire borne [0,1] : z = (val-normal)/(anormal-normal), cap a 1<br>
+        Poids (w) proportionnels aux HR publies (>3M participants, CTT, ERFC, CKD-PC, ADA)<br>
+        bioNorm = (Σ z_i×w_i / Σ w_i) × 100 — denominateur adaptatif<br>
+        Triade inflammatoire : bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR) → E** = E* × (1+0.15×bInflam)<br>
+        Integration : sf = wDecl(0.65)×sD + wBio(0.35)×bioNorm, reponderation si gap > 20<br>
+        BioFloor : sf ≥ 75% bioNorm | BEF : si bio>90, sf ≥ max(80, 85%×bio)
+      </div>
+    </details>`;
 
     html+=`</div>`; // fin wrapper no-rise-children
     return html;
@@ -1551,6 +1606,59 @@ function doRetro(){
   el.innerHTML=fl.length
     ?fl.map(f=>`<div class="retro-alert" style="border-left-color:${f.c}"><span style="color:${f.c}">${f.t}</span></div>`).join('')
     :'<div class="retro-ok">Pas d\'incoherence detectee.</div>';
+}
+
+// ── SIMULATION PROFILS BIOLOGIQUES ──
+// Pre-remplit les biomarqueurs selon 4 profils types + reset
+// Valeurs basees sur les seuils nm/ab de chaque marqueur
+function applyBioProfile(profile){
+  const pl=getPanelLvl();
+  const markers=pl>0 ? BIO.filter(m=>m.t<=pl) : BIO.filter(m=>m.t<=5);
+
+  if(profile==='reset'){
+    BIO.forEach(m=>{ S.bioValues[m.id]=undefined; });
+    calc(); render(S.step,0); doRetro(); return;
+  }
+
+  // Profils de simulation — valeurs realistes par marqueur
+  // normal: toutes les valeurs dans la zone normale
+  // borderline: valeurs entre normal et anormal (z~0.3-0.5)
+  // elevated: valeurs franchement anormales (z~0.7-0.9)
+  // critical: valeurs tres anormales (z~0.9-1.0)
+  const profiles={
+    normal:{
+      homaIR:1.8, hba1c:5.2, glyc:4.8, crphs:0.5, tsh:2.0, ldl:2.4, hdl:1.4,
+      tg:1.2, adipon:14, asat:25, apob:0.7, ggt:30,
+      tghdl:1.2, urate:300, leptine:12
+    },
+    borderline:{
+      homaIR:3.2, hba1c:5.9, glyc:5.8, crphs:2.0, tsh:3.5, ldl:3.5, hdl:0.85,
+      tg:1.9, adipon:8, asat:48, apob:1.0, ggt:60,
+      tghdl:2.7, urate:385, leptine:28
+    },
+    elevated:{
+      homaIR:4.5, hba1c:6.8, glyc:7.5, crphs:4.0, tsh:6.0, ldl:4.5, hdl:0.65,
+      tg:2.5, adipon:5, asat:65, apob:1.3, ggt:85,
+      tghdl:3.8, urate:440, leptine:45
+    },
+    critical:{
+      homaIR:6.0, hba1c:8.2, glyc:10, crphs:8.0, tsh:10, ldl:5.5, hdl:0.5,
+      tg:3.5, adipon:3, asat:90, apob:1.6, ggt:120,
+      tghdl:5.0, urate:520, leptine:65
+    }
+  };
+
+  const vals=profiles[profile];
+  if(!vals) return;
+
+  // Appliquer uniquement aux marqueurs prescrits
+  markers.forEach(m=>{
+    if(vals[m.id]!==undefined){
+      S.bioValues[m.id]=vals[m.id];
+    }
+  });
+
+  calc(); render(S.step,0); doRetro();
 }
 
 // ════════════════════════════════════════════════════════════════
