@@ -326,6 +326,25 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ═══ SII GRID ═══ */
+.sii-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.sii-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--glass2);border:1px solid var(--border);font-size:11px;font-weight:500;color:var(--dim)}
+.sii-item.on{color:var(--red);background:var(--red-bg);border-color:rgba(240,107,107,.15)}
+.sii-item.off{color:var(--green);background:var(--green-bg);border-color:rgba(61,219,163,.10)}
+.sii-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ═══ ORDONNANCE / PRESCRIPTION ═══ */
+.ordo-panel{margin-top:10px;padding:12px;border-radius:12px;background:var(--glass2);border:1px solid var(--border2)}
+.ordo-title{font-size:11px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.ordo-list{display:flex;flex-direction:column;gap:4px}
+.ordo-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:12px;color:var(--white);border-bottom:1px solid var(--border)}
+.ordo-item:last-child{border-bottom:none}
+.ordo-num{width:22px;height:22px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent3);color:var(--accent2);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono)}
+
+/* ═══ STRATEGY PHARMA / SUIVI ═══ */
+.str-pharma{font-size:12px;padding:8px 10px;margin-top:8px;border-radius:8px;background:rgba(176,141,248,.06);border:1px solid rgba(176,141,248,.12);color:var(--purple2)}
+.str-suivi{font-size:11px;color:var(--dim);margin-top:6px}
+
 /* ═══ RESPONSIVE ═══ */
 @media(min-width:640px){#app{max-width:460px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}body{background:#000}}
 
