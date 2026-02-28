@@ -757,7 +757,9 @@ const SCR=[
       {l:'Tour taille > seuil', v:S.tt>ttSeuil}
     ];
 
-    let html=`<div class="s-emoji">sD</div>
+    // WRAPPER UNIQUE — empeche les animations rise par enfant de faire clignoter
+    let html=`<div class="no-rise-children">
+    <div class="s-emoji">sD</div>
     <div class="s-title">Score Declaratif & Prescription Biologique</div>
     <div class="s-sub">Score calcule sans biologie (C+E+O+L). Il definit votre <b>niveau de risque</b> et la <b>prescription biologique</b>. <span class="ref">BSD v4.9</span></div>`;
 
@@ -825,6 +827,7 @@ const SCR=[
     </div>`;
 
     html+=`<div id="aiBox15"></div>`;
+    html+=`</div>`; // fin du wrapper no-rise-children
     return html;
   },
 
@@ -839,7 +842,6 @@ const SCR=[
     calc();
     const pl=getPanelLvl();
     const markers=BIO.filter(m=>m.t<=Math.max(5,pl));
-    const allMarkers=BIO; // pour affichage conditionnel
 
     // Compute z-scores pour affichage jauge
     const zDisplay={};
@@ -855,7 +857,8 @@ const SCR=[
     // Count filled
     const filled=BIO.filter(m=>S.bioValues[m.id]!==undefined&&S.bioValues[m.id]!==null).length;
 
-    let html=`<div class="s-emoji">Bio</div>
+    let html=`<div class="no-rise-children">
+    <div class="s-emoji">Bio</div>
     <div class="s-title">Resultats Biologiques</div>
     <div class="s-sub">Entrez vos resultats de prise de sang. Chaque marqueur est normalise en z-score [0-1] et pondere par son Hazard Ratio publie.
       Panel prescrit: <b>${pl<=0?'Optionnel':pl<=5?'P5 ('+markers.length+' marqueurs)':pl<=10?'P10 ('+markers.length+' marqueurs)':'P15 ('+markers.length+' marqueurs)'}</b>.
@@ -916,11 +919,12 @@ const SCR=[
       • BioFloor : sf ≥ 75% bioNorm | BEF : si bio>90, sf ≥ max(80, 85%×bio)
     </div>`;
 
+    html+=`</div>`; // fin wrapper no-rise-children
     return html;
   },
 
   // 17: Final Result
-  ()=>{calc();return renderFinal();}
+  ()=>{calc();return '<div class="no-rise-children">'+renderFinal()+'</div>';}
 ];
 
 const NTOT=SCR.length;

@@ -53,6 +53,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 @keyframes outL{to{transform:translateX(-35px);opacity:0}}
 @keyframes outR{to{transform:translateX(35px);opacity:0}}
 .scr>*{animation:rise .4s var(--ease) both}
+.scr>.no-rise-children{animation:rise .3s var(--ease) both;animation-delay:0s}
+.scr>.no-rise-children>*{animation:none!important}
 .scr>:nth-child(1){animation-delay:.02s}.scr>:nth-child(2){animation-delay:.05s}.scr>:nth-child(3){animation-delay:.08s}.scr>:nth-child(4){animation-delay:.11s}.scr>:nth-child(5){animation-delay:.14s}.scr>:nth-child(6){animation-delay:.17s}.scr>:nth-child(7){animation-delay:.20s}.scr>:nth-child(8){animation-delay:.22s}.scr>:nth-child(9){animation-delay:.24s}.scr>:nth-child(10){animation-delay:.26s}.scr>:nth-child(11){animation-delay:.28s}.scr>:nth-child(12){animation-delay:.30s}.scr>:nth-child(13){animation-delay:.32s}.scr>:nth-child(14){animation-delay:.34s}.scr>:nth-child(15){animation-delay:.36s}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
