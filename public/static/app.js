@@ -386,6 +386,20 @@ async function requestAIReport(){
         classification:S.classFinal, classDecl:S.classDecl,
         panelLvl:S.panelLvl, bInflam:S.bInflam?.toFixed(2)
       },
+      glp1_profiling:(()=>{
+        const g=getGLP1Profile();
+        return{
+          profileCode:g.profileCode, profileName:g.profile.name,
+          grs:g.grs, ppeEstimate:g.ppeEstimate,
+          molecule:g.profile.molecule, doseCible:g.profile.doseCible,
+          axes:g.axes,
+          efficacyCount:g.efficacyFactors.length,
+          resistanceCount:g.resistanceFactors.length,
+          topEfficacy:g.efficacyFactors.slice(0,3).map(f=>f.t),
+          topResistance:g.resistanceFactors.slice(0,3).map(f=>f.t),
+          alternative:g.profile.alternative
+        };
+      })(),
       biologie:{present:hasBio, bioNorm:S.bmn_b, marqueurs:bioDetail, wDecl:S.wDecl, wBio:S.wBio},
       profil:{
         age:getAge(), sexe:S.sexe, ethnie:ETH[S.ethnie]?.n,
@@ -1498,6 +1512,319 @@ function getGRILabel(gri){
   return{l:'Faible',c:'var(--red)',d:'GLP-1 peu probable, chirurgie a envisager'};
 }
 
+// ════════════════════════════════════════════════════════════════
+// GLP-1 RESPONSE PROFILING ENGINE v2.0
+// Phenotypage complet multi-axes du patient pour predire:
+// 1. PROFIL de reponse (5 niveaux + contre-indication)
+// 2. MOLECULE recommandee (Semaglutide/Tirzepatide/Liraglutide)
+// 3. DOSE cible personnalisee
+// 4. % perte de poids attendue (PPE)
+// 5. Facteurs d'efficacite / resistance detailles
+// 6. Timeline de reponse
+// 7. Strategie si non-repondeur
+//
+// Ref: STEP 1-5 (Sema), SURMOUNT 1-4 (Tirze), SCALE (Lira),
+//      Lingvay 2024, Garvey 2023, Jastreboff 2022
+// ════════════════════════════════════════════════════════════════
+
+function getGLP1Profile(){
+  const gri=S.gri, cti=S.cti, sf=S.sf, imc=S.imc;
+  const age=getAge(), sr=getPssTotal()/40, phq=getPhqTotal();
+  const e=ETH[S.ethnie]||ETH.eu;
+  const hasBio=(S.bmn_b>0);
+  const v=S.bioValues;
+
+  // ── AXE 1: Score IR (Insulinoresistance) 0-10 ──
+  // Cle de la reponse GLP-1: plus l'IR est forte, meilleure est la reponse
+  let irScore=0;
+  if(v.homaIR!==undefined){
+    if(v.homaIR>=5) irScore+=4;
+    else if(v.homaIR>=4) irScore+=3;
+    else if(v.homaIR>=2.5) irScore+=2;
+    else irScore+=0.5; // normal = leger bonus (bonne sensibilite de base)
+  } else {
+    // Estimation IR sans biologie (proxy declaratif)
+    if(S.comorbIds.includes('dt2')) irScore+=3;
+    else if(S.comorbIds.includes('predmt')) irScore+=2;
+    else if(S.comorbIds.includes('mets')) irScore+=2;
+    else if(S.comorbIds.includes('ir_occ')) irScore+=2.5;
+    else if(imc>=e.ob+5) irScore+=1.5;
+    else if(imc>=e.ob) irScore+=1;
+  }
+  if(v.adipon!==undefined && v.adipon<6) irScore+=1.5;
+  else if(v.adipon!==undefined && v.adipon<10) irScore+=0.5;
+  if(v.tghdl!==undefined && v.tghdl>3.5) irScore+=1.5;
+  else if(v.tghdl!==undefined && v.tghdl>2.5) irScore+=0.5;
+  if(S.comorbIds.includes('sopk')) irScore+=1; // SOPK = IR feminine, tres bon repondeur
+  if(S.comorbIds.includes('nafld')) irScore+=1; // Steatose = IR hepatique
+  irScore=Math.min(10,irScore);
+
+  // ── AXE 2: Score Chronicite-Resistance 0-10 ──
+  // Plus c'est chronique, moins le GLP-1 sera efficace seul
+  let chronScore=0;
+  chronScore+=Math.min(3, cti/20); // CTI 0-100 → 0-3 (principal)
+  if(S.yoyo>=1) chronScore+=2; // Regimes yoyo = set-point deplace
+  if(S.enf_ob>=2) chronScore+=1.5; // Obesite enfance = programmation epigenetique
+  else if(S.enf_ob>=1) chronScore+=0.5;
+  if(v.leptine!==undefined && v.leptine>=40) chronScore+=2; // Leptinoresistance = barrage central
+  else if(v.leptine!==undefined && v.leptine>=25) chronScore+=1;
+  if(imc>=40) chronScore+=1.5; // Obesite severe = masse grasse resistante
+  else if(imc>=35) chronScore+=0.5;
+  chronScore=Math.min(10,chronScore);
+
+  // ── AXE 3: Score Inflammation 0-10 ──
+  // GLP-1 a un effet anti-inflammatoire, les patients inflammes repondent bien
+  let inflamScore=0;
+  if(v.crphs!==undefined){
+    if(v.crphs>=5) inflamScore+=3;
+    else if(v.crphs>=3) inflamScore+=2;
+    else if(v.crphs>=1) inflamScore+=1;
+  }
+  if(S.bInflam>0) inflamScore+=Math.min(3, S.bInflam*3);
+  if(S.sii>=4) inflamScore+=2;
+  else if(S.sii>=2) inflamScore+=1;
+  if(v.ggt!==undefined && v.ggt>=80) inflamScore+=1; // Inflammation hepatique
+  inflamScore=Math.min(10,inflamScore);
+
+  // ── AXE 4: Score Psycho-Comportemental 0-10 ──
+  // Depression/stress/BES severes diminuent l'observance et la reponse
+  let psychoScore=0;
+  if(phq>=20) psychoScore+=3; // Depression severe = mauvaise compliance
+  else if(phq>=15) psychoScore+=2;
+  else if(phq>=10) psychoScore+=1;
+  if(sr>=0.6) psychoScore+=2; // Stress extreme = cortisol → resistance
+  else if(sr>=0.35) psychoScore+=1;
+  if(S.bes>=5) psychoScore+=3; // BES severe = TCA actif, GLP-1 peut aider mais limitee
+  else if(S.bes>=3) psychoScore+=1.5;
+  if(S.comorbIds.includes('depres')) psychoScore+=1;
+  psychoScore=Math.min(10,psychoScore);
+
+  // ── AXE 5: Score Iatrogene 0-5 ──
+  // Medicaments qui antagonisent les GLP-1
+  let iatroScore=0;
+  if(S.comorbIds.includes('cortis')) iatroScore+=3; // Corticoides = principal antagoniste
+  if(S.comorbIds.includes('antidep')) iatroScore+=1.5; // Antidep obesogenes
+  if(S.comorbIds.includes('hypo')&&(v.tsh===undefined||v.tsh>=6)) iatroScore+=1; // Hypothyroidie non controlee
+  iatroScore=Math.min(5,iatroScore);
+
+  // ── AXE 6: Facteurs demographiques ──
+  let demoBonus=0;
+  if(age>=30&&age<=65) demoBonus+=0.5; // Age optimal pour GLP-1
+  if(S.sexe==='f') demoBonus+=0.3; // Femmes repondent legerement mieux (STEP data)
+  if(e.dR>=1.5) demoBonus+=0.5; // Ethnies IR = meilleure reponse
+  if(S.comorbIds.includes('sopk')) demoBonus+=0.5; // SOPK = excellente reponse
+
+  // ════════════════════════════════════════════════════
+  // SCORE COMPOSITE DE REPONSE GLP-1 (GRS: GLP-1 Response Score)
+  // ════════════════════════════════════════════════════
+  // Facteurs positifs: IR + inflammation + demo
+  // Facteurs negatifs: chronicite + psycho + iatrogene
+  const posFactor = irScore*0.35 + inflamScore*0.15 + demoBonus;
+  const negFactor = chronScore*0.20 + psychoScore*0.15 + iatroScore*0.20;
+  let grs = posFactor - negFactor;
+  // Calibrer sur le GRI existant pour coherence
+  grs = (grs + gri) / 2;
+  grs = Math.max(-3, Math.min(6, grs));
+
+  // ════════════════════════════════════════════════════
+  // DETERMINATION DU PROFIL
+  // 5 profils + 1 contre-indication
+  // ════════════════════════════════════════════════════
+  let profile, profileCode;
+  const isContraindicated = (
+    (v.hba1c!==undefined && v.hba1c>=10) || // Urgence diabetique → insuline d'abord
+    (imc>=50 && cti>70) || // Super-obesite chronicisee → chirurgie
+    (S.comorbIds.includes('cortis') && iatroScore>=3 && irScore<3) // Corticoides hauts sans IR
+  );
+
+  if(isContraindicated){
+    profileCode='CI';
+    profile={
+      code:'CI',
+      name:'CONTRE-INDICATION RELATIVE',
+      color:'#64748b',
+      bgColor:'rgba(100,116,139,.12)',
+      icon:'⊘',
+      response:'N/A',
+      ppeRange:'N/A',
+      description:'Le profil actuel ne permet pas d\'attendre une reponse satisfaisante aux GLP-1 en premiere intention.',
+      molecule:null,
+      doseInit:null,
+      doseCible:null,
+      timeline:null,
+      alternative:'Insuline si HbA1c ≥ 10% | Chirurgie bariatrique si IMC ≥ 50 + CTI > 70 | Corriger corticotherapie'
+    };
+  } else if(grs>=2.5 && irScore>=4 && chronScore<=4){
+    profileCode='R1';
+    profile={
+      code:'R1',
+      name:'REPONDEUR EXCELLENT',
+      color:'var(--green)',
+      bgColor:'var(--green-bg)',
+      icon:'★',
+      response:'>85%',
+      ppeRange:'15-22%',
+      description:'Profil metabolique ideal pour les agonistes GLP-1. Insulinoresistance marquee avec faible chronicite. Reponse attendue rapide et durable.',
+      molecule:imc>=35||S.comorbIds.includes('dt2')?'Tirzepatide (Mounjaro/Zepbound)':'Semaglutide (Wegovy/Ozempic)',
+      moleculeAlt:imc>=35?'Semaglutide 2.4mg/sem si Tirzepatide non disponible':'Tirzepatide si reponse insuffisante a 6 mois',
+      doseInit:imc>=35?'Tirzepatide 2.5mg/sem':'Semaglutide 0.25mg/sem',
+      doseCible:imc>=35?'Tirzepatide 10-15mg/sem':'Semaglutide 2.4mg/sem',
+      timeline:'Perte appetit: 2-4 sem | -5% poids: 8-12 sem | -10%: 16-24 sem | -15%+: 6-12 mois | Plateau: 12-18 mois',
+      maintenance:'Traitement au long cours recommande. Risque de regain 50-70% a l\'arret (STEP 4 extension). Si objectif atteint: reduire dose mais ne pas arreter.',
+      alternative:null
+    };
+  } else if(grs>=1.5 && irScore>=2){
+    profileCode='R2';
+    profile={
+      code:'R2',
+      name:'BON REPONDEUR',
+      color:'var(--teal)',
+      bgColor:'rgba(20,184,166,.1)',
+      icon:'●',
+      response:'60-85%',
+      ppeRange:'10-17%',
+      description:'Bon profil de reponse. L\'insulinoresistance est presente mais moderee. Associer obligatoirement un programme nutritionnel structure pour optimiser la reponse.',
+      molecule:S.comorbIds.includes('dt2')?'Tirzepatide (Mounjaro)':'Semaglutide (Wegovy)',
+      moleculeAlt:'Liraglutide 3mg/j (Saxenda) si intolerance digestive GLP-1 hebdomadaire',
+      doseInit:S.comorbIds.includes('dt2')?'Tirzepatide 2.5mg/sem':'Semaglutide 0.25mg/sem',
+      doseCible:S.comorbIds.includes('dt2')?'Tirzepatide 10mg/sem':'Semaglutide 1.7-2.4mg/sem',
+      timeline:'Perte appetit: 3-6 sem | -5% poids: 12-16 sem | -10%: 20-30 sem | Plateau: 9-15 mois',
+      maintenance:'Traitement prolonge recommande (>12 mois). Reevaluation a 6 mois: si <5% de perte → envisager switch ou ajout.',
+      alternative:'Si reponse <5% a 6 mois: switch Sema→Tirze ou vice versa | Ajouter Metformine si IR persistante'
+    };
+  } else if(grs>=0.3 && chronScore<=6){
+    profileCode='R3';
+    profile={
+      code:'R3',
+      name:'REPONDEUR PARTIEL',
+      color:'var(--orange)',
+      bgColor:'var(--orange-bg)',
+      icon:'◐',
+      response:'30-60%',
+      ppeRange:'5-12%',
+      description:'Reponse incertaine. Facteurs limitants identifies (chronicite, stress, iatrogenie). GLP-1 possible mais dans un cadre multimodal obligatoire.',
+      molecule:'Semaglutide (Wegovy)',
+      moleculeAlt:'Tirzepatide si echec Semaglutide a 6 mois (switch recommande)',
+      doseInit:'Semaglutide 0.25mg/sem (titration lente sur 16 sem)',
+      doseCible:'Semaglutide 1.7-2.4mg/sem (selon tolerance)',
+      timeline:'Perte appetit: 4-8 sem (variable) | -5%: 16-24 sem | -10%: 30-40 sem (si atteint) | Evaluation: 6 mois',
+      maintenance:'Reevaluation obligatoire a 6 mois. Si <5% de perte: echec GLP-1, orienter vers chirurgie si CTI > 50.',
+      alternative:'Approche multimodale: GLP-1 + programme AP supervise + TCC + dieteticien | Si echec: evaluation chirurgicale'
+    };
+  } else if(grs>=-0.5){
+    profileCode='R4';
+    profile={
+      code:'R4',
+      name:'NON-REPONDEUR PROBABLE',
+      color:'var(--red)',
+      bgColor:'var(--red-bg)',
+      icon:'✕',
+      response:'<30%',
+      ppeRange:'<5%',
+      description:'Le profil du patient suggere une probabilite de reponse faible aux GLP-1. Facteurs de resistance majeurs identifies. Privilegier d\'autres strategies.',
+      molecule:'Essai GLP-1 possible (3 mois max) mais faible attente',
+      moleculeAlt:'Tirzepatide (double agoniste GIP/GLP-1) a titre de derniere tentative pharmacologique',
+      doseInit:'Semaglutide 0.25mg/sem (essai therapeutique)',
+      doseCible:'A evaluer selon reponse a 12 semaines',
+      timeline:'Si aucune reponse appetit a 8 sem: probablement non-repondeur | Evaluation stricte a 12 sem',
+      maintenance:'Arret si <3% de perte a 12 semaines. Redirection vers chirurgie bariatrique.',
+      alternative:'Chirurgie bariatrique prioritaire si IMC >= 35 ou IMC >= 30 + comorbidites | Programme intensif pluridisciplinaire'
+    };
+  } else {
+    profileCode='R5';
+    profile={
+      code:'R5',
+      name:'ECHEC PHARMACOLOGIQUE PREVU',
+      color:'var(--purple)',
+      bgColor:'var(--purple-bg)',
+      icon:'⬇',
+      response:'<10%',
+      ppeRange:'<3%',
+      description:'Resistance metabolique majeure. Les mecanismes adaptatifs (leptinoresistance, set-point eleve, chronicite installee) rendent les GLP-1 inefficaces comme monotherapie.',
+      molecule:'GLP-1 non recommande en premiere intention',
+      moleculeAlt:null,
+      doseInit:'N/A',
+      doseCible:'N/A',
+      timeline:'N/A — Orienter directement vers chirurgie',
+      maintenance:'Post-chirurgie: GLP-1 possible en adjuvant pour maintien ponderal (Semaglutide 1mg/sem)',
+      alternative:'Chirurgie bariatrique URGENTE (Sleeve/Bypass/SADI-S) + suivi 5 ans + GLP-1 adjuvant post-op si besoin'
+    };
+  }
+
+  // ════════════════════════════════════════════════════
+  // FACTEURS DETAILLES (pour affichage)
+  // ════════════════════════════════════════════════════
+  const efficacyFactors=[], resistanceFactors=[];
+
+  // Facteurs d'efficacite (+)
+  if(irScore>=4) efficacyFactors.push({t:'Insulinoresistance marquee',d:'HOMA-IR eleve = forte reponse aux incretines',s:3,ref:'STEP 2/SURMOUNT 2'});
+  else if(irScore>=2) efficacyFactors.push({t:'Insulinoresistance moderee',d:'IR presente, reponse probable',s:2,ref:'STEP 2'});
+  if(S.comorbIds.includes('sopk')) efficacyFactors.push({t:'SOPK diagnostique',d:'Phenotype IR feminin, excellente reponse GLP-1 (OR 2.77)',s:3,ref:'Jensterle 2022'});
+  if(S.comorbIds.includes('nafld')) efficacyFactors.push({t:'NAFLD / Steatose',d:'GLP-1 reduit la graisse hepatique de 30-40%',s:2,ref:'Newsome 2021, LEAN trial'});
+  if(S.comorbIds.includes('predmt')) efficacyFactors.push({t:'Pre-diabete',d:'Prevention du DT2 sous GLP-1 (reduction 80%)',s:3,ref:'STEP 2, DPP'});
+  if(v.crphs!==undefined && v.crphs>=3) efficacyFactors.push({t:'Inflammation active (CRP ≥ 3)',d:'Effet anti-inflammatoire du GLP-1 = double benefice',s:2,ref:'Pal 2022'});
+  if(v.adipon!==undefined && v.adipon<6) efficacyFactors.push({t:'Adiponectine basse',d:'Tissu adipeux dysfonctionnel, GLP-1 ameliore adipokines',s:2,ref:'Meier 2022'});
+  if(S.comorbIds.includes('mets')) efficacyFactors.push({t:'Syndrome metabolique',d:'GLP-1 corrige plusieurs composantes MetS simultanement',s:2,ref:'IDF/SURMOUNT'});
+  if(age>=30 && age<=55) efficacyFactors.push({t:'Age optimal (30-55 ans)',d:'Meilleure reponse metabolique et meilleure compliance',s:1,ref:'STEP 1'});
+  if(S.comorbIds.includes('dt2') && imc>=30) efficacyFactors.push({t:'DT2 + Obesite',d:'Double indication: controle glycemique + ponderal',s:2,ref:'SURMOUNT 2'});
+  if(v.tghdl!==undefined && v.tghdl>3.0) efficacyFactors.push({t:'Dyslipidemie atherogenique',d:'TG/HDL eleve = IR periph., GLP-1 efficace sur ce profil',s:1,ref:'Sattar 2021'});
+  if(inflamScore>=4) efficacyFactors.push({t:'Profil inflammatoire eleve (SII ≥ 4)',d:'L\'inflammation chronique renforce la cible GLP-1',s:2,ref:'Brook 2010'});
+
+  // Facteurs de resistance (-)
+  if(chronScore>=6) resistanceFactors.push({t:'Chronicite installee (CTI '+S.cti+')',d:'Set-point pondere durablement deplace, resistance aux mecanismes de satiete',s:3,ref:'Leibel 1995/Sumithran 2011'});
+  else if(chronScore>=3) resistanceFactors.push({t:'Debut de chronicisation (CTI '+S.cti+')',d:'Mecanismes adaptatifs en cours d\'installation',s:2,ref:'Sumithran 2011'});
+  if(v.leptine!==undefined && v.leptine>=40) resistanceFactors.push({t:'Leptinoresistance (leptine ≥ 40)',d:'Barrage central: satiete insensible, GLP-1 partiellement court-circuite',s:3,ref:'Considine 1996'});
+  if(S.yoyo>=1) resistanceFactors.push({t:'Regimes yoyo repetitifs',d:'Thermogenese adaptative reduite, depense energetique abaissee',s:2,ref:'Fothergill 2016'});
+  if(S.comorbIds.includes('cortis')) resistanceFactors.push({t:'Corticotherapie > 3 mois',d:'Cortisol exogene = adipogenese viscerale, antagonise GLP-1',s:3,ref:'Fardet 2007'});
+  if(S.bes>=5) resistanceFactors.push({t:'Hyperphagie severe (BES ≥ 5)',d:'TCA actif: GLP-1 reduit appetit mais ne traite pas la compulsion',s:2,ref:'Blundell 2023'});
+  if(phq>=15) resistanceFactors.push({t:'Depression moderee a severe (PHQ '+phq+')',d:'Impact sur compliance + alimentation emotionnelle',s:2,ref:'Wadden 2021'});
+  if(sr>=0.6) resistanceFactors.push({t:'Stress extreme (PSS '+getPssTotal()+')',d:'Hypercortisolemie chronique → resistance insuline + appetit',s:2,ref:'Tomiyama 2019'});
+  if(imc>=45) resistanceFactors.push({t:'Obesite morbide (IMC '+imc?.toFixed(1)+')',d:'Masse grasse critique: GLP-1 insuffisant comme monotherapie',s:3,ref:'STEP 1: IMC>40 = reponse diminuee'});
+  if(S.comorbIds.includes('saos') && S.comorbIds.includes('dt2')) resistanceFactors.push({t:'SAOS + DT2',d:'Hypoxie nocturne renforce l\'IR et la resistance au traitement',s:2,ref:'Drager 2015'});
+  if(S.comorbIds.includes('antidep')) resistanceFactors.push({t:'Antidepresseurs obesogenes',d:'Paroxetine/mirtazapine: prise poids +2-4 kg/an, antagonise partiellement GLP-1',s:1,ref:'Gafoor 2018'});
+  if(S.enf_ob>=2) resistanceFactors.push({t:'Obesite installee depuis l\'enfance',d:'Programmation epigenetique: hyperplasie adipocytaire irreversible',s:2,ref:'Geserick 2018'});
+  if(age>=65) resistanceFactors.push({t:'Age ≥ 65 ans',d:'Sarcopenie: risque de perte musculaire sous GLP-1, necessite AP structure',s:1,ref:'Rubino 2022'});
+  if(S.comorbIds.includes('hypo') && (v.tsh===undefined || v.tsh>=6)) resistanceFactors.push({t:'Hypothyroidie mal controlee',d:'Metabolisme basal abaisse, corriger TSH AVANT GLP-1',s:2,ref:''});
+
+  // Tri par severite
+  efficacyFactors.sort((a,b)=>b.s-a.s);
+  resistanceFactors.sort((a,b)=>b.s-a.s);
+
+  // ════════════════════════════════════════════════════
+  // PERTE DE POIDS ESTIMEE (PPE) personnalisee
+  // Ref: STEP 1 baseline: -15.3% (Sema 2.4), SURMOUNT-1: -22.5% (Tirze 15mg)
+  // Modulation selon profil patient
+  // ════════════════════════════════════════════════════
+  let ppeBase;
+  if(profile.molecule && profile.molecule.includes('Tirzepatide')) ppeBase=20;
+  else if(profile.molecule && profile.molecule.includes('Semaglutide')) ppeBase=15;
+  else ppeBase=10;
+
+  let ppeMod=0;
+  if(irScore>=4) ppeMod+=3; // Forte IR = meilleure reponse
+  if(S.comorbIds.includes('sopk')) ppeMod+=2;
+  if(chronScore>=6) ppeMod-=5; // Chronicite = diminue
+  if(v.leptine!==undefined && v.leptine>=40) ppeMod-=4;
+  if(psychoScore>=6) ppeMod-=3;
+  if(iatroScore>=3) ppeMod-=4;
+  if(S.yoyo>=1) ppeMod-=2;
+  if(imc>=45) ppeMod-=3;
+  if(age>=65) ppeMod-=2;
+
+  const ppeEstimate=Math.max(0,Math.min(25,Math.round(ppeBase+ppeMod)));
+
+  return{
+    profileCode,
+    profile,
+    grs:Math.round(grs*100)/100,
+    axes:{irScore:Math.round(irScore*10)/10, chronScore:Math.round(chronScore*10)/10, inflamScore:Math.round(inflamScore*10)/10, psychoScore:Math.round(psychoScore*10)/10, iatroScore:Math.round(iatroScore*10)/10},
+    efficacyFactors,
+    resistanceFactors,
+    ppeEstimate,
+    hasBio
+  };
+}
+
 // ── Prescription biologie detaillee ──
 // [BSD v4.9: P5 minimal, P10 intermediaire, P15 complet]
 function getBioPrescription(){
@@ -1747,20 +2074,123 @@ function renderFinal(){
   </div>`;
 
   // ══════════════════════════════════════════════════════
-  // 4. DIAGNOSTIC GRI — Reponse therapeutique
+  // 4. GLP-1 RESPONSE PROFILING — Phenotypage complet
   // ══════════════════════════════════════════════════════
-  r+=`<div style="border:1px solid ${griInfo.c};border-radius:12px;padding:12px 14px;margin-bottom:10px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div style="font-size:14px;font-weight:700;color:${griInfo.c}">GRI = ${S.gri.toFixed(1)}</div>
-      <div style="font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:${griInfo.c};color:#fff">${griInfo.l}</div>
+  const glp1=getGLP1Profile();
+  const gp=glp1.profile;
+  const ax=glp1.axes;
+
+  // 4a. Header Profil GLP-1
+  r+=`<div style="border:2px solid ${gp.color};border-radius:14px;overflow:hidden;margin-bottom:10px">
+    <div style="padding:14px 16px;background:${gp.bgColor}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:24px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${gp.color};color:#fff;font-weight:900">${gp.icon}</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:${gp.color}">${gp.name}</div>
+            <div style="font-size:10px;color:var(--dim2)">${gp.code} | GRI = ${S.gri.toFixed(1)} | GRS = ${glp1.grs.toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:900;color:${gp.color}">${gp.response}</div>
+          <div style="font-size:9px;color:var(--dim3)">prob. reponse</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--dim);line-height:1.5">${gp.description}</div>
     </div>
-    <div style="font-size:12px;color:var(--dim);margin-bottom:6px">${griInfo.d}</div>
-    <div style="font-size:10px;color:var(--dim3)">
-      <b>Decision therapeutique :</b> ${S.gri>=2.5?'Excellent candidat GLP-1 (Semaglutide/Tirzepatide). Reponse attendue >85%. Perte de poids estimee 15-20%.':
-      S.gri>=1.5?'Bon candidat GLP-1. Reponse attendue 60-85%. Associer programme nutritionnel structure.':
-      S.gri>=0.5?'Reponse GLP-1 incertaine. Privilegier approche multimodale (nutrition + AP + suivi psycho). GLP-1 en 2e intention.':
-      'Reponse GLP-1 peu probable. Orienter vers chirurgie bariatrique si CTI > 55. Sinon, programme intensif pluridisciplinaire.'}
+
+    <!-- Axes radar simplifie -->
+    <div style="padding:10px 16px;background:var(--bg2)">
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Axes du phenotypage</div>
+      ${[
+        {n:'Insulinoresistance (IR)',v:ax.irScore,max:10,good:true,c:'var(--teal)'},
+        {n:'Chronicite / Resistance',v:ax.chronScore,max:10,good:false,c:'var(--red)'},
+        {n:'Inflammation',v:ax.inflamScore,max:10,good:true,c:'var(--orange)'},
+        {n:'Psycho-comportemental',v:ax.psychoScore,max:10,good:false,c:'var(--purple)'},
+        {n:'Iatrogene',v:ax.iatroScore,max:5,good:false,c:'var(--red)'}
+      ].map(a=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <div style="min-width:130px;font-size:10px;color:var(--dim)">${a.n}</div>
+        <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
+          <div style="width:${Math.round(a.v/a.max*100)}%;height:100%;background:${a.good?'var(--green)':a.c};border-radius:3px"></div>
+        </div>
+        <div style="min-width:28px;font-size:10px;font-weight:700;color:${a.good&&a.v>=4?'var(--green)':!a.good&&a.v>=4?a.c:'var(--dim3)'}; text-align:right">${a.v}/${a.max}</div>
+        <div style="min-width:12px;font-size:9px">${a.good?(a.v>=4?'↑':''):(a.v>=4?'↓':'')}</div>
+      </div>`).join('')}
     </div>
+
+    <!-- Perte de poids estimee -->
+    ${gp.code!=='CI'&&gp.code!=='R5'?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px">Perte de poids estimee (PPE)</div>
+          <div style="font-size:10px;color:var(--dim3)">Ref: STEP 1-5 (Semaglutide) | SURMOUNT 1-4 (Tirzepatide)</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:900;color:${gp.color}">~${glp1.ppeEstimate}%</div>
+          <div style="font-size:9px;color:var(--dim3)">du poids initial</div>
+        </div>
+      </div>
+      ${S.poids>0?`<div style="font-size:10px;color:var(--dim);margin-top:4px">Soit environ <b style="color:var(--txt)">-${Math.round(S.poids*glp1.ppeEstimate/100)} kg</b> sur 12-18 mois (poids actuel: ${S.poids} kg → cible ~${Math.round(S.poids*(1-glp1.ppeEstimate/100))} kg)</div>`:''}
+    </div>`:''}
+
+    <!-- Molecule recommandee -->
+    ${gp.molecule?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Prescription GLP-1 recommandee</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <div style="flex:1;padding:8px;border-radius:8px;border:1px solid ${gp.color};background:${gp.bgColor}">
+          <div style="font-size:11px;font-weight:700;color:${gp.color}">${gp.molecule}</div>
+          ${gp.doseInit&&gp.doseInit!=='N/A'?`<div style="font-size:9px;color:var(--dim);margin-top:2px">Initiation: <b>${gp.doseInit}</b></div>`:''}
+          ${gp.doseCible&&gp.doseCible!=='N/A'?`<div style="font-size:9px;color:var(--dim)">Cible: <b>${gp.doseCible}</b></div>`:''}
+        </div>
+      </div>
+      ${gp.moleculeAlt?`<div style="font-size:9px;color:var(--dim3)"><b>Alternative:</b> ${gp.moleculeAlt}</div>`:''}
+    </div>`:''}
+
+    <!-- Timeline -->
+    ${gp.timeline&&gp.timeline!=='N/A'?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Timeline de reponse attendue</div>
+      <div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.timeline.split('|').map(t=>'<div style="padding:2px 0;border-left:2px solid '+gp.color+';padding-left:8px;margin-bottom:2px">'+t.trim()+'</div>').join('')}</div>
+    </div>`:''}
+
+    <!-- Facteurs d'efficacite -->
+    ${glp1.efficacyFactors.length>0?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
+        Facteurs d'efficacite (${glp1.efficacyFactors.length})
+      </div>
+      ${glp1.efficacyFactors.slice(0,6).map(f=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
+        <div style="min-width:8px;margin-top:4px;width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--txt)">${f.t} ${'●'.repeat(f.s)}</div>
+          <div style="font-size:9px;color:var(--dim3)">${f.d} <span style="color:var(--accent)">[${f.ref}]</span></div>
+        </div>
+      </div>`).join('')}
+    </div>`:''}
+
+    <!-- Facteurs de resistance -->
+    ${glp1.resistanceFactors.length>0?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
+        Facteurs de resistance (${glp1.resistanceFactors.length})
+      </div>
+      ${glp1.resistanceFactors.slice(0,6).map(f=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
+        <div style="min-width:8px;margin-top:4px;width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--txt)">${f.t} ${'✕'.repeat(f.s)}</div>
+          <div style="font-size:9px;color:var(--dim3)">${f.d}${f.ref?' <span style="color:var(--accent)">['+f.ref+']</span>':''}</div>
+        </div>
+      </div>`).join('')}
+    </div>`:''}
+
+    <!-- Maintenance / Alternative -->
+    ${gp.maintenance||gp.alternative?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
+      ${gp.maintenance?`<div style="margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Maintien / Long terme</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.maintenance}</div></div>`:''}
+      ${gp.alternative?`<div><div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Si echec / Alternative</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.alternative}</div></div>`:''}
+    </div>`:''}
+
+    <!-- Avertissement bio -->
+    ${!glp1.hasBio?`<div style="padding:8px 16px;border-top:1px solid var(--orange);background:rgba(245,158,11,.08)">
+      <div style="font-size:10px;color:var(--orange);font-weight:600">⚠ Profil base sur les donnees declaratives uniquement. La biologie (HOMA-IR, adiponectine, leptine) affinera significativement cette prediction.</div>
+    </div>`:''}
+
   </div>`;
 
   // ══════════════════════════════════════════════════════
