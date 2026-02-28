@@ -142,44 +142,37 @@ function haversine(lat1,lon1,lat2,lon2){
 
 async function geocode(query){
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=fr`,{headers:{'User-Agent':'ScoreBMN/2.0'}});
+    const r=await fetch(`/api/geo/search?q=${encodeURIComponent(query)}`);
     const d=await r.json();
-    if(d.length)return{lat:+d[0].lat,lon:+d[0].lon,name:d[0].display_name.split(',').slice(0,3).join(',').trim()};
+    if(d.results&&d.results.length)return d.results[0];
   }catch(e){console.warn('Geocode error:',e);}
   return null;
 }
 
 async function reverseGeocode(lat,lon){
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr`,{headers:{'User-Agent':'ScoreBMN/2.0'}});
+    const r=await fetch(`/api/geo/reverse?lat=${lat}&lon=${lon}`);
     const d=await r.json();
-    return d.display_name?d.display_name.split(',').slice(0,3).join(',').trim():`${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+    return d.name||`${lat.toFixed(3)}, ${lon.toFixed(3)}`;
   }catch(e){return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;}
 }
 
-// IP-based geolocation fallback (no permission needed)
+// IP-based geolocation fallback via server proxy (no CORS issues)
 async function ipGeolocate(){
   try{
-    const r=await fetch('https://ipapi.co/json/');
+    const r=await fetch('/api/geo/ip');
     const d=await r.json();
-    if(d.latitude&&d.longitude)return{lat:d.latitude,lon:d.longitude,name:`${d.city||''}, ${d.region||''}, ${d.country_name||''}`.replace(/^,\s*/,'').trim()};
-  }catch(e){}
-  try{
-    const r2=await fetch('https://get.geojs.io/v1/ip/geo.json');
-    const d2=await r2.json();
-    if(d2.latitude&&d2.longitude)return{lat:+d2.latitude,lon:+d2.longitude,name:`${d2.city||''}, ${d2.region||''}, ${d2.country||''}`.replace(/^,\s*/,'').trim()};
-  }catch(e2){}
+    if(d.lat&&d.lon)return{lat:d.lat,lon:d.lon,name:d.name||'Position detectee'};
+  }catch(e){console.warn('IP geoloc error:',e);}
   return null;
 }
 
 async function fetchAirQuality(lat,lon){
-  const url=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,uv_index&timezone=auto`;
-  try{const r=await fetch(url);return await r.json();}catch(e){return null;}
+  try{const r=await fetch(`/api/geo/air?lat=${lat}&lon=${lon}`);return await r.json();}catch(e){return null;}
 }
 
 async function fetchWeather(lat,lon){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`;
-  try{const r=await fetch(url);return await r.json();}catch(e){return null;}
+  try{const r=await fetch(`/api/geo/weather?lat=${lat}&lon=${lon}`);return await r.json();}catch(e){return null;}
 }
 
 function aqiToScore(usAqi){
