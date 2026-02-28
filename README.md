@@ -1,102 +1,89 @@
-# Score BMN v2.0 Enrichi — Architecture ABCKO+
+# Score BMN v2.0 — Évaluation Métabolique IA
 
-## Vue d'ensemble
-- **Nom** : Score BMN v2.0 (Bach-Manos-Noel)
-- **Objectif** : Algorithme clinique complet de scoring metabolique pour l'evaluation du risque d'obesite et de complications metaboliques
-- **Architecture** : ABCKO+ (Anthropometrie, Biologie, Comorbidites, Koefficients, Ordonnance + Exposome + Professionnel)
+## Project Overview
+- **Name**: Score BMN v2.0
+- **Version**: 5.0 (AI-Powered)
+- **Goal**: Questionnaire smartphone-first d'évaluation du risque métabolique et d'obésité avec intelligence artificielle adaptative
+- **Architecture**: ABCKO+ (BMN-C Clinique + BMN-K Comorbidités + BMN-B Biologie + CTI + GRI)
 
-## URL
-- **Sandbox** : https://3000-ib4jjzlrwtfls79jikkzg-cbeee0f9.sandbox.novita.ai
+## URLs
+- **Production**: https://3000-ib4jjzlrwtfls79jikkzg-cbeee0f9.sandbox.novita.ai
+- **API Health**: /api/health
+- **AI Analyze**: POST /api/ai/analyze
+- **AI Interpret**: POST /api/ai/interpret
 
-## Fonctionnalites Implementees (8 etapes)
+## Features Completed
 
-### Etape 1 : Identite & Anthropometrie
-- Ethnie (9 groupes x 8 multiplicateurs)
-- IMC auto-calcule, Tour de taille, WHtR
-- Histoire familiale (obesite parentale, enfance, DT2)
-- Cycles Yo-Yo ponderaux
-- Resume anthropometrique visuel avec seuils ethniques
+### Intelligence Artificielle
+- ✅ **Claude AI (Sonnet 4)** intégré côté serveur (clé API sécurisée)
+- ✅ Analyse adaptative sur 5 écrans clés (famille, exposome, activité, mental, comorbidités)
+- ✅ Interprétation finale personnalisée IA avec recommandations
 
-### Etape 2 : Exposome Environnemental (0-47 pts)
-- **API Qualite de l'Air** (WAQI temps reel) : AQI, PM2.5, PM10, NO2, O3, SO2, CO
-- Geolocalisation GPS ou recherche par ville
-- Qualite de l'eau (source, chlore)
-- Habitat (route, industrie, espaces verts, logement)
-- Pollution sonore (diurne + nocturne)
-- Perturbateurs endocriniens (alimentaires, cosmetiques, professionnels)
-- Pollution lumineuse (ecrans)
-- Precarite socio-economique (EPICES)
-- Desert alimentaire
-- Multiplicateur inflammatoire global calcule
+### APIs Géographiques (Automatiques)
+- ✅ **GPS automatique** au chargement de l'écran environnement
+- ✅ **Open-Meteo Air Quality** (CAMS/Copernicus) — AQI US, Europe, PM2.5, PM10, NO₂, O₃, SO₂, CO, UV
+- ✅ **Open-Meteo Weather** — Température, ressenti, humidité, vent
+- ✅ **Nominatim/OSM** — Géocodage et reverse geocoding
+- ✅ **Haversine** — Calcul automatique distance domicile-travail
+- ✅ Score exposome air auto-calculé depuis AQI
+- ✅ Impact température automatique
 
-### Etape 3 : Profil Professionnel (0-50 pts)
-- Situation professionnelle (actif, chomage, invalide, retraite)
-- Type de travail (sedentaire/actif, 7 niveaux)
-- Distance domicile-travail + mode transport + temps trajet
-- Horaires (jour, nuit, poste 3x8, gardes)
-- Stress Karasek simplifie (demande x latitude x soutien)
-- Restauration au travail
-- Posture dominante
-- Exposition toxiques professionnels
-- Impact retraite (activite, sedentarite, isolement)
-- Synthese visuelle avec contribution au BMN-C
+### Questionnaire (17 écrans)
+1. Accueil
+2. Date de naissance (âge auto)
+3. Sexe biologique
+4. Origine ethnique (9 groupes × 8 paramètres)
+5. Poids & Taille (IMC + seuils ethniques)
+6. Tour de taille (WHtR + seuils IDF)
+7. Antécédents familiaux
+8. Environnement géographique (GPS + API auto)
+9. Exposome environnemental (10 facteurs)
+10. Profil professionnel (10 dimensions + distance auto)
+11. Alimentation (DQI-BMN)
+12. Activité physique (IPAQ)
+13. Sommeil & substances
+14. Santé mentale (PSS-10, PHQ-9, BES)
+15. Comorbidités (13 items: maladies + phénotypes + traitements)
+16. Biologie optionnelle (15 biomarqueurs, panels P5/P10/P15)
+17. Résultat final (BMN-T/200, Markov, CTI, GRI, SII, stratégie, IA)
 
-### Etape 4 : Comportements & Mode de Vie (0-60 pts)
-- DQI-BMN alimentation detaillee (ultra-transformes, sucres, fibres, portions, repas)
-- IPAQ activite physique par type (cardio, muscu, marche)
-- Temps assis quotidien
-- Sommeil duree + ISI (Insomnia Severity Index)
-- Tabac (5 niveaux)
-- Alcool AUDIT-C (frequence + quantite)
+### Algorithme BMN v2.0 (Complet)
+- ✅ **BMN-C** /150 — 17 domaines cliniques
+- ✅ **BMN-K** /50 — 13 comorbidités avec OR/HR
+- ✅ **BMN-B** /100 — 15 biomarqueurs z-score normalisés
+- ✅ **BMN-T** /200 — Pondération dynamique (w_C=0.55, w_B=0.30, w_K=0.15)
+- ✅ **CTI** (Index de Chronicisation) — 7 coefficients γ × amplificateurs
+- ✅ **GRI** (Index Réponse GLP-1) — Facteurs δ favorables / ε défavorables
+- ✅ **SII** (Score Inflammatoire Indirect) — 9 critères
+- ✅ **Markov** — Projection 10 ans avec matrice de transition modulée
+- ✅ Multiplicateurs ethniques (9 groupes)
+- ✅ Rétro-validation biologie/comorbidités
+- ✅ Safety floors et comorbidity floor
 
-### Etape 5 : Sante Mentale (0-28 pts)
-- PSS-10 (stress percu, 0-40)
-- PHQ-9 (depression, 0-27)
-- BES (hyperphagie, 0-8)
-- Synthese visuelle avec SII auto-calcule
+### Références Internationales
+OMS · IDF 2006 · ADA 2024 · FINDRISC · IPAQ · PHQ-9 · PSS-10 · ISI · BES · AUDIT-C · Lancet 2016 (Global BMI Mortality) · BMJ Open 2016 (WHtR) · Lancet 2010 (MetS) · NEJM 1995 (Leibel) · NEJM 2011 (Sumithran) · SCORE2/Framingham · INTERHEART · DPP · DiaRem · Biswas 2015 · Cappuccio 2008 · Aubin 2012 · Lane 2024 · CAMS/Copernicus · Karasek
 
-### Etape 6 : BMN-K Comorbidites (0-50 pts)
-- 8 maladies etablies (DT2, pre-diabete, HTA, SAOS, SOPK, NAFLD, hypothyroidie, MetS)
-- 2 phenotypes metaboliques (MONW, IR occulte)
-- 3 traitements aggravants (corticoides, antidepresseurs, depression)
-- Comorbidity Floor (K > 30 -> BMN-T >= 40)
+## Tech Stack
+- **Backend**: Hono + TypeScript (Cloudflare Workers compatible)
+- **Frontend**: Vanilla JS + CSS (CDN-free, mobile-first)
+- **AI**: Claude Sonnet 4 (Anthropic API)
+- **APIs**: Open-Meteo (air + weather), Nominatim (geocoding)
+- **Build**: Vite
+- **Deploy**: Wrangler / PM2
 
-### Etape 7 : BMN-B Biologie (0-100 pts)
-- Classification intermediaire C+K automatique
-- Bilan prescrit (Tier 2A/2B/2C) selon classification
-- 15 biomarqueurs z-score normalises avec poids
-- 6 regles de retro-validation en temps reel
+## Data Architecture
+- **Côté client**: State objet JS avec tous les scores en temps réel
+- **Côté serveur**: Routes API pour Claude AI (clé sécurisée)
+- **APIs externes**: Open-Meteo (gratuit, sans clé), Nominatim/OSM (gratuit)
 
-### Etape 8 : BMN-T Score Final (0-200 pts)
-- Ponderation dynamique tri-source (w_C/w_B/w_K)
-- Bascule automatique si ecart Bio-Clinique > 20
-- BioFloor standard + urgence
-- Comorbidity SuperFloor
-- Projection Markov 6 etats a 10 ans
-- CTI (7 composantes gamma + amplificateurs comorbidites)
-- GRI (8 predicteurs favorables + 4 defavorables)
-- Plan therapeutique personnalise
-- Impact exposome + professionnel detaille
+## User Guide
+1. Ouvrez l'URL sur smartphone
+2. Suivez les écrans un par un (swipe ou boutons)
+3. La géolocalisation GPS se lance automatiquement
+4. L'IA Claude analyse votre profil sur les écrans clés
+5. Le résultat final affiche le score BMN-T/200 avec interprétation IA
 
-## Architecture Technique
-- **Backend** : Hono (Cloudflare Workers)
-- **Frontend** : Vanilla JS + CSS (CDN fonts)
-- **API externe** : WAQI (World Air Quality Index)
-- **Calculs** : 100% client-side pour la confidentialite patient
-- **Responsive** : Mobile, tablet, desktop
-- **Impression** : CSS print optimise
-
-## Algorithme — Specifications
-- BMN_T = w_C * C_norm + w_B * Bio_norm + w_K * K_norm
-- w_C = 0.55, w_B = 0.30, w_K = 0.15 (base)
-- Gap > 20 : bascule w_B jusqu'a 0.60
-- CTI = Sum(gamma_j * Z_j) * max(amplifier)
-- GRI = Sum(delta_k * F_k) - Sum(epsilon_k * U_k)
-- Markov : P_ij = P_ij(base) * exp(theta_BMN * T/100) * exp(theta_K * K/100)
-- Classification : FAIBLE(0-40), MODERE(41-80), ELEVE(81-120), TRES ELEVE(121-160), CRITIQUE(>160)
-
-## Deploiement
-- **Plateforme** : Cloudflare Pages
-- **Stack** : Hono + TypeScript + Vite
-- **Statut** : Actif
-- **Derniere MAJ** : 2026-02-28
+## Deployment
+- **Platform**: Cloudflare Pages / Sandbox
+- **Status**: ✅ Active v5.0
+- **Last Updated**: 2026-02-28
