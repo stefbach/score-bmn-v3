@@ -687,22 +687,184 @@ const SCR=[
     <div id="aiBox14"></div>`;
   },
 
-  // 15: Bio
-  ()=>{calc();const pl=getPanelLvl();const markers=BIO.filter(m=>m.t<=Math.max(5,pl));
-    return `<div class="s-emoji">Bio</div>
-    <div class="s-title">Resultats biologiques (optionnel)</div>
-    <div class="s-sub">Si vous avez des resultats de prise de sang recents, entrez les valeurs ci-dessous. Panel ${pl<=5?'basique (P5)':pl<=10?'intermediaire (P10)':'complet (P15)'} -- <b>${markers.length} marqueurs</b>. <span class="ref">SCORE2</span> <span class="ref">ADA 2024</span></div>
-    ${S.sii>=2?'<div class="auto-filled orange">SII >= 2: Panel P5 recommande (inflammation indirecte detectee)</div>':''}
-    <div class="fc">${markers.map(m=>`<div class="bio-row">
-      <div class="bio-inf"><div class="bio-nm">${m.n}${m.u?' <small>('+m.u+')</small>':''}</div><div class="bio-rg">${m.l}: <span class="bio-ok">${m.nr}</span> / <span class="bio-bad">${m.ar}</span></div></div>
-      <input type="number" class="bio-inp" id="bio_${m.id}" value="${S.bioValues[m.id]??''}" step="0.01" placeholder="--"
-        oninput="S.bioValues['${m.id}']=this.value===''?undefined:+this.value;calc();doRetro()">
-      <span class="bio-tier" style="background:${m.t<=5?'var(--red-bg);color:var(--red)':m.t<=10?'var(--orange-bg);color:var(--orange)':'var(--accent-bg);color:var(--accent)'}">P${m.t}</span>
-    </div>`).join('')}</div>
-    <div id="retro"></div>`;
+  // ════════════════════════════════════════════════════════════════
+  // 15: SCORE DECLARATIF sD + CLASSIFICATION + STRATEGIE BIO
+  // C'est ICI qu'on etablit le premier score et qu'on definit
+  // la strategie de prescription biologique
+  // ════════════════════════════════════════════════════════════════
+  ()=>{
+    calc();
+    const cls=getClass(S.sD);
+    const bioPrx=getBioPrescription();
+    const ctiInfo=getCTILabel(S.cti);
+    const griInfo=getGRILabel(S.gri);
+
+    // SII items detail
+    const e=ETH[S.ethnie]||ETH.eu;
+    const ttSeuil=S.sexe==='f'?e.tf:e.tm;
+    const apT=S.ap.cardio+S.ap.muscu+S.ap.marche*3.5;
+    const alimRaw=S.alim.ultra+S.alim.sucre_boisson+S.alim.sucre_solide+S.alim.fibres+S.alim.portions+S.alim.repas+S.alim.grignotage+S.alim.fast_food+S.alim.cuisine+S.alim.eau;
+    const siiItems=[
+      {l:'Stress PSS >= 35%', v:(getPssTotal()/40)>=0.35},
+      {l:'Activite < 75 min/sem', v:apT<75},
+      {l:'IMC >= seuil obesite', v:S.imc>=e.ob},
+      {l:'Tabagisme actif', v:S.tabac>=3},
+      {l:'Alimentation desequilibree', v:alimRaw>=20},
+      {l:'Insomnie ISI >= 15', v:S.isi>=15},
+      {l:'Tour taille > seuil', v:S.tt>ttSeuil}
+    ];
+
+    let html=`<div class="s-emoji">sD</div>
+    <div class="s-title">Score Declaratif & Strategie Biologique</div>
+    <div class="s-sub">Votre score declaratif est calcule a partir de vos reponses (C+E+O+L). Il determine votre <b>classification de risque</b> et la <b>strategie de prescription biologique</b>. <span class="ref">BSD v4.9</span></div>`;
+
+    // HERO sD
+    html+=`<div class="res-hero" style="background:${cls.bg}">
+      <div class="res-num" style="color:${cls.c}">${S.sD}<span class="res-max">/100</span></div>
+      <div class="res-lv" style="color:${cls.c}">${S.classDecl}</div>
+      <div class="res-tier" style="color:${cls.c}">Score Declaratif (sans biologie)</div>
+    </div>`;
+
+    // Decomposition CLEO
+    html+=`<div class="mrow" style="margin:12px 0">
+      <div class="mbox"><div class="mbox-lbl">C</div><div class="mbox-val" style="color:var(--accent)">${S.scoreC}</div><div class="mbox-sub">/50 clinique</div></div>
+      <div class="mbox"><div class="mbox-lbl">E</div><div class="mbox-val" style="color:${S.scoreE>15?'var(--orange)':'var(--green)'}">${S.scoreE}</div><div class="mbox-sub">/45 exposome</div></div>
+      <div class="mbox"><div class="mbox-lbl">O</div><div class="mbox-val">${S.scoreO}</div><div class="mbox-sub">/10 occup.</div></div>
+      <div class="mbox"><div class="mbox-lbl">L</div><div class="mbox-val">${S.scoreL}</div><div class="mbox-sub">/10 lifestyle</div></div>
+    </div>`;
+
+    // SII grille
+    html+=`<div class="sec"><div class="sec-tt">SII — Sous-Index Inflammatoire (${S.sii}/7)</div>
+      <div class="sii-grid">${siiItems.map(x=>`<div class="sii-item ${x.v?'on':'off'}"><span class="sii-dot" style="background:${x.v?'var(--red)':'var(--green)'}"></span>${x.l}</div>`).join('')}</div>
+      ${S.sii>=2?'<div class="auto-filled orange" style="margin-top:8px">SII >= 2 : bilan biologique P5 obligatoire meme en risque FAIBLE</div>':''}
+      ${S.indepCrit?'<div class="auto-filled orange" style="margin-top:4px">Critere independant present (age >= 40, ATCD fam, ou comorbidite) : P5 recommande</div>':''}
+    </div>`;
+
+    // CTI / GRI rapide
+    html+=`<div class="mrow" style="margin:8px 0">
+      <div class="mbox"><div class="mbox-lbl">CTI</div><div class="mbox-val" style="color:${ctiInfo.c}">${S.cti}</div><div class="mbox-sub">${ctiInfo.l}</div></div>
+      <div class="mbox"><div class="mbox-lbl">GRI</div><div class="mbox-val" style="color:${griInfo.c}">${S.gri.toFixed(1)}</div><div class="mbox-sub">${griInfo.l}</div></div>
+      <div class="mbox"><div class="mbox-lbl">K</div><div class="mbox-val" style="color:${S.bmn_k>20?'var(--red)':'var(--orange)'}">${S.bmn_k}</div><div class="mbox-sub">/50 comorb.</div></div>
+    </div>`;
+
+    // ══ ORDONNANCE BIOLOGIQUE ══
+    html+=`<div class="sec"><div class="sec-tt">Prescription Biologique — Ordonnance</div>
+      <div class="str-card" style="border-left-color:${bioPrx.color}">
+        <div class="str-tt" style="color:${bioPrx.color}">${bioPrx.tier}</div>
+        <div class="str-desc">${bioPrx.desc}</div>
+        <div class="str-desc" style="margin-top:4px"><b>Logique :</b> sD = ${S.sD} (${S.classDecl}) | SII = ${S.sii}/7 ${S.indepCrit?'| Critere independant':''}
+          → Panel <b>${S.panelLvl>0?'P'+S.panelLvl:'optionnel'}</b></div>
+        ${bioPrx.panel.length?`<div class="ordo-panel"><div class="ordo-title">Examens a prescrire :</div>
+          <div class="ordo-list">${bioPrx.panel.map((m,i)=>`<div class="ordo-item"><span class="ordo-num">${i+1}</span>${m}</div>`).join('')}</div></div>`
+          :'<div class="str-desc" style="color:var(--green)">Pas de bilan obligatoire. Envisager P5 si premiere visite ou bilan > 2 ans.</div>'}
+        <div class="str-desc" style="margin-top:6px;font-weight:600">Suivi recommande : ${bioPrx.suivi}</div>
+      </div>
+    </div>`;
+
+    // Explication du flux
+    html+=`<div class="str-desc" style="font-size:11px;color:var(--dim2);margin:8px 0;padding:10px;background:var(--bg2);border-radius:8px">
+      <b>Flux algorithmique :</b> Ce score declaratif (sD) est base uniquement sur vos reponses. 
+      A l'etape suivante, vous pourrez entrer vos resultats biologiques. La biologie sera alors 
+      <b>integree dynamiquement</b> (sf = wDecl×sD + wBio×bioNorm) selon la methodologie BSD v4.7.1, 
+      avec des filets de securite (BioFloor 75%, BioEmergencyFloor 85%) et une triade inflammatoire.
+    </div>`;
+
+    html+=`<div id="aiBox15"></div>`;
+    return html;
   },
 
-  // 16: Final Result
+  // ════════════════════════════════════════════════════════════════
+  // 16: BIOLOGIE — Methodologie BSD v4.7.1
+  // z-score lineaire borne [0,1] × poids HR-concordants
+  // bioNorm = (Σ(z_i × w_i) / Σ(w_i)) × 100 (denominateur adaptatif)
+  // Triade inflammatoire : bInflam = moy(z_crphs, z_tghdl, z_homaIR)
+  // Retro-validation en temps reel
+  // ════════════════════════════════════════════════════════════════
+  ()=>{
+    calc();
+    const pl=getPanelLvl();
+    const markers=BIO.filter(m=>m.t<=Math.max(5,pl));
+    const allMarkers=BIO; // pour affichage conditionnel
+
+    // Compute z-scores pour affichage jauge
+    const zDisplay={};
+    BIO.forEach(m=>{
+      const v=S.bioValues[m.id];
+      if(v===undefined||v===null) return;
+      let z;
+      if(!m.inv){ z=v<=m.nm?0:v>=m.ab?1:(v-m.nm)/(m.ab-m.nm); }
+      else { z=v>=m.nm?0:v<=m.ab?1:(m.nm-v)/(m.nm-m.ab); }
+      zDisplay[m.id]=Math.max(0,Math.min(1,z));
+    });
+
+    // Count filled
+    const filled=BIO.filter(m=>S.bioValues[m.id]!==undefined&&S.bioValues[m.id]!==null).length;
+
+    let html=`<div class="s-emoji">Bio</div>
+    <div class="s-title">Resultats Biologiques</div>
+    <div class="s-sub">Entrez vos resultats de prise de sang. Chaque marqueur est normalise en z-score [0-1] et pondere par son Hazard Ratio publie.
+      Panel prescrit: <b>${pl<=0?'Optionnel':pl<=5?'P5 ('+markers.length+' marqueurs)':pl<=10?'P10 ('+markers.length+' marqueurs)':'P15 ('+markers.length+' marqueurs)'}</b>.
+      <span class="ref">BSD v4.7.1</span> <span class="ref">SCORE2</span></div>`;
+
+    // bioNorm live
+    if(filled>0){
+      const cls=getClass(S.bmn_b);
+      html+=`<div class="res-hero" style="background:${cls.bg};padding:12px">
+        <div class="res-num" style="color:${cls.c};font-size:32px">${S.bmn_b}<span class="res-max" style="font-size:14px">/100</span></div>
+        <div class="res-lv" style="color:${cls.c};font-size:13px">bioNorm (${filled} marqueurs renseignes)</div>
+        <div style="font-size:11px;color:var(--dim2);margin-top:4px">bioNorm = (Σ z_i×w_i / Σ w_i) × 100 | Denominateur adaptatif</div>
+      </div>`;
+    }
+
+    // bInflam display
+    if(S.bInflam>0){
+      html+=`<div class="auto-filled ${S.bInflam>0.5?'orange':''}">Triade inflammatoire (bInflam) = ${S.bInflam.toFixed(2)} → Amplification Exposome +${Math.round(S.bInflam*15)}%</div>`;
+    }
+
+    // Markers input with z-score gauge
+    html+=`<div class="fc">`;
+    markers.forEach(m=>{
+      const v=S.bioValues[m.id];
+      const z=zDisplay[m.id];
+      const hasVal=v!==undefined&&v!==null;
+      const zCol=!hasVal?'var(--dim3)':z>=0.7?'var(--red)':z>=0.3?'var(--orange)':'var(--green)';
+
+      html+=`<div class="bio-row">
+        <div class="bio-inf">
+          <div class="bio-nm">${m.n}${m.u?' <small>('+m.u+')</small>':''} <span style="color:var(--dim2);font-size:10px">w=${m.w}</span></div>
+          <div class="bio-rg">${m.l}: <span class="bio-ok">${m.nr}</span> / <span class="bio-bad">${m.ar}</span></div>
+          ${hasVal?`<div style="margin-top:3px;display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+              <div style="width:${Math.round(z*100)}%;height:100%;background:${zCol};transition:width .3s"></div>
+            </div>
+            <span style="font-size:10px;color:${zCol};font-weight:700;min-width:32px">z=${z.toFixed(2)}</span>
+          </div>`:''}
+        </div>
+        <input type="number" class="bio-inp" id="bio_${m.id}" value="${v??''}" step="0.01" placeholder="--"
+          oninput="S.bioValues['${m.id}']=this.value===''?undefined:+this.value;calc();render(S.step,0);doRetro()">
+        <span class="bio-tier" style="background:${m.t<=5?'var(--red-bg);color:var(--red)':m.t<=10?'var(--orange-bg);color:var(--orange)':'var(--accent-bg);color:var(--accent)'}">P${m.t}</span>
+      </div>`;
+    });
+    html+=`</div>`;
+
+    // Retro-validation
+    html+=`<div id="retro"></div>`;
+
+    // Methodologie
+    html+=`<div style="margin-top:12px;padding:10px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--dim2)">
+      <b>Methodologie BSD v4.7.1 :</b><br>
+      • z-score lineaire borne [0,1] : z = (val-normal)/(anormal-normal), cap a 1<br>
+      • Poids (w) proportionnels aux HR publies (>3M participants, CTT, ERFC, CKD-PC, ADA)<br>
+      • bioNorm = (Σ z_i×w_i / Σ w_i) × 100 — denominateur adaptatif<br>
+      • Triade inflammatoire : bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR) → E** = E* × (1+0.15×bInflam)<br>
+      • Integration : sf = wDecl(0.65)×sD + wBio(0.35)×bioNorm, reponderation si gap > 20<br>
+      • BioFloor : sf ≥ 75% bioNorm | BEF : si bio>90, sf ≥ max(80, 85%×bio)
+    </div>`;
+
+    return html;
+  },
+
+  // 17: Final Result
   ()=>{calc();return renderFinal();}
 ];
 
@@ -713,8 +875,10 @@ const SECTIONS=[
   {from:7,to:7,name:'Lieu',ico:'[G]'},{from:8,to:8,name:'Travail',ico:'[T]'},
   {from:9,to:9,name:'Nutrition',ico:'[N]'},{from:10,to:11,name:'Mode de vie',ico:'[V]'},
   {from:12,to:13,name:'Sante mentale',ico:'[S]'},
-  {from:14,to:14,name:'Pathologies',ico:'[P]'},{from:15,to:15,name:'Biologie',ico:'[B]'},
-  {from:16,to:16,name:'Resultat',ico:'[R]'}
+  {from:14,to:14,name:'Pathologies',ico:'[P]'},
+  {from:15,to:15,name:'Score & Strategie',ico:'[sD]'},
+  {from:16,to:16,name:'Biologie',ico:'[B]'},
+  {from:17,to:17,name:'Resultat',ico:'[R]'}
 ];
 function getSec(step){return SECTIONS.find(s=>step>=s.from&&step<=s.to)||SECTIONS[0];}
 function toggleCM(id){if(S.comorbIds.includes(id))S.comorbIds=S.comorbIds.filter(x=>x!==id);else S.comorbIds.push(id);render(S.step,0);}
@@ -736,7 +900,7 @@ function render(step,dir){
   const pf=$('pgFill');if(pf)pf.style.width=(step/(NTOT-1)*100)+'%';
   updateBadge();renderNav(step);
   if(step===7&&S.airData)setTimeout(renderGeoResults,50);
-  if(step===15)setTimeout(doRetro,60);
+  if(step===16)setTimeout(doRetro,60);
   triggerAI(step);
 }
 
@@ -759,7 +923,8 @@ function triggerAI(step){
     10:{id:'aiBox10',q:'Activite physique: cardio='+S.ap.cardio+'min/sem, muscu='+S.ap.muscu+'min/sem, marche='+S.ap.marche+'min/j, assis='+S.assis+'h/j. OMS recommande 150min. Analyse.'},
     12:{id:'aiBox12',q:'Stress PSS-10='+getPssTotal()+'/40. Items: '+S.pss.join(',')+'. Impact sur poids et comportement alimentaire?'},
     13:{id:'aiBox13',q:'Depression PHQ-9='+getPhqTotal()+'/27. BES='+S.bes+'/8. Analyse impact bidirectionnel obesite-depression-hyperphagie.'},
-    14:{id:'aiBox14',q:'Comorbidites selectionnees: '+S.comorbIds.join(',')+'. Analyse interactions et impact sur BMN-K.'}
+    14:{id:'aiBox14',q:'Comorbidites selectionnees: '+S.comorbIds.join(',')+'. Analyse interactions et impact sur BMN-K.'},
+    15:{id:'aiBox15',q:'Score declaratif sD='+S.sD+'/100 ('+S.classDecl+'). C='+S.scoreC+'/50, E='+S.scoreE+'/45, O='+S.scoreO+'/10, L='+S.scoreL+'/10. SII='+S.sii+'/7. Panel=P'+(S.panelLvl||0)+'. CTI='+S.cti+'. GRI='+S.gri.toFixed(1)+'. Analyse la strategie bio et therapeutique.'}
   };
   if(aiScreens[step]){
     const cfg=aiScreens[step];
