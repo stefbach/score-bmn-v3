@@ -60,35 +60,58 @@ np.random.seed(42)
 # Mappings spécifiques par étude : nom variable source → nom BMN v3
 STUDY_CONFIGS = {
     "MESA": {
-        "id_col": "MESAID",
+        "id_col": "idno",
+        # Fichiers réels MESA BioLINCC (Exam 1 = Baseline)
+        "files": {
+            "baseline":  "mesa_e1_main.sas7bdat",      # Démographie + Anthropométrie
+            "lab":       "mesa_e1_lab.sas7bdat",        # Biologie (glucose, insuline, lipides, etc.)
+            "meds":      "mesa_e1_meds.sas7bdat",       # Médicaments (antidiabétiques, statines, etc.)
+            "ct_adipose":"mesa_e1_ct_adipose.sas7bdat",  # CT graisse viscérale/sous-cutanée
+        },
         "file_patterns": {
-            "baseline": ["*exam1*", "*baseline*", "*visit1*"],
-            "lab":      ["*lab*", "*blood*", "*biochem*"],
-            "meds":     ["*med*", "*pharm*", "*drug*"],
-            "demo":     ["*demo*", "*participant*"],
-            "anthro":   ["*anthro*", "*exam*", "*body*"],
+            "baseline": ["*e1_main*", "*exam1*", "*baseline*"],
+            "lab":      ["*e1_lab*", "*lab*", "*blood*"],
+            "meds":     ["*e1_meds*", "*med*", "*pharm*"],
+            "ct_adipose":["*ct_adipose*", "*adipose*", "*visceral*"],
         },
         "var_map": {
-            # Démographie
-            "AGE1C":    "age",     "AGE":      "age",
-            "GENDER1":  "sex_code", "GENDER":  "sex_code",
-            "RACE1C":   "race_eth", "RACE":    "race_eth",
+            # Démographie — variables réelles MESA Exam 1
+            "age1c":    "age",      "AGE1C":    "age",     "AGE":      "age",
+            "gender1":  "sex_code", "GENDER1":  "sex_code","GENDER":   "sex_code",
+            "race1c":   "race_eth", "RACE1C":   "race_eth","RACE":     "race_eth",
             # Anthropométrie
-            "BMI1C":    "bmi",      "BMI":     "bmi",
-            "WAISTCM1": "waist",    "WAIST":   "waist",
-            "HTCM1":    "height_cm","HEIGHT":  "height_cm",
-            # Biomarqueurs (unités MESA : mg/dL sauf mention)
-            "GLUCOS1":  "glucose_mgdl", "GLUCOSE": "glucose_mgdl",
-            "INSULIN1": "insulin_uU",   "INSULIN": "insulin_uU",
-            "HBA1C1":   "hba1c",
-            "CRPHS1":   "crphs",    "CRP":     "crphs",
-            "TRIG1":    "tg_mgdl",  "TRIG":    "tg_mgdl",
-            "HDL1":     "hdl_mgdl", "HDL":     "hdl_mgdl",
-            "LDL1":     "ldl_mgdl", "LDL":     "ldl_mgdl",
-            "TOTCHOL1": "tc_mgdl",  "TCHOL":   "tc_mgdl",
-            "AST1":     "asat",     "AST":     "asat",
-            "GGT1":     "ggt",      "GGT":     "ggt",
-            "URATE1":   "urate_mgdl", "URICACID": "urate_mgdl",
+            "bmi1c":    "bmi",      "BMI1C":    "bmi",     "BMI":      "bmi",
+            "waistcm1": "waist",    "WAISTCM1": "waist",   "WAIST":    "waist",
+            "htcm1":    "height_cm","HTCM1":    "height_cm","HEIGHT":  "height_cm",
+            # Biomarqueurs (MESA Exam 1, unités mg/dL sauf mention)
+            "glucos1":  "glucose_mgdl", "GLUCOS1":  "glucose_mgdl", "GLUCOSE": "glucose_mgdl",
+            "insulin1": "insulin_uU",   "INSULIN1": "insulin_uU",   "INSULIN": "insulin_uU",
+            "hba1c1":   "hba1c",        "HBA1C1":   "hba1c",
+            "crphs1":   "crphs",        "CRPHS1":   "crphs",    "CRP":     "crphs",
+            "trig1":    "tg_mgdl",      "TRIG1":    "tg_mgdl",  "TRIG":    "tg_mgdl",
+            "hdl1":     "hdl_mgdl",     "HDL1":     "hdl_mgdl", "HDL":     "hdl_mgdl",
+            "ldl1":     "ldl_mgdl",     "LDL1":     "ldl_mgdl", "LDL":     "ldl_mgdl",
+            "totchol1": "tc_mgdl",      "TOTCHOL1": "tc_mgdl",  "TCHOL":   "tc_mgdl",
+            "ast1":     "asat",         "AST1":     "asat",      "AST":     "asat",
+            "ggt1":     "ggt",          "GGT1":     "ggt",       "GGT":     "ggt",
+            "urate1":   "urate_mgdl",   "URATE1":  "urate_mgdl","URICACID":"urate_mgdl",
+            # CT Adipose Tissue (spécificité MESA — validation WHtR)
+            "vatarea1": "vat_area",     "VATAREA1": "vat_area",   # Visceral Adipose Tissue area (cm²)
+            "satarea1": "sat_area",     "SATAREA1": "sat_area",   # Subcutaneous AT area (cm²)
+            # Tabagisme MESA
+            "cig1":     "tobaccoStatus","CIG1":     "tobaccoStatus",
+            "smkstat1": "tobaccoStatus","SMKSTAT1": "tobaccoStatus",
+            # Activité physique MESA (MET-min/semaine)
+            "modmin1":  "mod_min_week", "MODMIN1":  "mod_min_week",
+            "vigmin1":  "vig_min_week", "VIGMIN1":  "vig_min_week",
+            # Sommeil
+            "sleepdr1": "sleepHours",   "SLEEPDR1": "sleepHours",
+            # Alcool (drinks/semaine)
+            "alcwk1":   "drinksPerWeek","ALCWK1":   "drinksPerWeek",
+            # Comorbidités
+            "dm031":    "has_diabetes", "DM031":    "has_diabetes",
+            "htn1":     "has_hta",      "HTN1":     "has_hta",
+            "htnmed1":  "has_hta_med",  "HTNMED1":  "has_hta_med",
         },
         "sex_map": {0: "F", 1: "M", "F": "F", "M": "M", "Female": "F", "Male": "M"},
         # MESA RACE1C : 1=White/Caucasian, 2=Chinese American, 3=Black/African Am, 4=Hispanic
@@ -220,7 +243,7 @@ def find_id_column(df, study_config):
         if col.upper() == preferred.upper():
             return col
     # Fallback : chercher des patterns courants
-    for pattern in ["ID", "PID", "SUBJID", "SEQN", "MESAID", "DBGAP_ID"]:
+    for pattern in ["ID", "IDNO", "PID", "SUBJID", "SEQN", "MESAID", "DBGAP_ID"]:
         for col in df.columns:
             if col.upper() == pattern:
                 return col
@@ -278,6 +301,7 @@ def load_biolincc_study(study_name, data_path="./biolincc_data/", file_list=None
 
     # --- Découverte des fichiers ---
     if file_list:
+        # Mapping explicite fourni par l'utilisateur
         files_by_cat = {}
         for cat, fpath in file_list.items():
             full_path = os.path.join(study_dir, fpath) if not os.path.isabs(fpath) else fpath
@@ -285,7 +309,26 @@ def load_biolincc_study(study_name, data_path="./biolincc_data/", file_list=None
                 files_by_cat[cat] = full_path
             else:
                 print(f"  [!] Fichier non trouvé : {fpath}")
+    elif "files" in config:
+        # Fichiers prédéfinis dans la config de l'étude (ex: MESA)
+        files_by_cat = {}
+        for cat, fname in config["files"].items():
+            full_path = os.path.join(study_dir, fname)
+            if os.path.exists(full_path):
+                files_by_cat[cat] = full_path
+                print(f"  [{cat.upper()}] Trouvé : {fname}")
+            else:
+                print(f"  [{cat.upper()}] Non trouvé : {fname} (optionnel)")
+        # Si aucun fichier prédéfini trouvé, fallback sur découverte auto
+        if not files_by_cat:
+            print("  Fichiers prédéfinis non trouvés, tentative de découverte automatique...")
+            all_files = discover_files(study_dir)
+            print(f"  Fichiers découverts : {len(all_files)}")
+            for f in all_files:
+                print(f"    - {os.path.relpath(f, study_dir)}")
+            files_by_cat = _match_files_to_categories(all_files, config)
     else:
+        # Découverte automatique par patterns
         all_files = discover_files(study_dir)
         print(f"\n  Fichiers découverts : {len(all_files)}")
         for f in all_files:
@@ -468,6 +511,21 @@ def harmonize_to_bmn(df, study_name):
     if 'ldl' not in df_h.columns and all(c in df_h.columns for c in ['tc_mmol', 'hdl', 'tg']):
         df_h['ldl'] = df_h['tc_mmol'] - df_h['hdl'] - df_h['tg'] / 2.2
         print(f"  LDL Friedewald dérivé : TC - HDL - TG/2.2")
+
+    # --- Variables spécifiques MESA ---
+    # VAT/SAT ratio (CT Adipose Tissue — validation du WHtR)
+    if 'vat_area' in df_h.columns and 'sat_area' in df_h.columns:
+        df_h['vat_sat_ratio'] = df_h['vat_area'] / df_h['sat_area'].replace(0, np.nan)
+        print(f"  VAT/SAT ratio dérivé (CT adipose)")
+        print(f"    VAT area : {df_h['vat_area'].mean():.1f} +/- {df_h['vat_area'].std():.1f} cm2")
+        print(f"    SAT area : {df_h['sat_area'].mean():.1f} +/- {df_h['sat_area'].std():.1f} cm2")
+
+    # Activité physique MESA : combiner moderate + vigorous minutes/semaine
+    if 'mod_min_week' in df_h.columns or 'vig_min_week' in df_h.columns:
+        mod = pd.to_numeric(df_h.get('mod_min_week', 0), errors='coerce').fillna(0)
+        vig = pd.to_numeric(df_h.get('vig_min_week', 0), errors='coerce').fillna(0)
+        df_h['physicalActivityMinWeek'] = mod + vig
+        print(f"  Activite physique : moderate + vigorous = {df_h['physicalActivityMinWeek'].mean():.0f} min/sem")
 
     # --- Résumé des données manquantes ---
     bmn_biomarkers = ['homaIR', 'hba1c', 'crphs', 'tghdl', 'glyc', 'ldl', 'tg', 'hdl',
@@ -1541,8 +1599,10 @@ def run_validation(df, imputed_datasets, study_name, output_dir=None):
 # ═══════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    DATA_PATH = "./biolincc_data/"
     STUDY = "MESA"
+
+    # Chemins de données possibles (essayer dans l'ordre)
+    DATA_PATHS = ["./mesa_data/", "./biolincc_data/MESA/", "./biolincc_data/"]
 
     print("=" * 70)
     print("  SCORE BMN v3.0 — VALIDATION SUR COHORTE BioLINCC")
@@ -1550,13 +1610,27 @@ if __name__ == "__main__":
 
     # ── ÉTAPE 1 : Chargement des données ──
     print(f"\n[1/5] Chargement des donnees {STUDY}...")
-    df = load_biolincc_study(STUDY, data_path=DATA_PATH)
+
+    # Essayer chaque chemin
+    df = None
+    for DATA_PATH in DATA_PATHS:
+        resolved = DATA_PATH
+        if os.path.isdir(resolved):
+            print(f"  Tentative : {resolved}")
+            df = load_biolincc_study(STUDY, data_path=resolved)
+            if df is not None:
+                break
 
     if df is None:
         print(f"\n  Pour utiliser ce script :")
         print(f"    1. Telechargez les donnees depuis https://biolincc.nhlbi.nih.gov/")
-        print(f"    2. Decompressez dans {DATA_PATH}<STUDY_NAME>/")
-        print(f"    3. Relancez ce script")
+        print(f"    2. Decompressez dans l'un de ces chemins :")
+        for p in DATA_PATHS:
+            print(f"       - {p}")
+        print(f"    3. Relancez : python3 biolincc_data_loader.py")
+        print(f"\n  Fichiers MESA attendus :")
+        for cat, fname in STUDY_CONFIGS["MESA"]["files"].items():
+            print(f"    - {fname} ({cat})")
         print(f"\n  Etudes supportees : {', '.join(STUDY_CONFIGS.keys())}")
         exit(0)
 
