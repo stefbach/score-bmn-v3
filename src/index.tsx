@@ -429,7 +429,7 @@ tr:hover{background:rgba(129,140,248,.05)}
   <a href="#s1"><span>1.</span> Vue d'ensemble</a>
   <a href="#s2"><span>2.</span> Architecture generale</a>
   <a href="#s3"><span>3.</span> Profils ethniques (9 profils)</a>
-  <a href="#s4"><span>4.</span> Comorbidites (14 pathologies)</a>
+  <a href="#s4"><span>4.</span> Comorbidites (13 declaratives + IR occulte auto)</a>
   <a href="#s5"><span>5.</span> Biomarqueurs (15 marqueurs)</a>
   <a href="#s6"><span>6.</span> Instruments psychometriques valides</a>
   <a href="#s7"><span>7.</span> Phase C — Score Clinique (0-50)</a>
@@ -558,7 +558,7 @@ PATIENT &rarr; QUESTIONNAIRE (18 ecrans)
 <!-- ═══════════════════════════════════════════ -->
 <!-- 4. COMORBIDITES -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="s4">4. Comorbidites (14 pathologies)</h2>
+<h2 id="s4">4. Comorbidites (13 declaratives + IR occulte auto-detectee)</h2>
 <p><strong>Sources :</strong> ADA 2024, IDF MetS, DPP. Score BMN-K = somme des points, cap <strong>50</strong>.</p>
 
 <h3>Maladies etablies</h3>
@@ -579,7 +579,7 @@ PATIENT &rarr; QUESTIONNAIRE (18 ecrans)
 <table>
 <tr><th>ID</th><th>Nom</th><th>Pts</th><th>Evidence</th><th>Description</th><th>ca</th><th>gr</th><th>Fav</th></tr>
 <tr><td><code>monw</code></td><td>Phenotype MONW</td><td><b>10</b></td><td>OR 2.38</td><td>IMC &lt; 25 mais 2+ criteres MetS</td><td>1.1</td><td>0.70</td><td><span class="badge g">Oui</span></td></tr>
-<tr><td><code>ir_occ</code></td><td>IR occulte</td><td><b>8</b></td><td>OR 2.12</td><td>TG/HDL &gt; 3.5 non diagnostique</td><td>1.2</td><td>0.55</td><td><span class="badge g">Oui</span></td></tr>
+<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td><code>ir_occ</code></td><td>IR occulte <b>(AUTO)</b></td><td><b>8</b></td><td>OR 2.12</td><td>⚠ Non declarable. Detection automatique si TG/HDL &gt; 3.5 dans la biologie. +8 pts BMN-K injectes automatiquement.</td><td>1.2</td><td>0.55</td><td><span class="badge g">Auto</span></td></tr>
 </table>
 
 <h3>Traitements aggravants</h3>
@@ -948,7 +948,8 @@ Si gap &gt; 20 : extraW = min(0.30, (gap-20)/100*0.60)
 <tr><td>HOMA-IR biologique</td><td>&ge; 4</td><td>+3</td><td>Biologie</td></tr>
 <tr><td>HOMA-IR biologique</td><td>&ge; 2.5</td><td>+2</td><td>Biologie</td></tr>
 <tr><td>DT2 declare (proxy)</td><td>Oui</td><td>+3</td><td>Declaratif</td></tr>
-<tr><td>Pre-diabete / MetS / IR occulte (proxy)</td><td>Oui</td><td>+2 / +2 / +2.5</td><td>Declaratif</td></tr>
+<tr><td>Pre-diabete / MetS (proxy)</td><td>Oui</td><td>+2 / +2</td><td>Declaratif</td></tr>
+<tr style="background:rgba(239,68,68,.08)"><td>IR occulte (auto-detectee)</td><td>TG/HDL &gt; 3.5</td><td>+8 pts BMN-K auto + irScore via bio</td><td>Biologie (v3.1.1)</td></tr>
 <tr><td>Adiponectine basse</td><td>&lt; 6 ug/mL</td><td>+1.5</td><td>Biologie</td></tr>
 <tr><td>TG/HDL eleve</td><td>&gt; 3.5</td><td>+1.5</td><td>Biologie</td></tr>
 <tr><td>SOPK</td><td>Oui</td><td>+1</td><td>Declaratif</td></tr>
@@ -1196,7 +1197,7 @@ SINON
 <tr><td>11</td><td>Sommeil + substances</td></tr>
 <tr><td>12</td><td>Stress PSS-10 (10 items)</td><td rowspan="2">[S] Sante mentale</td></tr>
 <tr><td>13</td><td>Depression PHQ-9 + BES</td></tr>
-<tr><td>14</td><td>Comorbidites (14 pathologies)</td><td>[P] Pathologies</td></tr>
+<tr><td>14</td><td>Comorbidites (13 declaratives + IR occulte auto)</td><td>[P] Pathologies</td></tr>
 <tr><td>15</td><td>Score sD + Prescription bio</td><td>[sD] Score</td></tr>
 <tr><td>16</td><td>Fiche biologique + simulation</td><td>[B] Biologie</td></tr>
 <tr><td>17</td><td>Resultat final complet</td><td>[R] Resultat</td></tr>
@@ -1347,7 +1348,7 @@ tr:nth-child(even){background:var(--bg2)}
   <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1</div>
   <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 2 mars 2026</div>
   <div style="font-size:11px;color:var(--dim3)">Version : DS-3.1-FINAL | Classification : Usage médical restreint</div>
-  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.1 : +Dyslipidémie (14e comorbidité) · Flag statines · Correction bioNorm</div>
+  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.1.1 : +Dyslipidémie (14e) · Flag statines · IR occulte auto-détectée (TG/HDL > 3.5)</div>
 </div>
 
 <div class="toc">
@@ -1516,7 +1517,7 @@ Justification des plages :<br>
 <p>Seuils IDF 2006 spécifiques par ethnie et sexe. Dépassement du seuil = +1 pt, dépassement &gt;10 cm = +2 pts. L'obésité abdominale est le meilleur prédicteur de la résistance à l'insuline (Després 2012, Nature).</p>
 
 <h3>5.4 Sous-score c4 — Comorbidités projetées (0-10 pts)</h3>
-<p>Projection du score BMN-K (0-50, somme pondérée des 14 comorbidités v3.1) sur une échelle 0-10 avec modulation ethnique pour l'HTA (multiplicateur hR) et le diabète (multiplicateur dR). v3.1 : inclut la dyslipidémie avec 3 sous-types et interaction MetS (+3). Voir section X et XXIII pour le détail.</p>
+<p>Projection du score BMN-K (0-50, somme pondérée des 13 comorbidités déclaratives + IR occulte auto-détectée) sur une échelle 0-10 avec modulation ethnique pour l'HTA (multiplicateur hR) et le diabète (multiplicateur dR). v3.1 : inclut la dyslipidémie avec 3 sous-types et interaction MetS (+3). v3.1.1 : IR occulte retirée du déclaratif → détection automatique via TG/HDL > 3.5 (+8 pts BMN-K). Voir section X et XXIII pour le détail.</p>
 
 <h3>5.5 Sous-score c5 — Antécédents familiaux & génétique (0-10 pts)</h3>
 <table>
@@ -1655,7 +1656,7 @@ de l'exposome. Les particules fines aggravent un terrain inflammatoire préexist
 <tr><td>nafld</td><td>NAFLD</td><td>10</td><td>OR 3.22</td><td>Younossi et al., Hepatology 2016</td><td>8 500 000</td><td>dis</td><td>1</td><td>IR hépatique. Prévalence 25% mondiale. GLP-1 réduit stéatose -30/40% (Newsome 2021).</td></tr>
 <tr><td>monw</td><td>Phénotype MONW</td><td>10</td><td>OR 2.38</td><td>Stefan et al., Lancet Diab Endocrinol 2017</td><td>15 études</td><td>phe</td><td>1</td><td>IMC &lt; 25 mais ≥2 critères MetS. Risque sous-estimé. Sensibilité du modèle ++.</td></tr>
 <tr><td>predmt</td><td>Pré-diabète</td><td>8</td><td>HR 2.11</td><td>Huang et al., BMJ 2016</td><td>1 611 339</td><td>dis</td><td>1</td><td>HbA1c 5.7-6.4%. Réversible. GLP-1 prévient DT2 (réduction 80%, STEP 2).</td></tr>
-<tr><td>ir_occ</td><td>IR occulte</td><td>8</td><td>OR 2.12</td><td>McLaughlin et al., Circulation 2005</td><td>n=490</td><td>phe</td><td>1</td><td>TG/HDL > 3.5 non diagnostiquée. Détection = objectif de sensibilité du modèle.</td></tr>
+<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td>ir_occ</td><td>IR occulte <b>(AUTO v3.1.1)</b></td><td>8</td><td>OR 2.12</td><td>McLaughlin et al., Circulation 2005</td><td>n=490</td><td>bio-auto</td><td>1</td><td><b>v3.1.1 : Retirée du déclaratif</b> — le patient ne peut pas savoir qu'il a une IR occulte. Détection automatique via TG/HDL > 3.5 dans le module biologique. +8 pts BMN-K injectés automatiquement, CTI ca ×1.2, GRI +0.55.</td></tr>
 <tr><td>cortis</td><td>Corticoïdes >3 mois</td><td>8</td><td>HR 2.12</td><td>Fardet et al., J Clin Endocrinol Metab 2007</td><td>6 500</td><td>tx</td><td>0</td><td>Adipogenèse viscérale iatrogène. gr = -0.35 (antagonise GLP-1).</td></tr>
 <tr><td>hypo</td><td>Hypothyroïdie</td><td>6</td><td>OR 1.74</td><td>Laurberg et al., Eur Thyroid J 2012</td><td>34 000</td><td>dis</td><td>0</td><td>TSH>4 → métabolisme ralenti -10/15%. À corriger AVANT GLP-1.</td></tr>
 <tr><td>depres</td><td>Dépression traitée</td><td>6</td><td>OR 1.92</td><td>Luppino et al., Arch Gen Psychiatry 2010</td><td>58 745</td><td>tx</td><td>0</td><td>Impact métabolique bidirectionnel. Compliance réduite.</td></tr>
@@ -1826,7 +1827,8 @@ GRI = Σ δ_k × F_k − Σ ε_k × U_k<br>
 <br>
 Facteurs FAVORABLES (δ) :<br>
   • Comorbidités gri_fav=1 : predmt (0.82), sopk (0.83), monw (0.70), mets (0.65),<br>
-    nafld (0.66), dt2 (0.65), ir_occ (0.55)<br>
+    nafld (0.66), dt2 (0.65)<br>
+  • IR occulte : +0.55 (auto-détectée via TG/HDL > 3.5, v3.1.1 — non déclarative)<br>
   • HOMA-IR > 2.5 : +1.07<br>
   • Adiponectine &lt; 6 : +0.62<br>
   • TG/HDL > 3.5 : +0.55<br>
@@ -2070,7 +2072,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
     E = min(45, round(30×(0.7×A+0.5×B+0.3×C_layer)/1.5 × (1+0.15×bInflam)))<br>
     O = min(10, Karasek_or_Retraite)<br>
     L = min(10, l1+l2+l3+l4)<br>
-    K_v3.1 = Σ(pts_14_comorbidités) ≤ 50 | dyslipi: 10(mixte)/8(traitée)/6(LDL) | +3 si mixte+MetS<br>
+    K_v3.1.1 = Σ(pts_13_comorbidités_décl) + ir_occ_auto(8 si TG/HDL>3.5) ≤ 50 | dyslipi: 10(mixte)/8(traitée)/6(LDL) | +3 si mixte+MetS<br>
     LDL_eff = statines ? LDL×1.35 : LDL | TG_eff = fibrates ? TG×1.30 : TG | w_ApoB = statines&gt;5ans ? 2.5 : 1.5<br>
     bioNorm = (Σ z_i×w_i_eff / Σ w_i_eff) × 100<br>
     sf = wDecl×sD + wBio×bioNorm (+ repondération + planchers)<br>
@@ -2158,7 +2160,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 
 <div style="margin-top:30px;text-align:center;font-size:11px;color:var(--dim3)">
   Document confidentiel — SCORE BMN v3.1 — Bach · Manos · Noël — 2 mars 2026<br>
-  93+ références | 22 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 | v3.1 : +Dyslipidémie (14e comorbidité)<br>
+  93+ références | 23 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 | v3.1.1 : IR occulte auto-détectée<br>
   Usage médical restreint — Ne pas diffuser sans autorisation
 </div>
 
