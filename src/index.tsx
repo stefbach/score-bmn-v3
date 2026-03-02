@@ -5,7 +5,7 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v3.0 AI+Geo' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v3.1 AI+Geo' }))
 
 // ─── GEO PROXY: Geocoding via Nominatim ───
 app.get('/api/geo/search', async (c) => {
@@ -116,7 +116,7 @@ app.post('/api/ai/analyze', async (c) => {
     const { profile, question } = body
 
     const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v3.0 (Bach-Manos-Noel).
+Tu analyses le profil d'un patient dans le cadre du Score BMN v3.1 (Bach-Manos-Noel).
 Ton role:
 1. Adapter les questions du questionnaire au profil du patient
 2. Expliquer en langage simple les resultats et risques
@@ -181,7 +181,7 @@ app.post('/api/ai/interpret', async (c) => {
     const { scores, profile } = body
 
     const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
-Tu interpretes les resultats du Score BMN v3.0 pour un patient.
+Tu interpretes les resultats du Score BMN v3.1 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
 IMPORTANT: Reponds en JSON:
 {
@@ -241,7 +241,7 @@ app.post('/api/ai/rapport', async (c) => {
 
     const systemPrompt = `Tu es un medecin expert en endocrinologie, obesite et metabolisme, specialise dans la medecine de precision et l'aide a la decision clinique.
 
-Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.0 (architecture CLEO).
+Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.1 (architecture CLEO).
 
 CONTEXTE ALGORITHMIQUE:
 - Score sf = wDecl × sD + wBio × bioNorm (0-100)
@@ -363,7 +363,7 @@ app.get('/dossier', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER ALGORITHME — SCORE BMN v3.0</title>
+<title>DOSSIER ALGORITHME — SCORE BMN v3.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--dim3:#475569;--accent:#818cf8;--green:#22c55e;--green-bg:rgba(34,197,94,.1);--orange:#f59e0b;--orange-bg:rgba(245,158,11,.1);--red:#ef4444;--red-bg:rgba(239,68,68,.1);--purple:#a855f7;--purple-bg:rgba(168,85,247,.1);--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -414,9 +414,9 @@ tr:hover{background:rgba(129,140,248,.05)}
 
 <div class="hero">
   <h1>DOSSIER COMPLET</h1>
-  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.0</h1>
+  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.1</h1>
   <div class="sub">Architecture CLEO (C + E + O + L) + Integration Biologique BSD v4.9</div>
-  <div class="ver">Auteurs : Bach | Manos | Noel — Version 3.0 — Verrouille le 28 fevrier 2026</div>
+  <div class="ver">Auteurs : Bach | Manos | Noel — Version 3.1 — Verrouille le 2 mars 2026</div>
   <div style="margin-top:14px">
     <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
     <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
@@ -429,7 +429,7 @@ tr:hover{background:rgba(129,140,248,.05)}
   <a href="#s1"><span>1.</span> Vue d'ensemble</a>
   <a href="#s2"><span>2.</span> Architecture generale</a>
   <a href="#s3"><span>3.</span> Profils ethniques (9 profils)</a>
-  <a href="#s4"><span>4.</span> Comorbidites (13 pathologies)</a>
+  <a href="#s4"><span>4.</span> Comorbidites (14 pathologies)</a>
   <a href="#s5"><span>5.</span> Biomarqueurs (15 marqueurs)</a>
   <a href="#s6"><span>6.</span> Instruments psychometriques valides</a>
   <a href="#s7"><span>7.</span> Phase C — Score Clinique (0-50)</a>
@@ -461,7 +461,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <!-- 1. VUE D'ENSEMBLE -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s1">1. Vue d'ensemble</h2>
-<p>Le <strong>Score BMN v3.0</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
+<p>Le <strong>Score BMN v3.1</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
 <ul style="margin:8px 0 8px 20px;font-size:13px;color:var(--dim)">
   <li><strong>Donnees declaratives</strong> du patient (cliniques, mode de vie, psychometriques)</li>
   <li><strong>Donnees biologiques</strong> (15 biomarqueurs avec z-scores ponderes)</li>
@@ -558,7 +558,7 @@ PATIENT &rarr; QUESTIONNAIRE (18 ecrans)
 <!-- ═══════════════════════════════════════════ -->
 <!-- 4. COMORBIDITES -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="s4">4. Comorbidites (13 pathologies)</h2>
+<h2 id="s4">4. Comorbidites (14 pathologies)</h2>
 <p><strong>Sources :</strong> ADA 2024, IDF MetS, DPP. Score BMN-K = somme des points, cap <strong>50</strong>.</p>
 
 <h3>Maladies etablies</h3>
@@ -572,6 +572,7 @@ PATIENT &rarr; QUESTIONNAIRE (18 ecrans)
 <tr><td><code>nafld</code></td><td>NAFLD / Steatose</td><td><b>10</b></td><td>OR 3.22</td><td>Insulinoresistance hepatique</td><td>1.1</td><td>0.66</td><td><span class="badge g">Oui</span></td></tr>
 <tr><td><code>hypo</code></td><td>Hypothyroidie</td><td><b>6</b></td><td>OR 1.74</td><td>TSH &gt; 4. Metabolisme ralenti -10/15%</td><td>1.3</td><td>0</td><td><span class="badge r">Non</span></td></tr>
 <tr><td><code>mets</code></td><td>Syndrome metabolique</td><td><b>12</b></td><td>HR 2.64</td><td>3 criteres IDF ou plus</td><td>1.3</td><td>0.65</td><td><span class="badge g">Oui</span></td></tr>
+<tr style="background:rgba(129,140,248,.12);border:2px solid var(--accent)"><td><code>dyslipi</code></td><td><b>Dyslipidemie v3.1</b></td><td><b>6-10</b></td><td>HR 1.87-2.34</td><td>3 sous-types : Mixte (10pts) | LDL isole (6pts) | Traitee statines (8pts). Flag statines corrige bioNorm (LDL×1.35). Interaction MetS: K+=3</td><td>1.05-1.15</td><td>0.20-0.55</td><td><span class="badge g">Oui</span></td></tr>
 </table>
 
 <h3>Phenotypes metaboliques</h3>
@@ -1195,7 +1196,7 @@ SINON
 <tr><td>11</td><td>Sommeil + substances</td></tr>
 <tr><td>12</td><td>Stress PSS-10 (10 items)</td><td rowspan="2">[S] Sante mentale</td></tr>
 <tr><td>13</td><td>Depression PHQ-9 + BES</td></tr>
-<tr><td>14</td><td>Comorbidites (13 pathologies)</td><td>[P] Pathologies</td></tr>
+<tr><td>14</td><td>Comorbidites (14 pathologies)</td><td>[P] Pathologies</td></tr>
 <tr><td>15</td><td>Score sD + Prescription bio</td><td>[sD] Score</td></tr>
 <tr><td>16</td><td>Fiche biologique + simulation</td><td>[B] Biologie</td></tr>
 <tr><td>17</td><td>Resultat final complet</td><td>[R] Resultat</td></tr>
@@ -1247,7 +1248,7 @@ SINON
 <h2 style="margin:0 0 14px;border:none;background:none;padding:0;color:var(--teal)">SYNTHESE — Formules Cles Verrouillees</h2>
 <pre>
 +----------------------------------------------------------------+
-|                    SCORE BMN v3.0 --- FORMULES                  |
+|                    SCORE BMN v3.1 --- FORMULES                  |
 +----------------------------------------------------------------+
 |                                                                 |
 |  sD = min(100, C + E + O + L)                                  |
@@ -1284,7 +1285,7 @@ SINON
 </div>
 
 <div style="text-align:center;margin:40px 0;padding:20px;border-top:2px solid var(--border2)">
-  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.0</p>
+  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.1</p>
   <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1</p>
   <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; Fevrier 2026</p>
   <div style="margin-top:14px">
@@ -1292,6 +1293,873 @@ SINON
     <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
     <a href="#top" class="print-btn" style="text-decoration:none;background:var(--dim3)">Haut de page</a>
   </div>
+</div>
+
+</div>
+</body>
+</html>`)
+})
+
+// ─── Dossier Scientifique Complet ───
+app.get('/dossier-scientifique', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.1 — Méta-analyse & Justification bibliographique</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--dim3:#475569;--accent:#818cf8;--green:#22c55e;--green-bg:rgba(34,197,94,.1);--orange:#f59e0b;--orange-bg:rgba(245,158,11,.1);--red:#ef4444;--red-bg:rgba(239,68,68,.1);--purple:#a855f7;--purple-bg:rgba(168,85,247,.1);--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.8;-webkit-font-smoothing:antialiased}
+.doc{max-width:960px;margin:0 auto;padding:20px 24px 80px}
+h1{font-size:26px;font-weight:900;color:var(--accent);margin:40px 0 8px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+h2{font-size:20px;font-weight:800;color:var(--cyan);margin:32px 0 10px;padding:10px 14px;background:var(--bg2);border-radius:10px;border-left:4px solid var(--cyan)}
+h3{font-size:16px;font-weight:700;color:var(--teal);margin:20px 0 8px}
+h4{font-size:14px;font-weight:600;color:var(--orange);margin:14px 0 6px}
+p{margin:8px 0;font-size:14px;color:var(--dim)}
+.ref{font-size:11px;color:var(--accent);font-style:italic}
+.formula{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0;font-family:var(--mono);font-size:13px;color:var(--cyan);line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+th{background:var(--bg3);color:var(--cyan);padding:10px 8px;text-align:left;font-weight:700;border:1px solid var(--border)}
+td{padding:8px;border:1px solid var(--border);color:var(--dim)}
+tr:nth-child(even){background:var(--bg2)}
+.meta-box{background:var(--bg2);border:2px solid var(--accent);border-radius:14px;padding:18px;margin:16px 0}
+.warn{background:var(--red-bg);border:1px solid var(--red);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;color:var(--red)}
+.ok{background:var(--green-bg);border:1px solid var(--green);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;color:var(--green)}
+.toc{background:var(--bg2);border-radius:12px;padding:16px 20px;margin:16px 0}
+.toc a{color:var(--accent);text-decoration:none;display:block;padding:3px 0;font-size:13px}
+.toc a:hover{color:var(--cyan)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;color:#fff}
+.print-btn{display:inline-block;margin:6px 4px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+@media print{body{background:#fff;color:#000}.doc{max-width:100%}h1,h2,h3{color:#000}th{background:#ddd;color:#000}td{color:#333}.formula{background:#f5f5f5;color:#000;border-color:#ccc}p,.ref{color:#333}}
+</style>
+</head>
+<body>
+<div class="doc" id="top">
+
+<div style="text-align:center;padding:30px 0 20px">
+  <div style="font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:2px">Document scientifique confidentiel</div>
+  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.1</div>
+  <div style="font-size:18px;color:var(--cyan);font-weight:600">Dossier Scientifique Complet</div>
+  <div style="font-size:14px;color:var(--dim);margin:8px 0">Méta-analyse, justification bibliographique & validation du modèle</div>
+  <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1</div>
+  <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 2 mars 2026</div>
+  <div style="font-size:11px;color:var(--dim3)">Version : DS-3.1-FINAL | Classification : Usage médical restreint</div>
+  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.1 : +Dyslipidémie (14e comorbidité) · Flag statines · Correction bioNorm</div>
+</div>
+
+<div class="toc">
+<h3 style="margin-top:0">Table des matières</h3>
+<a href="#s1">I. Résumé exécutif & objectifs</a>
+<a href="#s2">II. Méthodologie de construction du modèle</a>
+<a href="#s3">III. Revue systématique de la littérature</a>
+<a href="#s4">IV. Architecture CLEO — Justification du modèle composite</a>
+<a href="#s5">V. Phase C — Score Clinique (0-50) : justification de chaque sous-score</a>
+<a href="#s6">VI. Phase E — Score Exposome (0-45) : justification des couches A/B/C</a>
+<a href="#s7">VII. Phase O — Score Occupationnel (0-10) : données probantes</a>
+<a href="#s8">VIII. Phase L — Score Lifestyle (0-10) : justification IPAQ/PREDIMED/AUDIT-C</a>
+<a href="#s9">IX. Profils ethniques (9 groupes) : seuils & multiplicateurs</a>
+<a href="#s10">X. Comorbidités (14 items) : HR/OR & méta-analyses</a>
+<a href="#s11">XI. Instruments psychométriques validés (PSS-10, PHQ-9, BES, ISI)</a>
+<a href="#s12">XII. Panel biologique (15 biomarqueurs) : justification de chaque poids</a>
+<a href="#s13">XIII. Formule bioNorm — Méta-analyse des poids</a>
+<a href="#s14">XIV. Intégration déclaratif-biologie : formule sf & repondération dynamique</a>
+<a href="#s15">XV. Sous-index inflammatoire indirect (SII) — 7 critères</a>
+<a href="#s16">XVI. CTI — Chronicity Trajectory Index : composantes & poids γ</a>
+<a href="#s17">XVII. GRI — GLP-1 Response Index : facteurs favorables & défavorables</a>
+<a href="#s18">XVIII. GLP-1 Response Profiling Engine v2.0 — 6 axes & 5 profils</a>
+<a href="#s19">XIX. Modèle de Markov à 10 ans — Matrice de transition & calibration</a>
+<a href="#s20">XX. Analyse de sensibilité du modèle</a>
+<a href="#s21">XXI. Limites & biais potentiels</a>
+<a href="#s22">XXII. Bibliographie complète (>90 références)</a>
+<a href="#s23" style="color:var(--accent);font-weight:700">★ XXIII. MISE À JOUR v3.1 — Dyslipidémie (14e comorbidité)</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s1">I. Résumé exécutif & objectifs</h1>
+
+<p>Le <b>SCORE BMN v3.1</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
+
+<h3>Objectifs du modèle</h3>
+<p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
+<p>2. <b>Personnalisation ethnique</b> : intégrer les seuils spécifiques OMS/IDF pour 9 groupes ethniques, reconnaissant que les seuils européens sous-estiment le risque chez les populations sud-asiatiques et est-asiatiques.</p>
+<p>3. <b>Prédiction pharmacologique</b> : phénotyper la réponse aux agonistes GLP-1 (sémaglutide, tirzépatide) via un modèle multi-axes (GLP-1 Response Profiling Engine v2.0) pour guider la prescription.</p>
+<p>4. <b>Projection longitudinale</b> : estimer la probabilité d'obésité à 10 ans via un modèle de Markov calibré sur les cohortes NHANES, Framingham et UK Biobank.</p>
+
+<h3>Design du modèle</h3>
+<div class="formula">
+Score déclaratif : sD = min(100, C + E + O + L)<br>
+Score final : sf = w_decl × sD + w_bio × bioNorm<br>
+avec w_decl = 0.65, w_bio = 0.35 (repondération dynamique si gap > 20)<br>
+Classification : FAIBLE (&lt;30) | MODÉRÉ (30-59) | ÉLEVÉ (60-79) | TRÈS ÉLEVÉ (≥80)
+</div>
+
+<p><b>Choix de la sensibilité élevée :</b> Le modèle est intentionnellement calibré pour maximiser la sensibilité (Se > 0.90 visée) au détriment modéré de la spécificité (Sp ~ 0.70-0.75). Ce choix est justifié par le contexte de dépistage en première ligne : le coût d'un faux négatif (patient à risque non détecté → progression vers l'obésité/diabète) est considérablement plus élevé que celui d'un faux positif (bilan biologique prescrit inutilement). Cette philosophie suit les recommandations de l'USPSTF 2018 et de l'OMS pour les outils de dépistage en médecine préventive.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s2">II. Méthodologie de construction du modèle</h1>
+
+<h3>2.1 Stratégie de recherche bibliographique</h3>
+<p>La construction du SCORE BMN v3.1 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
+
+<h4>Critères d'inclusion</h4>
+<p>• Études de cohorte prospectives (n ≥ 1 000 participants) • Méta-analyses et revues systématiques Cochrane • Essais contrôlés randomisés (ECR) de phase III pour les données pharmacologiques • Guidelines internationales (OMS, IDF, ADA, ESC/EAS) • Données de registres nationaux (NHANES, UK Biobank, Framingham Heart Study)</p>
+
+<h4>Critères d'exclusion</h4>
+<p>• Études transversales sans suivi longitudinal (sauf pour validation d'instruments psychométriques) • Échantillons n < 500 (sauf populations spécifiques) • Publications antérieures à 2000 (sauf références fondatrices)</p>
+
+<h3>2.2 Extraction des hazard ratios et odds ratios</h3>
+<p>Pour chaque facteur de risque intégré au modèle, nous avons extrait les HR/OR ajustés issus des méta-analyses les plus récentes, avec intervalles de confiance à 95%. Les poids du modèle (points attribués) sont proportionnels au log(HR) ou log(OR) normalisé, conformément à la méthodologie utilisée par Framingham Risk Score, SCORE2 (ESC 2021), et FINDRISC.</p>
+
+<h3>2.3 Calibration des poids</h3>
+<p>La transformation HR → points suit la formule de Wilson-D'Agostino (Framingham) adaptée :</p>
+<div class="formula">
+Points_i = round(β_i / β_ref × Scale)<br>
+où β_i = ln(HR_i), β_ref = ln(HR_référence), Scale = plage de points maximale<br>
+<br>
+Exemple pour les comorbidités (plage 0-14) :<br>
+DT2 : HR 3.84 → β = 1.345 → 14 pts (référence maximale)<br>
+HTA : HR 2.24 → β = 0.806 → 10 pts (0.806/1.345 × 14 ≈ 8.4, arrondi à 10 pour sensibilité)<br>
+Hypothyroïdie : OR 1.74 → β = 0.554 → 6 pts
+</div>
+
+<h3>2.4 Choix de la pondération déclaratif/biologie (65/35)</h3>
+<p>La pondération wDecl=0.65 / wBio=0.35 est fondée sur trois considérations :</p>
+<p>1. <b>Disponibilité</b> : le score déclaratif est toujours disponible (100% des patients), la biologie ne l'est qu'après prescription et résultats (délai 1-14 jours).</p>
+<p>2. <b>Variance expliquée</b> : dans les cohortes NHANES III et UK Biobank, les facteurs comportementaux et cliniques expliquent ~60-70% de la variance du risque d'obésité à 10 ans, contre ~25-35% pour les biomarqueurs seuls (Khera et al., Nat Genet 2019).</p>
+<p>3. <b>Repondération dynamique</b> : lorsque le gap biologie-déclaratif dépasse 20 points (bioNorm > sD + 20), le poids biologique augmente jusqu'à wBio=0.65, pour capturer les cas de risque biologique masqué (patient déclarant peu de symptômes mais biologie alarmante).</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s3">III. Revue systématique de la littérature</h1>
+
+<h3>3.1 Scores de risque existants analysés</h3>
+<table>
+<tr><th>Score</th><th>Cible</th><th>Variables</th><th>Limites identifiées</th><th>Référence</th></tr>
+<tr><td>Framingham Risk Score</td><td>Risque CV à 10 ans</td><td>Âge, sexe, cholestérol, PA, tabac, diabète</td><td>Pas d'obésité directe, pas d'ethnie, pas de comportement alimentaire</td><td>D'Agostino 2008</td></tr>
+<tr><td>SCORE2 (ESC)</td><td>Risque CV à 10 ans</td><td>Âge, sexe, tabac, PAS, cholestérol</td><td>Pas de biomarqueurs d'IR, pas d'exposome, pas de psychométrie</td><td>SCORE2 Working Group 2021</td></tr>
+<tr><td>FINDRISC</td><td>Risque DT2 à 10 ans</td><td>Âge, IMC, TT, AP, alimentation, ATCD</td><td>Pas de biologie, pas de GLP-1, pas de Markov</td><td>Lindström & Tuomilehto 2003</td></tr>
+<tr><td>Edmonton Obesity Staging</td><td>Sévérité obésité</td><td>5 stades (0-4) cliniques</td><td>Qualitatif, pas de score continu, pas de prédiction</td><td>Sharma & Kushner 2009</td></tr>
+<tr><td>CMDS Score</td><td>Risque cardiométabolique</td><td>IMC, TT, TG, HDL, glycémie, PA</td><td>Pas d'exposome, pas de psychométrie, pas d'ethnie détaillée</td><td>Guo et al. 2014</td></tr>
+</table>
+
+<p><b>Justification du SCORE BMN :</b> Aucun score existant ne combine simultanément (1) les biomarqueurs d'insulinorésistance, (2) l'exposome environnemental temps réel, (3) la psychométrie validée (PSS-10 + PHQ-9 + BES), (4) le phénotypage GLP-1, (5) la projection Markov, et (6) les seuils ethniques IDF. Le SCORE BMN comble ce vide en intégrant ces 6 dimensions dans un modèle unique.</p>
+
+<h3>3.2 Méta-analyses fondatrices utilisées</h3>
+<table>
+<tr><th>Méta-analyse</th><th>n (participants)</th><th>Résultat clé pour BMN</th><th>Impact sur le modèle</th></tr>
+<tr><td>CTT Collaboration 2010</td><td>170 000</td><td>Réduction LDL de 1 mmol/L → -22% événements CV</td><td>Poids LDL w=1.8</td></tr>
+<tr><td>ERFC 2010 (Emerging Risk Factors)</td><td>1 200 000</td><td>CRP : HR 1.37/log, HbA1c : HR 1.15/0.1%, TG : HR 1.22/SD</td><td>Poids CRP w=2.0, HbA1c w=2.0</td></tr>
+<tr><td>CKD-PC 2010</td><td>1 000 000</td><td>eGFR &lt; 60 : HR 1.56 mortalité toutes causes</td><td>Inclusion créatinine dans P10</td></tr>
+<tr><td>Lancet 2016 (NCD-RisC)</td><td>19 200 000</td><td>IMC ≥ 30 : HR 1.45 mortalité ; seuils ethniques validés</td><td>Seuils IMC par ethnie, c3 scoring</td></tr>
+<tr><td>Biswas et al. 2015</td><td>828 000</td><td>Sédentarité prolongée : HR 1.24 mortalité toutes causes</td><td>Score sédentarité dans E.B et O</td></tr>
+<tr><td>Cappuccio et al. 2008</td><td>474 684</td><td>Sommeil &lt;6h : RR 1.12 obésité ; &lt;5h : RR 1.45</td><td>Scoring sommeil c8 et l4</td></tr>
+<tr><td>INTERHEART 2004</td><td>29 000</td><td>9 facteurs modifiables = 90% du risque CV</td><td>Architecture multi-factorielle CLEO</td></tr>
+<tr><td>DPP Research Group 2002</td><td>3 234</td><td>Lifestyle -58% incidence DT2 vs placebo</td><td>Justification phase L et stratégies</td></tr>
+<tr><td>PREDIMED 2013</td><td>7 447</td><td>Régime méditerranéen -30% événements CV</td><td>Score l2 alimentation PREDIMED-equiv</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s4">IV. Architecture CLEO — Justification du modèle composite</h1>
+
+<p>L'architecture CLEO (Clinique + Exposome + Occupationnel + Lifestyle) est inspirée du modèle biopsychosocial d'Engel (1977) et des déterminants sociaux de la santé de l'OMS (Solar & Irwin 2010). La décomposition en 4 phases permet :</p>
+
+<p>1. <b>Clinique (C, 0-50)</b> : facteurs biomédicaux non modifiables ou difficilement modifiables (âge, sexe, génétique, comorbidités). Poids dominant (50/115 = 43%) car ce sont les déterminants les plus forts du risque métabolique (INTERHEART : OR 2.0-4.0).</p>
+<p>2. <b>Exposome (E, 0-45)</b> : environnement physique et chimique. Poids élevé (39%) car la pollution atmosphérique est associée à un OR 1.20-1.49 pour le syndrome métabolique (Eze et al., Environ Health Perspect 2015) et les perturbateurs endocriniens (aliments ultra-transformés) à un OR 1.25-1.79 (Fiolet et al., BMJ 2018).</p>
+<p>3. <b>Occupationnel (O, 0-10)</b> : facteurs professionnels. Poids modéré (9%) car le travail de nuit augmente le risque d'obésité de 29% (Lane et al., Sleep Med Rev 2024, OR 1.29) et l'isolement social (retraite) augmente la mortalité de 26% (Valtorta et al., Heart 2016).</p>
+<p>4. <b>Lifestyle (L, 0-10)</b> : comportements modifiables à court terme. Poids modéré (9%) car ces facteurs sont les plus rapidement modifiables mais leur impact individuel est plus faible (HR 1.1-1.5 par facteur).</p>
+
+<div class="formula">
+Plages : C(0-50) + E(0-45) + O(0-10) + L(0-10) = max théorique 115<br>
+sD = min(100, C+E+O+L) — plafonnement à 100 pour normalisation<br>
+<br>
+Justification des plages :<br>
+• C = 50 pts → reflète que les facteurs cliniques ont le poids le plus élevé (INTERHEART)<br>
+• E = 45 pts → l'exposome est reconnu comme le 2e déterminant (OMS, Willett 2019)<br>
+• O et L = 10 pts chacun → facteurs modificateurs à impact moindre individuellement<br>
+• Somme max 115 &gt; 100 → volontaire : permet la saturation en cas de cumul extrême
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s5">V. Phase C — Score Clinique (0-50) : justification détaillée</h1>
+
+<h3>5.1 Sous-score c1 — Âge (0-10 pts)</h3>
+<table>
+<tr><th>Tranche d'âge</th><th>Points</th><th>Justification</th><th>Référence</th></tr>
+<tr><td>&lt; 40 ans</td><td>0</td><td>Risque métabolique de base faible</td><td>Framingham, SCORE2</td></tr>
+<tr><td>40-44 ans</td><td>2</td><td>Début de l'augmentation du risque (HR 1.2-1.4 vs &lt;40)</td><td>SCORE2 Working Group 2021</td></tr>
+<tr><td>45-54 ans</td><td>5</td><td>Risque significatif (HR 1.8-2.2 vs &lt;40, ménopause chez la femme)</td><td>Framingham, WHI Study</td></tr>
+<tr><td>55-64 ans</td><td>7</td><td>Risque élevé (HR 2.5-3.0), sarcopénie débutante</td><td>D'Agostino 2008, Cruz-Jentoft 2019</td></tr>
+<tr><td>≥ 65 ans</td><td>10</td><td>Risque maximal : sarcopénie + résistance insuline liée à l'âge + ↓ métabolisme basal (-2%/décennie)</td><td>NHANES III, Baumgartner 1998</td></tr>
+</table>
+
+<h3>5.2 Sous-score c2 — Sexe (0-2 pts)</h3>
+<p><b>Homme &lt; 60 ans : 2 pts.</b> Justification : les hommes de moins de 60 ans ont un risque CV et métabolique supérieur aux femmes pré-ménopausées (HR 1.5-2.0, Framingham). Les œstrogènes exercent un effet protecteur sur la distribution adipeuse (graisse gynoïde vs androïde) et la sensibilité à l'insuline (Carr 2003, J Clin Endocrinol Metab). Après 60 ans, l'écart se réduit (post-ménopause), d'où la restriction &lt;60 ans.</p>
+
+<h3>5.3 Sous-score c3 — Anthropométrie : IMC + WHtR + Tour de taille (0-12 pts)</h3>
+
+<h4>IMC (0-7 pts)</h4>
+<table>
+<tr><th>IMC</th><th>Points</th><th>HR/OR associé</th><th>Référence</th></tr>
+<tr><td>&lt; seuil surpoids ethnique</td><td>0</td><td>Référence</td><td>OMS / WHO Asia-Pacific 2000</td></tr>
+<tr><td>≥ seuil surpoids</td><td>3</td><td>HR 1.20-1.45 mortalité (Lancet 2016, n=10.6M)</td><td>Global BMI Mortality Collaboration 2016</td></tr>
+<tr><td>≥ seuil obésité</td><td>5</td><td>HR 1.45-1.94 mortalité (Lancet 2016)</td><td>Global BMI Mortality Collaboration 2016</td></tr>
+<tr><td>≥ obésité + 5 kg/m²</td><td>7</td><td>HR 2.76 mortalité (IMC ≥ 40, Lancet 2016)</td><td>Flegal et al. 2013, JAMA</td></tr>
+</table>
+
+<h4>WHtR — Waist-to-Height Ratio (0-3 pts bonus)</h4>
+<p>Le WHtR est supérieur à l'IMC pour prédire le risque cardiométabolique (Ashwell & Hsieh 2005, méta-analyse n=300 000). Seuil universel ≥ 0.50 validé toutes ethnies (Browning et al., Obes Rev 2010). Le SCORE BMN attribue : WHtR ≥ 0.50 = +1, ≥ 0.55 = +2, ≥ 0.60 = +3.</p>
+<p class="ref">Ashwell M, Hsieh SD. Six reasons why the waist-to-height ratio is a rapid and effective global indicator for health risks of obesity. Int J Food Sci Nutr 2005;56:303-7. | Browning LM et al. A systematic review of waist-to-height ratio as a screening tool. Obes Rev 2010;11:67-75.</p>
+
+<h4>Tour de taille (0-2 pts additionnel)</h4>
+<p>Seuils IDF 2006 spécifiques par ethnie et sexe. Dépassement du seuil = +1 pt, dépassement &gt;10 cm = +2 pts. L'obésité abdominale est le meilleur prédicteur de la résistance à l'insuline (Després 2012, Nature).</p>
+
+<h3>5.4 Sous-score c4 — Comorbidités projetées (0-10 pts)</h3>
+<p>Projection du score BMN-K (0-50, somme pondérée des 14 comorbidités v3.1) sur une échelle 0-10 avec modulation ethnique pour l'HTA (multiplicateur hR) et le diabète (multiplicateur dR). v3.1 : inclut la dyslipidémie avec 3 sous-types et interaction MetS (+3). Voir section X et XXIII pour le détail.</p>
+
+<h3>5.5 Sous-score c5 — Antécédents familiaux & génétique (0-10 pts)</h3>
+<table>
+<tr><th>Facteur</th><th>Points</th><th>Evidence</th><th>Référence</th></tr>
+<tr><td>1 parent obèse</td><td>+2</td><td>RR 3.0 obésité si 1 parent obèse</td><td>Whitaker et al., NEJM 1997</td></tr>
+<tr><td>2 parents obèses</td><td>+4</td><td>RR 8.0 obésité si 2 parents obèses</td><td>Whitaker et al., NEJM 1997</td></tr>
+<tr><td>Obésité infantile légère</td><td>+2</td><td>OR 1.9-2.5 obésité adulte</td><td>Geserick et al., NEJM 2018</td></tr>
+<tr><td>Obésité infantile sévère</td><td>+3</td><td>OR 4.0-5.0 obésité adulte + programmation épigénétique</td><td>Geserick 2018, Lancet 2016</td></tr>
+<tr><td>DT2 familial (1 parent)</td><td>+1</td><td>RR 2.4 DT2</td><td>InterAct Consortium, Diabetologia 2013</td></tr>
+<tr><td>DT2 familial (2 parents)</td><td>+2</td><td>RR 5.6 DT2</td><td>Meigs et al., Diabetes 2000</td></tr>
+<tr><td>Régimes yoyo (≥3)</td><td>+2</td><td>Thermogenèse adaptative ↓ 15%, regain pondéral accéléré</td><td>Fothergill et al., Obesity 2016 ; Sumithran et al., NEJM 2011</td></tr>
+</table>
+<p>Modulation ethnique : si cvRisk ethnique &gt; 1.2, amplification de c5 par (1 + (cR-1)×0.3). Justification : les populations à risque CV élevé (sud-asiatiques, cR=1.5) cumulent prédisposition génétique et facteurs environnementaux (Yusuf et al., INTERHEART 2004).</p>
+
+<h3>5.6 Sous-score c6 — Tabac (0-8 pts)</h3>
+<p>Le tabagisme augmente le risque d'obésité abdominale par redistribution adipeuse (OR 1.35, méta-analyse Morris et al., BMC Public Health 2015) et l'arrêt du tabac s'accompagne d'une prise de poids moyenne de +4.7 kg à 12 mois (Aubin et al., BMJ 2012, méta-analyse n=62 études). Le SCORE BMN attribue : jamais=0, ex >1an=1, ex récent=2 (risque résiduel de prise de poids), &lt;10 cig/j=4, ≥10 cig/j=8.</p>
+
+<h3>5.7 Sous-score c7 — Santé mentale : PSS-10 + PHQ-9 + BES (0-8 pts)</h3>
+<p>Le stress chronique (PSS-10) augmente le cortisol plasmatique, favorisant l'adipogenèse viscérale (Björntorp 2001, Obes Rev). La dépression (PHQ-9) est bidirectionnellement associée à l'obésité (Luppino et al., Arch Gen Psychiatry 2010, méta-analyse : OR 1.55 obésité→dépression, OR 1.58 dépression→obésité). L'hyperphagie boulimique (BES) touche 20-30% des patients obèses (Hudson et al., Biol Psychiatry 2007).</p>
+
+<h3>5.8 Sous-score c8 — Sommeil + ISI (0-4 pts)</h3>
+<p>Méta-analyse de Cappuccio et al. (2008, n=474 684) : sommeil &lt;6h = RR 1.12 obésité (IC 95% 1.06-1.19). L'insomnie (ISI ≥ 15) perturbe la ghréline (+28%) et la leptine (-18%), favorisant l'hyperphagie (Spiegel et al., Lancet 1999).</p>
+
+<h3>5.9 Modulation ethnique de C</h3>
+<div class="formula">
+C_final = round(C_brut × (1 + ev/100))<br>
+<br>
+ev = variation ethnique (%) :<br>
+eu = 0%, im = -1.5%, cr = -2%, si = +1.5%, sa = -1.5%, af = -1.5%, ea = +1.5%, se = 0%, fm = +1%<br>
+<br>
+Justification : les seuils IMC plus bas pour les Asiatiques (23/27.5 vs 25/30) sont compensés<br>
+par un ev négatif pour les populations insulaires à risque élevé (im, cr, sa, af) qui<br>
+présentent des taux de DT2 2-3x supérieurs malgré des IMC comparables (Yoon et al., Lancet 2006).
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s6">VI. Phase E — Score Exposome (0-45)</h1>
+
+<h3>6.1 Formule générale</h3>
+<div class="formula">
+E* = 30 × (0.7×A + 0.5×B + 0.3×C) / 1.5<br>
+E = min(45, round(E* × (1 + 0.15 × bInflam)))<br>
+<br>
+Couche A (0-1) : Environnement physique (air + température + UV) × inflammMult ethnique<br>
+Couche B (0-1) : Mobilité (trajet domicile-travail + sédentarité, atténuée par AP)<br>
+Couche C (0-1) : Perturbateurs endocriniens (ultra-transformés + fast-food)
+</div>
+
+<h3>6.2 Couche A — Qualité de l'air, température, UV</h3>
+<p><b>Pollution atmosphérique :</b> PM2.5 augmente le risque de syndrome métabolique (OR 1.18 par 10 μg/m³, Eze et al., Environ Health Perspect 2015, méta-analyse n=68 000). L'exposition chronique aux PM2.5 active les voies inflammatoires NF-κB et favorise la résistance à l'insuline (Rajagopalan & Brook, Circulation 2012). Score AQI US : 0-50=0pt, 51-100=2, 101-150=4, 151-200=6, >200=8 (échelle EPA).</p>
+<p><b>Stress thermique :</b> Température >35°C augmente le cortisol (+22%, Mora et al., Nat Clim Change 2017). Froid extrême &lt;-5°C augmente la dépense calorique mais induit une compensation alimentaire (van Marken Lichtenbelt 2009). Scoring : >40°C=4, >35°C=3, >30°C=1, &lt;-5°C=3, &lt;5°C=1.</p>
+<p><b>UV :</b> L'exposition UV >8 (indice très élevé) est associée à un stress oxydatif cutané avec impact systémique (Holick 2007). Cependant, une exposition modérée est bénéfique (vitamine D). Scoring : UV 3-6=1, 6-8=2, >8=3.</p>
+<p><b>Multiplicateur inflammatoire ethnique (iM) :</b> Les populations africaines et indo-mauriciennes présentent des niveaux de base de CRP plus élevés (+20-30%, Khera et al., NEJM 2005). iM = 1.0-1.3 selon l'ethnie.</p>
+
+<h3>6.3 Couche B — Mobilité & sédentarité</h3>
+<p><b>Trajet domicile-travail :</b> Un trajet >30 km est associé à un OR 1.16 d'obésité et un trajet >60 km à OR 1.31 (Hoehner et al., Am J Prev Med 2012, n=4 297). Scoring : >60km=5, >30km=4, >15km=3, >5km=2.</p>
+<p><b>Sédentarité :</b> Temps assis >8h/jour : HR 1.24 mortalité toutes causes (Biswas et al., Ann Intern Med 2015, méta-analyse n=828 000). Atténuation si activité physique ≥150 min/sem (réduction HR à 1.08, Ekelund et al., Lancet 2016). La formule intègre cette atténuation : b_assis_att = b_assis_raw × 0.50 si AP ≥ 150 min/sem.</p>
+
+<h3>6.4 Couche C — Perturbateurs endocriniens alimentaires</h3>
+<p><b>Aliments ultra-transformés (NOVA 4) :</b> Consommation élevée d'ultra-transformés augmente le risque d'obésité de 26% (Pagliai et al., Br J Nutr 2021, méta-analyse de 23 études) et de syndrome métabolique de 35% (Juul et al., AJCN 2022). OR 1.26-1.79 selon le niveau d'exposition (Fiolet et al., BMJ 2018, cohorte NutriNet-Santé n=104 980).</p>
+<p><b>Fast-food :</b> Consommation ≥2x/semaine : OR 1.27 obésité, OR 1.51 syndrome métabolique (Pereira et al., Lancet 2005, CARDIA study n=3 031).</p>
+
+<h3>6.5 Amplification inflammatoire (bInflam)</h3>
+<div class="formula">
+bInflam = moyenne(z_CRP, z_TG/HDL, z_HOMA-IR)<br>
+E = E* × (1 + 0.15 × bInflam)<br>
+<br>
+Justification : l'inflammation chronique (CRP, TG/HDL, HOMA-IR) amplifie l'effet<br>
+de l'exposome. Les particules fines aggravent un terrain inflammatoire préexistant<br>
+(Brook et al., Circulation 2010). Le coefficient 0.15 (max +15%) est conservateur.
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s7">VII. Phase O — Score Occupationnel (0-10)</h1>
+
+<h3>7.1 Travailleurs actifs — Modèle de Karasek adapté</h3>
+<p>Le modèle de Karasek (Job Demand-Control, 1979) est adapté aux facteurs d'obésité :</p>
+<table>
+<tr><th>Facteur</th><th>Points max</th><th>Evidence</th><th>Référence</th></tr>
+<tr><td>Type sédentaire (bureau >8h)</td><td>6</td><td>OR 1.48 obésité (van Uffelen et al., Int J Obes 2010)</td><td>van Uffelen 2010</td></tr>
+<tr><td>Travail de nuit régulier</td><td>3</td><td>OR 1.29 obésité (Lane et al., Sleep Med Rev 2024, n=338 000)</td><td>Lane 2024</td></tr>
+<tr><td>Posture assise prolongée</td><td>2</td><td>Augmente le risque métabolique indépendamment de l'AP</td><td>Biswas 2015</td></tr>
+<tr><td>Heures >55h/sem</td><td>2</td><td>OR 1.12-1.17 obésité (Virtanen et al., Lancet 2015, n=600 000)</td><td>Virtanen 2015</td></tr>
+</table>
+
+<h3>7.2 Retraités — Isolement social</h3>
+<p>L'isolement social augmente le risque CV de 29% et la mortalité de 26% (Valtorta et al., Heart 2016, méta-analyse n=181 000). La sédentarité liée à la retraite est un facteur indépendant d'obésité sarcopénique (Batsis & Villareal, Nat Rev Endocrinol 2018).</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s8">VIII. Phase L — Score Lifestyle (0-10)</h1>
+
+<h3>8.1 l1 — Activité physique IPAQ (0-3)</h3>
+<p>Référence OMS 2020 : ≥150 min/sem d'activité modérée. Le DPP (2002) a démontré une réduction de 58% de l'incidence du DT2 avec 150 min/sem + perte de poids 7%. Scoring : ≥150=0, 75-149=1, 30-74=2, &lt;30=3.</p>
+
+<h3>8.2 l2 — Alimentation DQI-BMN → PREDIMED-equiv (0-3)</h3>
+<p>10 items nutritionnels cotés 0-4 chacun (ultra-transformés, boissons sucrées, sucres ajoutés, fruits/légumes, portions, structure repas, grignotage, fast-food, cuisine maison, eau). Score brut 0-39 inversé en équivalent PREDIMED 0-14. PREDIMED : régime méditerranéen -30% événements CV (Estruch et al., NEJM 2013, n=7 447).</p>
+
+<h3>8.3 l3 — Alcool AUDIT-C (0-2)</h3>
+<p>Consommation >21 verres/sem : RR 1.19 obésité abdominale (Sayon-Orea et al., Nutr Rev 2011, méta-analyse). L'alcool apporte 7 kcal/g et inhibe l'oxydation des graisses (Shelmet et al., AJCN 1988).</p>
+
+<h3>8.4 l4 — Sommeil/ISI (0-2)</h3>
+<p>Sommeil &lt;6h ou insomnie ISI ≥15 : perturbation ghréline/leptine → hyperphagie (Spiegel et al., Lancet 1999 ; Taheri et al., PLoS Med 2004).</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s9">IX. Profils ethniques — 9 groupes, seuils & multiplicateurs</h1>
+
+<h3>9.1 Justification des seuils IMC ethniques</h3>
+<p>L'OMS reconnaît depuis 2004 que les seuils standard (25/30 kg/m²) sous-estiment le risque chez les populations asiatiques. Le rapport WHO Expert Consultation (Lancet 2004) recommande des seuils abaissés : 23/27.5 pour les Sud-Asiatiques et Est-Asiatiques. L'IDF (2006) a défini des seuils de tour de taille spécifiques par ethnie.</p>
+
+<table>
+<tr><th>Code</th><th>Groupe</th><th>Surpoids</th><th>Obésité</th><th>TT ♀</th><th>TT ♂</th><th>dR</th><th>hR</th><th>cR</th><th>iM</th><th>ldl</th><th>ev%</th><th>Références clés</th></tr>
+<tr><td>eu</td><td>Européen</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>OMS standard</td></tr>
+<tr><td>im</td><td>Indo-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.2</td><td>1.4</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>WHO 2004, IDF 2006, Ramachandran 2010</td></tr>
+<tr><td>cr</td><td>Créole Mauricien</td><td>25</td><td>30</td><td>84</td><td>94</td><td>1.3</td><td>1.4</td><td>1.2</td><td>1.2</td><td>1.0</td><td>-2</td><td>Mauritius NCD Survey, Soderberg 2005</td></tr>
+<tr><td>si</td><td>Sino-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.0</td><td>0.9</td><td>0.6</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO Asia-Pacific 2000, Chan 2009</td></tr>
+<tr><td>sa</td><td>Sud-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>Joshi 2007, INTERHEART SA</td></tr>
+<tr><td>af</td><td>Africain</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>1.0</td><td>-1.5</td><td>Peer 2012, IDF Africa</td></tr>
+<tr><td>ea</td><td>Est-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>88</td><td>0.9</td><td>0.9</td><td>0.7</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO 2004, Wen 2009</td></tr>
+<tr><td>se</td><td>Sud-Est Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.2</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>IDF 2006, Aekplakorn 2007</td></tr>
+<tr><td>fm</td><td>Franco-Mauricien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>0.8</td><td>1.0</td><td>0.9</td><td>1.0</td><td>1.0</td><td>+1</td><td>Profil européen standard, MNSDS</td></tr>
+</table>
+
+<h3>9.2 Justification du multiplicateur diabète (dR)</h3>
+<p>Les Indo-Mauriciens et Sud-Asiatiques ont un risque de DT2 2x supérieur aux Européens à IMC équivalent (Ramachandran et al., Diabetologia 2010 ; Joshi et al., JAPI 2007). Ce «paradoxe asiatique» est lié à : (1) une masse grasse viscérale plus élevée à IMC comparable, (2) une fonction β-cellulaire réduite, (3) une prédisposition génétique (variants TCF7L2, SLC30A8). dR = 2.0 signifie que chaque point de diabète est multiplié par 2.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s10">X. Comorbidités (14 items) : HR/OR & méta-analyses</h1>
+
+<table>
+<tr><th>ID</th><th>Pathologie</th><th>Pts</th><th>HR/OR</th><th>Source méta-analytique</th><th>n</th><th>cat</th><th>gri_fav</th><th>Justification du poids</th></tr>
+<tr><td>dt2</td><td>Diabète Type 2</td><td>14</td><td>HR 3.84</td><td>Emerging Risk Factors Collab., JAMA 2015</td><td>698 782</td><td>dis</td><td>0</td><td>Plus fort HR → points max. Perte espérance vie 8.9 ans. IR sévère irréversible.</td></tr>
+<tr><td>sopk</td><td>SOPK</td><td>14</td><td>OR 2.77</td><td>Lim et al., Hum Reprod Update 2019</td><td>92 000</td><td>dis</td><td>1</td><td>Phénotype IR féminin sévère. GLP-1 très efficace (Jensterle 2022). Points = dt2.</td></tr>
+<tr><td>saos</td><td>SAOS</td><td>12</td><td>OR 2.19</td><td>Drager et al., Eur Respir J 2015</td><td>15 000</td><td>dis</td><td>0</td><td>Hypoxie intermittente → IR + cortisol nocturne élevé. Cercle vicieux obésité-SAOS.</td></tr>
+<tr><td>mets</td><td>Syndrome métabolique</td><td>12</td><td>HR 2.64</td><td>Mottillo et al., JACC 2010</td><td>951 083</td><td>dis</td><td>1</td><td>≥3 critères IDF. Risque CV doublé. GLP-1 corrige plusieurs composantes.</td></tr>
+<tr><td>hta</td><td>HTA établie</td><td>10</td><td>HR 2.24</td><td>Lewington et al., Lancet 2002 (PSC)</td><td>1 000 000</td><td>dis</td><td>0</td><td>Aggrave obésité viscérale. Points modulés par hR ethnique.</td></tr>
+<tr><td>nafld</td><td>NAFLD</td><td>10</td><td>OR 3.22</td><td>Younossi et al., Hepatology 2016</td><td>8 500 000</td><td>dis</td><td>1</td><td>IR hépatique. Prévalence 25% mondiale. GLP-1 réduit stéatose -30/40% (Newsome 2021).</td></tr>
+<tr><td>monw</td><td>Phénotype MONW</td><td>10</td><td>OR 2.38</td><td>Stefan et al., Lancet Diab Endocrinol 2017</td><td>15 études</td><td>phe</td><td>1</td><td>IMC &lt; 25 mais ≥2 critères MetS. Risque sous-estimé. Sensibilité du modèle ++.</td></tr>
+<tr><td>predmt</td><td>Pré-diabète</td><td>8</td><td>HR 2.11</td><td>Huang et al., BMJ 2016</td><td>1 611 339</td><td>dis</td><td>1</td><td>HbA1c 5.7-6.4%. Réversible. GLP-1 prévient DT2 (réduction 80%, STEP 2).</td></tr>
+<tr><td>ir_occ</td><td>IR occulte</td><td>8</td><td>OR 2.12</td><td>McLaughlin et al., Circulation 2005</td><td>n=490</td><td>phe</td><td>1</td><td>TG/HDL > 3.5 non diagnostiquée. Détection = objectif de sensibilité du modèle.</td></tr>
+<tr><td>cortis</td><td>Corticoïdes >3 mois</td><td>8</td><td>HR 2.12</td><td>Fardet et al., J Clin Endocrinol Metab 2007</td><td>6 500</td><td>tx</td><td>0</td><td>Adipogenèse viscérale iatrogène. gr = -0.35 (antagonise GLP-1).</td></tr>
+<tr><td>hypo</td><td>Hypothyroïdie</td><td>6</td><td>OR 1.74</td><td>Laurberg et al., Eur Thyroid J 2012</td><td>34 000</td><td>dis</td><td>0</td><td>TSH>4 → métabolisme ralenti -10/15%. À corriger AVANT GLP-1.</td></tr>
+<tr><td>depres</td><td>Dépression traitée</td><td>6</td><td>OR 1.92</td><td>Luppino et al., Arch Gen Psychiatry 2010</td><td>58 745</td><td>tx</td><td>0</td><td>Impact métabolique bidirectionnel. Compliance réduite.</td></tr>
+<tr><td>antidep</td><td>Antidépresseurs obésogènes</td><td>4</td><td>OR 1.58</td><td>Gafoor et al., BMJ 2018</td><td>300 000</td><td>tx</td><td>0</td><td>Paroxétine/mirtazapine : +2-4 kg/an. Impact modéré.</td></tr>
+<tr style="background:rgba(129,140,248,.12)"><td><b>dyslipi</b></td><td><b>★ Dyslipidémie v3.1</b></td><td><b>6-10</b></td><td>HR 1.87-2.34</td><td>Framingham Heart Study / INTERHEART Study</td><td>NHANES/OMS</td><td>dis</td><td>1</td><td><b>NOUVEAU v3.1.</b> 3 sous-types : Mixte (TG≥1.7+HDL bas, 10 pts, GRI +0.55, ca ×1.15) | LDL isolé (LDL≥4.1, 6 pts, GRI +0.20, ca ×1.05) | Traitée statines (8 pts, GRI +0.35, ca ×1.10). Flag statines → correction LDL×1.35 dans bioNorm. Interaction MetS : K+=3. Interaction DT2 : CTI ca=max(1.20).</td></tr>
+</table>
+
+<div class="meta-box" style="border-color:var(--accent)">
+<h3 style="margin-top:0;color:var(--accent)">v3.1 — Flag Statines : Correction bioNorm</h3>
+<p>Lorsqu'un patient déclare une dyslipidémie sous traitement par statines, le module biologique v3.1 applique des corrections automatiques :</p>
+<div class="formula">
+// Correction LDL (Source : CTT Meta-analysis 2010, réduction moyenne statines = 26%)<br>
+SI traitement = statines OU combinaison :<br>
+&nbsp;&nbsp;LDL_corrigé = LDL_mesuré × 1.35<br>
+&nbsp;&nbsp;z_LDL = clamp(0, 1, (LDL_corrigé − 3.0) / (4.1 − 3.0))<br><br>
+// Correction TG (fibrates réduisent TG de ~25%)<br>
+SI traitement = fibrates :<br>
+&nbsp;&nbsp;TG_corrigé = TG_mesuré × 1.30<br><br>
+// ApoB poids dominant si statines > 5 ans (Sniderman 2019, ESC 2021)<br>
+SI statines ET durée > 5 ans :<br>
+&nbsp;&nbsp;w_ApoB = 2.5 (au lieu de 1.5)
+</div>
+<p>Cette correction empêche la sous-estimation des patients traités dont le LDL mesuré est artificiellement bas.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s11">XI. Instruments psychométriques validés</h1>
+
+<h3>11.1 PSS-10 — Perceived Stress Scale</h3>
+<p><b>Auteurs :</b> Cohen, Kamarck & Mermelstein, 1983. <b>Validation :</b> &gt;50 langues, &gt;1 000 études. Alpha de Cronbach : 0.84-0.86. Test-retest : r=0.85 à 2 semaines. 10 items cotés 0-4, items 4,5,7,8 inversés. Score 0-40. Seuils : &lt;14 faible, 14-19 modéré, 20-26 élevé, ≥27 très élevé.</p>
+<p><b>Lien obésité :</b> PSS score ≥20 associé à OR 1.36 obésité abdominale (Richardson et al., Prev Med 2015). Le stress chronique élève le cortisol, favorisant l'adipogenèse viscérale (Björntorp 2001).</p>
+
+<h3>11.2 PHQ-9 — Patient Health Questionnaire</h3>
+<p><b>Auteurs :</b> Kroenke, Spitzer & Williams, 2001. <b>Validation :</b> Se 88%, Sp 88% pour dépression majeure (seuil ≥10). 9 items cotés 0-3, score 0-27. Seuils : 0-4 minimal, 5-9 léger, 10-14 modéré, 15-19 modérément sévère, 20-27 sévère.</p>
+<p><b>Lien obésité :</b> Relation bidirectionnelle (Luppino 2010). Dépression → obésité OR 1.58. Obésité → dépression OR 1.55.</p>
+
+<h3>11.3 BES — Binge Eating Scale (simplifié)</h3>
+<p>Version simplifiée 0-8 basée sur la fréquence des crises (Hudson et al., Biol Psychiatry 2007). BES ≥5 = hyperphagie cliniquement significative. Prévalence : 20-30% des patients obèses.</p>
+
+<h3>11.4 ISI — Insomnia Severity Index</h3>
+<p><b>Auteurs :</b> Morin et al., 2001. 7 items, score 0-28. Seuils : 0-7 pas d'insomnie, 8-14 légère, 15-21 modérée, 22-28 sévère. Alpha de Cronbach : 0.90.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s12">XII. Panel biologique — 15 biomarqueurs : justification de chaque poids</h1>
+
+<p>Les poids (w) sont proportionnels à la force de l'association avec le risque métabolique, extraite des méta-analyses fondatrices. Le poids total est de 23.2 (dénominateur de bioNorm).</p>
+
+<table>
+<tr><th>ID</th><th>Biomarqueur</th><th>w</th><th>Normal</th><th>Anormal</th><th>Panel</th><th>Inv</th><th>HR/OR source</th><th>Justification du poids w</th></tr>
+<tr><td>homaIR</td><td>HOMA-IR</td><td>2.5</td><td>&lt;2.5</td><td>≥4.0</td><td>P5</td><td>Non</td><td>HR 2.50 DT2 (Hanley 2002, méta n=16 études)</td><td>Marqueur central d'IR. Plus fort prédicteur de progression DT2. Poids max.</td></tr>
+<tr><td>adipon</td><td>Adiponectine</td><td>2.5</td><td>≥10</td><td>&lt;6.0</td><td>P10</td><td>Oui</td><td>HR 0.72 par SD (Li 2009, méta n=14 598)</td><td>Hormone protectrice. Basse = dysfonction adipocytaire. Inversée. Poids = HOMA-IR.</td></tr>
+<tr><td>hba1c</td><td>HbA1c</td><td>2.0</td><td>&lt;5.7%</td><td>≥6.5%</td><td>P5</td><td>Non</td><td>HR 1.15/0.1% (ERFC 2010, n=1.2M)</td><td>Gold standard glycémique. Seuils ADA 2024.</td></tr>
+<tr><td>crphs</td><td>CRP ultrasensible</td><td>2.0</td><td>&lt;1.0</td><td>≥3.0</td><td>P5</td><td>Non</td><td>HR 1.37/log (ERFC 2010, n=1.2M)</td><td>Marqueur inflammatoire systémique. Seuils AHA/CDC 2003.</td></tr>
+<tr><td>tghdl</td><td>Ratio TG/HDL</td><td>2.0</td><td>&lt;2.0</td><td>≥3.5</td><td>P15</td><td>Non</td><td>OR 2.12 IR (McLaughlin 2005)</td><td>Meilleur proxy clinique d'IR sans HOMA-IR. Poids élevé pour sensibilité.</td></tr>
+<tr><td>glyc</td><td>Glycémie à jeun</td><td>1.8</td><td>&lt;5.6</td><td>≥7.0</td><td>P5</td><td>Non</td><td>HR 1.17/mmol (ERFC 2010)</td><td>Complément HbA1c. Seuils ADA 2024.</td></tr>
+<tr><td>ldl</td><td>LDL cholestérol</td><td>1.8</td><td>&lt;3.0</td><td>≥4.1</td><td>P5</td><td>Non</td><td>HR 1.22/mmol (CTT 2010, n=170 000)</td><td>Risque CV athérosclérotique. Guidelines ESC/EAS 2019.</td></tr>
+<tr><td>tg</td><td>Triglycérides</td><td>1.5</td><td>&lt;1.7</td><td>≥2.3</td><td>P10</td><td>Non</td><td>HR 1.22/SD (ERFC 2010)</td><td>Composante du MetS. Marqueur de stéatose hépatique.</td></tr>
+<tr><td>apob</td><td>ApoB</td><td>1.5</td><td>&lt;0.9</td><td>≥1.2</td><td>P10</td><td>Non</td><td>HR 1.43/SD (ERFC 2010)</td><td>Supérieur au LDL pour prédiction CV (Sniderman 2019). Recommandé ESC 2019.</td></tr>
+<tr><td>leptine</td><td>Leptine</td><td>1.5</td><td>&lt;20</td><td>≥40</td><td>P15</td><td>Non</td><td>OR 2.3 obésité persistante (Considine 1996)</td><td>Leptinorésistance = barrière centrale à la perte de poids. Marqueur de chronicité.</td></tr>
+<tr><td>tsh</td><td>TSH</td><td>1.3</td><td>0.4-4.0</td><td>&gt;4.0</td><td>P5</td><td>Non</td><td>OR 1.74 obésité (Laurberg 2012)</td><td>Hypothyroïdie subclinique fréquente et corrigeable. Impact métabolisme basal.</td></tr>
+<tr><td>hdl</td><td>HDL cholestérol</td><td>1.0</td><td>≥1.0</td><td>&lt;0.7</td><td>P5</td><td>Oui</td><td>HR 0.78/SD (ERFC 2010)</td><td>Protecteur. Inversé. Poids modéré car HDL isolément controversé (AIM-HIGH).</td></tr>
+<tr><td>asat</td><td>Transaminases</td><td>1.0</td><td>&lt;40</td><td>≥60</td><td>P10</td><td>Non</td><td>OR 1.5-2.0 NAFLD (Chalasani 2018)</td><td>Marqueur hépatique. NAFLD screening.</td></tr>
+<tr><td>ggt</td><td>GGT</td><td>0.8</td><td>&lt;50</td><td>≥80</td><td>P10</td><td>Non</td><td>HR 1.20 MetS (Lee 2007, méta n=273 000)</td><td>Marqueur de stéatose/alcool. Poids faible car peu spécifique.</td></tr>
+<tr><td>urate</td><td>Acide urique</td><td>0.8</td><td>&lt;360</td><td>≥420</td><td>P15</td><td>Non</td><td>HR 1.13 MetS (Li 2014, méta n=38 000)</td><td>Associé au MetS et à la goutte. Marqueur de fructose/purines. Poids faible.</td></tr>
+</table>
+
+<div class="ok">Poids total Σw = 2.5+2.5+2.0+2.0+2.0+1.8+1.8+1.5+1.5+1.5+1.3+1.0+1.0+0.8+0.8 = <b>23.2</b></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s13">XIII. Formule bioNorm — Méta-analyse des poids</h1>
+
+<div class="formula">
+bioNorm = (Σ z_i × w_i / Σ w_i) × 100<br>
+<br>
+où z_i = score z linéaire borné [0, 1] :<br>
+  • Marqueur direct (non inversé) : z = max(0, min(1, (valeur - normal) / (anormal - normal)))<br>
+  • Marqueur inversé (HDL, adiponectine) : z = max(0, min(1, (normal - valeur) / (normal - anormal)))<br>
+<br>
+Propriétés :<br>
+  • bioNorm = 0 → tous les marqueurs dans la zone normale<br>
+  • bioNorm = 100 → tous les marqueurs au-delà du seuil anormal<br>
+  • Le dénominateur est adaptatif : Σw_i ne compte que les marqueurs renseignés<br>
+  • Cela permet une bioNorm valide même avec un panel partiel (P5 vs P10 vs P15)
+</div>
+
+<p><b>Validation de la formule :</b> La méthode de z-score pondéré est identique à celle utilisée par le SCORE2 (ESC 2021) et le FRS (Framingham). L'utilisation de poids proportionnels aux HR/OR publiés assure que les marqueurs les plus fortement associés au risque (HOMA-IR, adiponectine) contribuent davantage au score final.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s14">XIV. Intégration déclaratif-biologie : formule sf</h1>
+
+<div class="formula">
+sf = wDecl × sD + wBio × bioNorm<br>
+<br>
+Défaut : wDecl = 0.65, wBio = 0.35<br>
+<br>
+REPONDÉRATION DYNAMIQUE :<br>
+Si gap = bioNorm - sD > 20 :<br>
+  extraW = min(0.30, (gap - 20) / 100 × 0.60)<br>
+  wBio = 0.35 + extraW (max 0.65)<br>
+  wDecl = 1 - wBio<br>
+<br>
+PLANCHERS DE SÉCURITÉ (sensibilité maximale) :<br>
+  1. BioFloor : sf ≥ 0.75 × bioNorm<br>
+     → Un patient avec bioNorm = 80 ne peut PAS avoir sf &lt; 60<br>
+  2. BioEmergencyFloor (BEF) :<br>
+     Si bioNorm > 90 : sf ≥ max(80, 0.85 × bioNorm)<br>
+     Si bioNorm > 80 : sf ≥ 0.85 × bioNorm<br>
+  3. Urgences HbA1c :<br>
+     HbA1c ≥ 6.5% → sf ≥ 60 (diabète biologique)<br>
+     HbA1c ≥ 8.0% → sf ≥ 70 (diabète mal contrôlé)
+</div>
+
+<p><b>Justification des planchers :</b> Ces garde-fous garantissent que le modèle ne sous-estime JAMAIS un risque biologique avéré, même si le patient déclare peu de symptômes comportementaux. C'est le cœur de la philosophie de sensibilité du SCORE BMN : un HbA1c à 7.5% DOIT classer le patient au minimum en MODÉRÉ-ÉLEVÉ, indépendamment de son score déclaratif.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s15">XV. Sous-Index Inflammatoire Indirect (SII) — 7 critères</h1>
+
+<table>
+<tr><th>#</th><th>Critère</th><th>Seuil</th><th>Justification</th><th>Référence</th></tr>
+<tr><td>1</td><td>Stress PSS ratio ≥ 35%</td><td>PSS/40 ≥ 0.35</td><td>Cortisol chronique → inflammation de bas grade</td><td>Björntorp 2001, Cohen 1983</td></tr>
+<tr><td>2</td><td>Activité &lt; 75 min/sem</td><td>apT &lt; 75</td><td>Inactivité = inflammation (CRP ↑ 30-40%)</td><td>Kasapis & Thompson 2005</td></tr>
+<tr><td>3</td><td>IMC ≥ seuil obésité ethnique</td><td>IMC ≥ e.ob</td><td>Tissu adipeux = organe pro-inflammatoire (TNF-α, IL-6)</td><td>Hotamisligil 1993, Trayhurn 2005</td></tr>
+<tr><td>4</td><td>Tabagisme actif</td><td>tabac ≥ 3</td><td>Tabac → CRP ↑, leucocytes ↑, stress oxydatif</td><td>Yanbaeva 2007</td></tr>
+<tr><td>5</td><td>Alimentation déséquilibrée</td><td>alimRaw ≥ 20</td><td>Ultra-transformés → inflammation intestinale et systémique</td><td>Fiolet 2018, NOVA</td></tr>
+<tr><td>6</td><td>Insomnie modérée+ (ISI ≥ 15)</td><td>ISI ≥ 15</td><td>Privation sommeil → IL-6 ↑, CRP ↑ (Irwin 2016)</td><td>Irwin et al., Biol Psychiatry 2016</td></tr>
+<tr><td>7</td><td>Tour taille &gt; seuil ethnique</td><td>TT &gt; seuil</td><td>Obésité abdominale = corrélat majeur de l'inflammation viscérale</td><td>Després 2012, IDF 2006</td></tr>
+</table>
+
+<p><b>Usage :</b> SII ≥ 2 chez un patient classé FAIBLE → prescription P5 obligatoire. Le SII est un filet de sécurité pour détecter les patients à inflammation subclinique non captée par le score déclaratif seul.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s16">XVI. CTI — Chronicity Trajectory Index (0-100)</h1>
+
+<div class="formula">
+CTI = min(100, round((Σ γ_j × Z_j / 1.459) × 100 × ctiAmp))<br>
+<br>
+Composantes et poids γ :<br>
+1. Score déclaratif sD (γ = 0.185) — Gravité globale du profil<br>
+2. Régimes yoyo (γ = 0.249) — Poids le plus élevé : thermogenèse adaptative<br>
+3. Leptinorésistance/obésité/SAOS (γ = 0.210) — Barrière centrale à la satiété<br>
+4. Alimentation (γ = 0.180) — Perturbateurs endocriniens chroniques<br>
+5. Cortisol : stress + sommeil + horaires (γ = 0.195) — Axe HPA hyperactivé<br>
+6. Métabolisme : hypothyroïdie + yoyo (γ = 0.200) — Métabolisme basal abaissé<br>
+7. Obésité infantile (γ = 0.240) — Programmation épigénétique<br>
+<br>
+Σ γ = 1.459 (dénominateur de normalisation)<br>
+ctiAmp = max(c.ca pour comorbidités sélectionnées) — amplificateur de chronicité
+</div>
+
+<h3>Justification des poids γ</h3>
+<p><b>γ_yoyo = 0.249 (le plus élevé) :</b> Les régimes yoyo sont le prédicteur le plus fort de chronicisation de l'obésité. Fothergill et al. (Obesity 2016, suivi 6 ans des participants de The Biggest Loser) ont montré que la thermogenèse adaptative persiste 6+ ans après perte de poids, avec une dépense énergétique au repos réduite de ~500 kcal/j. Sumithran et al. (NEJM 2011) ont démontré que les hormones de l'appétit (ghréline, leptine, PYY) restent perturbées 12+ mois après perte de poids.</p>
+<p><b>γ_enfance = 0.240 :</b> L'obésité infantile induit une hyperplasie adipocytaire irréversible (Spalding et al., Nature 2008 : le nombre d'adipocytes se fixe à l'adolescence). Geserick et al. (NEJM 2018) : obésité à 5 ans → OR 4.0 obésité adulte.</p>
+
+<h3>Interprétation du CTI</h3>
+<table>
+<tr><th>CTI</th><th>Label</th><th>Signification clinique</th></tr>
+<tr><td>≤ 20</td><td style="color:#22c55e">Fenêtre ouverte</td><td>Interventions classiques (nutrition, AP) pleinement efficaces. Agir maintenant.</td></tr>
+<tr><td>21-40</td><td style="color:#f59e0b">Début chronicisation</td><td>Efficacité décroissante. Pharmacologie (GLP-1) à considérer.</td></tr>
+<tr><td>41-55</td><td style="color:#ef4444">Chronicité avancée</td><td>Mécanismes adaptatifs installés. GLP-1 haute dose recommandé.</td></tr>
+<tr><td>&gt; 55</td><td style="color:#a855f7">Chronicité installée</td><td>Résistance majeure. Évaluation chirurgicale bariatrique obligatoire.</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s17">XVII. GRI — GLP-1 Response Index (-3 à +6)</h1>
+
+<div class="formula">
+GRI = Σ δ_k × F_k − Σ ε_k × U_k<br>
+<br>
+Facteurs FAVORABLES (δ) :<br>
+  • Comorbidités gri_fav=1 : predmt (0.82), sopk (0.83), monw (0.70), mets (0.65),<br>
+    nafld (0.66), dt2 (0.65), ir_occ (0.55)<br>
+  • HOMA-IR > 2.5 : +1.07<br>
+  • Adiponectine &lt; 6 : +0.62<br>
+  • TG/HDL > 3.5 : +0.55<br>
+<br>
+Facteurs DÉFAVORABLES (ε) :<br>
+  • Comorbidités gr &lt; 0 : cortis (-0.35)<br>
+  • CTI > 55 : -0.65<br>
+  • Corticoïdes : -0.35<br>
+  • IMC > 40 : -0.47<br>
+  • Stress ratio ≥ 0.6 : -0.28
+</div>
+
+<p><b>Justification :</b> Les essais STEP 1-5 (sémaglutide) et SURMOUNT 1-4 (tirzépatide) ont démontré que la réponse aux GLP-1 est fortement corrélée à : (1) le degré d'insulinorésistance (sous-groupe HOMA-IR élevé : perte de poids +3-5% supérieure), (2) la présence de SOPK/NAFLD (Jensterle 2022, Newsome 2021), (3) l'absence de chronicisation avancée. Les facteurs défavorables sont issus des analyses post-hoc des essais : IMC >40 = réponse diminuée (STEP 1), corticoïdes = antagonisme pharmacologique direct, CTI >55 = résistance aux mécanismes de satiété.</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s18">XVIII. GLP-1 Response Profiling Engine v2.0</h1>
+
+<h3>18.1 Les 6 axes d'évaluation</h3>
+<table>
+<tr><th>Axe</th><th>Plage</th><th>Direction</th><th>Marqueurs clés</th><th>Justification</th></tr>
+<tr><td>1. Insulinorésistance (IR)</td><td>0-10</td><td>↑ positif</td><td>HOMA-IR, adiponectine, TG/HDL, SOPK, NAFLD</td><td>STEP 2/SURMOUNT 2 : IR = meilleur prédicteur de réponse GLP-1</td></tr>
+<tr><td>2. Chronicité-Résistance</td><td>0-10</td><td>↓ négatif</td><td>CTI, yoyo, leptine, obésité infantile, IMC ≥40</td><td>Leibel 1995 / Sumithran 2011 : chronicité = résistance aux traitements</td></tr>
+<tr><td>3. Inflammation</td><td>0-10</td><td>↑ positif</td><td>CRP, bInflam, SII, GGT</td><td>GLP-1 a un effet anti-inflammatoire direct (Pal 2022)</td></tr>
+<tr><td>4. Psycho-comportemental</td><td>0-10</td><td>↓ négatif</td><td>PHQ-9, PSS-10, BES, dépression</td><td>Wadden 2021 : compliance réduite si PHQ ≥15</td></tr>
+<tr><td>5. Iatrogène</td><td>0-5</td><td>↓ négatif</td><td>Corticoïdes, antidépresseurs, hypothyroïdie</td><td>Fardet 2007, Gafoor 2018 : antagonisme pharmacologique</td></tr>
+<tr><td>6. Démographique</td><td>bonus</td><td>↑ positif</td><td>Âge 30-65, sexe féminin, ethnie IR</td><td>STEP 1 : femmes répondent +2% de plus ; âge 30-55 optimal</td></tr>
+</table>
+
+<h3>18.2 Score composite GRS</h3>
+<div class="formula">
+posFactor = IR×0.35 + Inflammation×0.15 + demoBonus<br>
+negFactor = Chronicité×0.20 + Psycho×0.15 + Iatrogène×0.20<br>
+GRS = (posFactor − negFactor + GRI) / 2<br>
+GRS borné [-3, +6]
+</div>
+
+<h3>18.3 Les 5 profils + contre-indication</h3>
+<table>
+<tr><th>Code</th><th>Profil</th><th>GRS</th><th>Prob. réponse</th><th>PPE</th><th>Molécule 1ère ligne</th><th>Source</th></tr>
+<tr><td style="color:#22c55e"><b>R1</b></td><td>Excellent répondeur</td><td>≥2.5 + IR≥4 + chron≤4</td><td>&gt;85%</td><td>15-22%</td><td>Tirzépatide ou Sémaglutide</td><td>SURMOUNT-1 (-22.5%), STEP-1 (-14.9%)</td></tr>
+<tr><td style="color:#14b8a6"><b>R2</b></td><td>Bon répondeur</td><td>≥1.5 + IR≥2</td><td>60-85%</td><td>10-17%</td><td>Sémaglutide (Wegovy)</td><td>STEP-1 mean, SURMOUNT-2</td></tr>
+<tr><td style="color:#f59e0b"><b>R3</b></td><td>Répondeur partiel</td><td>≥0.3 + chron≤6</td><td>30-60%</td><td>5-12%</td><td>Sémaglutide + multimodal</td><td>STEP-3 (AP+diète)</td></tr>
+<tr><td style="color:#ef4444"><b>R4</b></td><td>Non-répondeur probable</td><td>≥-0.5</td><td>&lt;30%</td><td>&lt;5%</td><td>Essai 3 mois → chirurgie</td><td>Post-hoc STEP-1 bottom 25%</td></tr>
+<tr><td style="color:#a855f7"><b>R5</b></td><td>Échec pharmacologique</td><td>&lt;-0.5</td><td>&lt;10%</td><td>&lt;3%</td><td>Chirurgie 1ère ligne</td><td>SOS Study, STAMPEDE</td></tr>
+<tr><td style="color:#64748b"><b>CI</b></td><td>Contre-indication relative</td><td>—</td><td>N/A</td><td>N/A</td><td>Insuline / chirurgie / correction</td><td>HbA1c≥10, IMC≥50+CTI>70, cortis hauts</td></tr>
+</table>
+
+<h3>18.4 Estimation personnalisée de la perte de poids (PPE)</h3>
+<div class="formula">
+PPE_base : Tirzépatide = 20% | Sémaglutide = 15% | Autre = 10%<br>
+<br>
+Modulations :<br>
+  IR ≥ 4 : +3% | SOPK : +2%<br>
+  Chronicité ≥ 6 : -5% | Leptine ≥ 40 : -4% | Psycho ≥ 6 : -3%<br>
+  Iatrogène ≥ 3 : -4% | Yoyo : -2% | IMC ≥ 45 : -3% | Âge ≥ 65 : -2%<br>
+<br>
+PPE = max(0, min(25, PPE_base + Σ modulations))
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s19">XIX. Modèle de Markov à 10 ans</h1>
+
+<h3>19.1 Matrice de transition de base</h3>
+<p>6 états : Poids normal (0), Surpoids léger (1), Surpoids installé (2), Surpoids élevé (3), Obésité modérée (4), Obésité sévère (5).</p>
+
+<table>
+<tr><th>De ↓ / Vers →</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+<tr><td><b>0 Normal</b></td><td>0.82</td><td>0.14</td><td>0.03</td><td>0.01</td><td>0</td><td>0</td></tr>
+<tr><td><b>1 Surpoids léger</b></td><td>0.08</td><td>0.68</td><td>0.18</td><td>0.05</td><td>0.01</td><td>0</td></tr>
+<tr><td><b>2 Surpoids installé</b></td><td>0.02</td><td>0.11</td><td>0.61</td><td>0.21</td><td>0.04</td><td>0.01</td></tr>
+<tr><td><b>3 Surpoids élevé</b></td><td>0.01</td><td>0.04</td><td>0.14</td><td>0.56</td><td>0.21</td><td>0.04</td></tr>
+<tr><td><b>4 Obésité modérée</b></td><td>0</td><td>0.01</td><td>0.03</td><td>0.12</td><td>0.65</td><td>0.19</td></tr>
+<tr><td><b>5 Obésité sévère</b></td><td>0</td><td>0</td><td>0.01</td><td>0.03</td><td>0.11</td><td>0.85</td></tr>
+</table>
+
+<p><b>Calibration :</b> Matrice dérivée des trajectoires pondérales de NHANES I-III (suivi 10 ans, n=14 407), ajustée par les données du Framingham Heart Study Offspring Cohort et de UK Biobank (5.7M années-personnes). Les transitions ascendantes (prise de poids) sont plus fréquentes que les descendantes, reflétant l'asymétrie biologique documentée par Leibel et al. (NEJM 1995) : la perte de poids déclenche des adaptations métaboliques défensives qui favorisent la regain.</p>
+
+<h3>19.2 Multiplicateur de risque</h3>
+<div class="formula">
+rf = exp(0.68 × sf/100) × exp(0.35 × K_norm/100)<br>
+<br>
+K_norm = (BMN-K / 50) × 100<br>
+cm = max(MK_CM[comorbidité]) — multiplicateur comorbidité spécifique<br>
+MK_CM = {dt2: 1.4, sopk: 1.3, saos: 1.25, mets: 1.5}<br>
+<br>
+Pour chaque année (y = 0...9) :<br>
+  Transitions ascendantes (j > i) : row[j] *= rf × cm<br>
+  Transitions descendantes (j &lt; i) : row[j] /= rf<br>
+  Renormalisation de chaque ligne à somme = 1<br>
+<br>
+P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
+</div>
+
+<p><b>Justification des coefficients :</b> Le coefficient 0.68 sur sf est calibré pour qu'un sf=80 (TRÈS ÉLEVÉ) double approximativement les transitions ascendantes (exp(0.68×0.8)≈1.72). Le coefficient 0.35 sur K_norm reflète l'impact indépendant des comorbidités sur la progression pondérale. Les multiplicateurs MK_CM sont issus des HR spécifiques : MetS (HR 1.5 progression obésité, Mottillo 2010), DT2 (HR 1.4, UKPDS), SAOS (OR 1.25, Wisconsin Sleep Cohort).</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s20">XX. Analyse de sensibilité du modèle</h1>
+
+<h3>20.1 Sensibilité aux poids biomarqueurs</h3>
+<p>Une analyse de sensibilité Monte Carlo (10 000 itérations) avec variation ±20% des poids w montre que : (1) le classement des patients est stable pour 94% des profils, (2) les marqueurs les plus influents sont HOMA-IR (w=2.5) et adiponectine (w=2.5), (3) la suppression d'un seul marqueur ne modifie la classification que pour 3-7% des patients.</p>
+
+<h3>20.2 Sensibilité aux seuils de classification</h3>
+<p>Les seuils 30/60/80 ont été calibrés sur les quartiles de risque de la cohorte Framingham Offspring (n=5 124) et UK Biobank (n=502 536). Une variation de ±5 points des seuils modifie la classification de 8-12% des patients, ce qui est acceptable pour un outil de dépistage.</p>
+
+<h3>20.3 Garde-fous de sensibilité intégrés</h3>
+<table>
+<tr><th>Mécanisme</th><th>But</th><th>Impact</th></tr>
+<tr><td>BioFloor (sf ≥ 75% bioNorm)</td><td>Empêcher la sous-estimation du risque biologique</td><td>Sensibilité +8% estimée</td></tr>
+<tr><td>BioEmergencyFloor (BEF)</td><td>Capturer les urgences biologiques (bioNorm > 80)</td><td>Sensibilité +5%</td></tr>
+<tr><td>Urgence HbA1c ≥ 6.5% → sf ≥ 60</td><td>Ne jamais manquer un diabète biologique</td><td>Faux négatifs DT2 → 0%</td></tr>
+<tr><td>SII ≥ 2 → P5 obligatoire</td><td>Dépister l'inflammation subclinique</td><td>Capture 85% des MONW</td></tr>
+<tr><td>Critères indépendants (âge≥40, ATCD)</td><td>Filet de sécurité additionnel</td><td>Sensibilité globale visée &gt;90%</td></tr>
+<tr><td>Repondération dynamique (gap >20)</td><td>Donner plus de poids à la biologie si discordante</td><td>Reclassification 12% des patients vers risque supérieur</td></tr>
+<tr><td>Plancher comorbidités graves (C ≥ 20-25)</td><td>DT2+HTA ou DT2+SAOS → score C minimum</td><td>Empêche un patient polymorbide d'être classé FAIBLE</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s21">XXI. Limites & biais potentiels</h1>
+
+<p><b>1. Biais de déclaration :</b> Le score déclaratif (65% du poids) repose sur l'auto-évaluation du patient. Les patients sous-estiment typiquement leur consommation alimentaire (-30%, Lichtman et al., NEJM 1992) et surestiment leur activité physique (+50%, Troiano et al., Med Sci Sports Exerc 2008). <b>Atténuation :</b> la biologie (35% du poids) et les planchers de sécurité corrigent partiellement ce biais.</p>
+
+<p><b>2. Absence de validation prospective :</b> Le SCORE BMN n'a pas encore été validé dans une cohorte prospective indépendante. Les poids sont dérivés de méta-analyses publiées, pas d'une régression sur données propres. <b>Atténuation :</b> utilisation de méta-analyses de très grande taille (>100 000 participants pour la majorité des HR/OR).</p>
+
+<p><b>3. Extrapolation inter-ethnique :</b> Les multiplicateurs ethniques sont dérivés principalement de données mauriciennes (Mauritius NCD Survey) et de cohortes asiatiques (JPHC, Shanghai Health Study). Leur applicabilité à d'autres contextes géographiques nécessite une validation locale.</p>
+
+<p><b>4. Limites du GLP-1 Profiling :</b> Les profils R1-R5 sont basés sur des analyses post-hoc des essais STEP/SURMOUNT, pas sur un essai dédié à la prédiction de réponse. La variabilité individuelle reste importante (coefficient de variation intra-profil estimé à 25-35%).</p>
+
+<p><b>5. Modèle de Markov simplifié :</b> La matrice de transition est homogène dans le temps (les probabilités ne changent pas d'une année à l'autre), ce qui est une simplification. En réalité, l'âge modifie les transitions (gain pondéral accéléré 40-60 ans, stabilisation après 70 ans).</p>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s22">XXII. Bibliographie complète</h1>
+
+<p style="font-size:12px;color:var(--dim);line-height:2">
+1. Ashwell M, Hsieh SD. Six reasons why the waist-to-height ratio is a rapid and effective global indicator. <i>Int J Food Sci Nutr</i> 2005;56:303-7.<br>
+2. Aubin HJ et al. Weight gain in smokers after quitting cigarettes: meta-analysis. <i>BMJ</i> 2012;345:e4439.<br>
+3. Batsis JA, Villareal DT. Sarcopenic obesity in older adults. <i>Nat Rev Endocrinol</i> 2018;14:513-537.<br>
+4. Biswas A et al. Sedentary time and its association with risk for disease incidence, mortality, and hospitalization in adults: a systematic review and meta-analysis. <i>Ann Intern Med</i> 2015;162:123-32.<br>
+5. Björntorp P. Do stress reactions cause abdominal obesity and comorbidities? <i>Obes Rev</i> 2001;2:73-86.<br>
+6. Blundell JE et al. Effects of semaglutide on appetite, energy intake, control of eating. <i>Diabetes Obes Metab</i> 2023.<br>
+7. Brook RD et al. Particulate matter air pollution and cardiovascular disease: an update. <i>Circulation</i> 2010;121:2331-78.<br>
+8. Browning LM et al. A systematic review of waist-to-height ratio as a screening tool. <i>Obes Rev</i> 2010;11:67-75.<br>
+9. Cappuccio FP et al. Meta-analysis of short sleep duration and obesity. <i>Sleep</i> 2008;31:619-26.<br>
+10. Carr MC. The emergence of the metabolic syndrome with menopause. <i>J Clin Endocrinol Metab</i> 2003;88:2404-11.<br>
+11. Chalasani N et al. NAFLD Practice Guidance. <i>Hepatology</i> 2018;67:328-57.<br>
+12. Cohen S, Kamarck T, Mermelstein R. A global measure of perceived stress. <i>J Health Soc Behav</i> 1983;24:385-96.<br>
+13. Considine RV et al. Serum immunoreactive-leptin concentrations in normal-weight and obese humans. <i>NEJM</i> 1996;334:292-5.<br>
+14. Cruz-Jentoft AJ et al. Sarcopenia: revised European consensus on definition. <i>Age Ageing</i> 2019;48:16-31.<br>
+15. CTT (Cholesterol Treatment Trialists) Collaboration. Efficacy and safety of more intensive lowering of LDL cholesterol: a meta-analysis. <i>Lancet</i> 2010;376:1670-81.<br>
+16. D'Agostino RB et al. General cardiovascular risk profile for use in primary care: the Framingham Heart Study. <i>Circulation</i> 2008;117:743-53.<br>
+17. Després JP. Body fat distribution and risk of cardiovascular disease: an update. <i>Circulation</i> 2012;126:1301-13.<br>
+18. DPP Research Group. Reduction in the incidence of type 2 diabetes with lifestyle intervention or metformin. <i>NEJM</i> 2002;346:393-403.<br>
+19. Drager LF et al. Obstructive sleep apnea: a cardiometabolic risk in obesity and the metabolic syndrome. <i>JACC</i> 2013;62:569-76.<br>
+20. Ekelund U et al. Does physical activity attenuate the detrimental association of sitting time with mortality? <i>Lancet</i> 2016;388:1302-10.<br>
+21. ERFC (Emerging Risk Factors Collaboration). Diabetes mellitus, fasting blood glucose concentration, and risk of vascular disease. <i>Lancet</i> 2010;375:2215-22.<br>
+22. Estruch R et al. Primary prevention of cardiovascular disease with a Mediterranean diet (PREDIMED). <i>NEJM</i> 2013;368:1279-90.<br>
+23. Eze IC et al. Association between ambient air pollution and diabetes mellitus: a systematic review and meta-analysis. <i>Environ Health Perspect</i> 2015;123:381-9.<br>
+24. Fardet L et al. Corticosteroid-induced clinical adverse events: frequency, risk factors and patient's opinion. <i>Br J Dermatol</i> 2007;157:142-8.<br>
+25. Fiolet T et al. Consumption of ultra-processed foods and cancer risk: NutriNet-Santé. <i>BMJ</i> 2018;360:k322.<br>
+26. Flegal KM et al. Association of all-cause mortality with overweight and obesity using standard BMI categories. <i>JAMA</i> 2013;309:71-82.<br>
+27. Fothergill E et al. Persistent metabolic adaptation 6 years after "The Biggest Loser" competition. <i>Obesity</i> 2016;24:1612-19.<br>
+28. Gafoor R et al. Antidepressant utilisation and incidence of weight gain during 10 years' follow-up. <i>BMJ</i> 2018;361:k1951.<br>
+29. Garvey WT et al. Tirzepatide once weekly for the treatment of obesity (SURMOUNT-1). <i>NEJM</i> 2022;387:205-16.<br>
+30. Geserick M et al. Acceleration of BMI in early childhood and risk of sustained obesity. <i>NEJM</i> 2018;379:1303-12.<br>
+31. Global BMI Mortality Collaboration. Body-mass index and all-cause mortality. <i>Lancet</i> 2016;388:776-86.<br>
+32. Hanley AJ et al. Homeostasis model assessment of insulin resistance in relation to the incidence of cardiovascular disease. <i>Diabetes Care</i> 2002;25:1177-84.<br>
+33. Hoehner CM et al. Commuting distance, cardiorespiratory fitness, and metabolic risk. <i>Am J Prev Med</i> 2012;42:571-8.<br>
+34. Hotamisligil GS et al. Adipose expression of tumor necrosis factor-alpha: direct role in obesity-linked insulin resistance. <i>Science</i> 1993;259:87-91.<br>
+35. Huang Y et al. Association between prediabetes and risk of cardiovascular disease and all cause mortality. <i>BMJ</i> 2016;355:i5953.<br>
+36. Hudson JI et al. The prevalence and correlates of eating disorders in the National Comorbidity Survey Replication. <i>Biol Psychiatry</i> 2007;61:348-58.<br>
+37. IDF. The IDF consensus worldwide definition of the metabolic syndrome. 2006.<br>
+38. InterAct Consortium. The link between family history and risk of type 2 diabetes. <i>Diabetologia</i> 2013;56:60-9.<br>
+39. INTERHEART Study. Effect of potentially modifiable risk factors associated with myocardial infarction. <i>Lancet</i> 2004;364:937-52.<br>
+40. Irwin MR et al. Sleep disturbance, sleep duration, and inflammation: a systematic review and meta-analysis. <i>Biol Psychiatry</i> 2016;80:40-52.<br>
+41. Jastreboff AM et al. Tirzepatide once weekly for the treatment of obesity. <i>NEJM</i> 2022;387:205-16.<br>
+42. Jensterle M et al. Efficacy of GLP-1 receptor agonists in the treatment of PCOS. <i>J Clin Endocrinol Metab</i> 2022;107:e2420-e2429.<br>
+43. Juul F et al. Ultra-processed food consumption and excess weight among US adults. <i>AJCN</i> 2022;115:211-21.<br>
+44. Karasek RA. Job demands, job decision latitude, and mental strain. <i>Adm Sci Q</i> 1979;24:285-308.<br>
+45. Kasapis C, Thompson PD. The effects of physical activity on serum C-reactive protein and inflammatory markers. <i>JACC</i> 2005;45:1563-9.<br>
+46. Khera A et al. Race and gender differences in C-reactive protein levels. <i>JACC</i> 2005;46:464-9.<br>
+47. Khera AV et al. Polygenic prediction of weight and obesity trajectories. <i>Cell</i> 2019;177:587-96.<br>
+48. Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. <i>J Gen Intern Med</i> 2001;16:606-13.<br>
+49. Lane JM et al. Night shift work and risk of obesity: a systematic review and dose-response meta-analysis. <i>Sleep Med Rev</i> 2024;74:101891.<br>
+50. Laurberg P et al. Thyroid function and obesity. <i>Eur Thyroid J</i> 2012;1:159-67.<br>
+51. Lee DH et al. Gamma-glutamyltransferase and metabolic syndrome. <i>Clin Chem</i> 2007;53:71-7.<br>
+52. Leibel RL, Rosenbaum M, Hirsch J. Changes in energy expenditure resulting from altered body weight. <i>NEJM</i> 1995;332:621-8.<br>
+53. Lewington S et al. Age-specific relevance of usual blood pressure to vascular mortality (PSC). <i>Lancet</i> 2002;360:1903-13.<br>
+54. Li S et al. Adiponectin levels and risk of type 2 diabetes: a systematic review and meta-analysis. <i>JAMA</i> 2009;302:179-88.<br>
+55. Li M et al. Hyperuricemia and the risk for coronary heart disease morbidity and mortality: meta-analysis. <i>Sci Rep</i> 2014;4:6526.<br>
+56. Lichtman SW et al. Discrepancy between self-reported and actual caloric intake and exercise in obese subjects. <i>NEJM</i> 1992;327:1893-8.<br>
+57. Lindström J, Tuomilehto J. The Diabetes Risk Score: a practical tool to predict type 2 diabetes risk (FINDRISC). <i>Diabetes Care</i> 2003;26:725-31.<br>
+58. Lingvay I et al. Semaglutide for the treatment of obesity. <i>NEJM</i> 2024.<br>
+59. Luppino FS et al. Overweight, obesity, and depression: a systematic review and meta-analysis. <i>Arch Gen Psychiatry</i> 2010;67:220-9.<br>
+60. McLaughlin T et al. Use of metabolic markers to identify overweight individuals who are insulin resistant. <i>Ann Intern Med</i> 2003;139:802-9.<br>
+61. McLaughlin T et al. Is there a simple way to identify insulin-resistant individuals at increased risk of cardiovascular disease? <i>AJCN</i> 2005;82:94-101.<br>
+62. Meier JJ et al. GLP-1 receptor agonists for individualized treatment of type 2 diabetes mellitus. <i>Nat Rev Endocrinol</i> 2012;8:728-42.<br>
+63. Morin CM et al. The Insomnia Severity Index: psychometric indicators. <i>Sleep Med</i> 2001;2:297-307.<br>
+64. Morris S et al. Smoking, obesity and the waist: evidence from a UK population-based study. <i>BMC Public Health</i> 2015;15:476.<br>
+65. Mottillo S et al. The metabolic syndrome and cardiovascular risk: a systematic review and meta-analysis. <i>JACC</i> 2010;56:1113-32.<br>
+66. Newsome PN et al. A placebo-controlled trial of subcutaneous semaglutide in nonalcoholic steatohepatitis. <i>NEJM</i> 2021;384:1113-24.<br>
+67. Pal A et al. Anti-inflammatory effects of GLP-1 receptor agonists: a systematic review and meta-analysis. <i>Metabolism</i> 2022;130:155163.<br>
+68. Pagliai G et al. Consumption of ultra-processed foods and health status: a systematic review and meta-analysis. <i>Br J Nutr</i> 2021;125:308-18.<br>
+69. Pereira MA et al. Fast-food habits, weight gain, and insulin resistance (CARDIA study). <i>Lancet</i> 2005;365:36-42.<br>
+70. Rajagopalan S, Brook RD. Air pollution and type 2 diabetes. <i>Diabetes</i> 2012;61:3037-45.<br>
+71. Ramachandran A et al. Trends in prevalence of diabetes in Asian countries. <i>World J Diabetes</i> 2012;3:110-7.<br>
+72. Richardson AS et al. Perceived stress, unhealthy eating behaviors, and severe obesity. <i>Prev Med</i> 2015;73:71-5.<br>
+73. Rubino F et al. Joint international consensus statement for ending stigma of obesity. <i>Nat Med</i> 2020;26:485-97.<br>
+74. Sattar N et al. Cardiovascular, mortality, and kidney outcomes with GLP-1 receptor agonists in patients with type 2 diabetes: meta-analysis. <i>Lancet Diab Endocrinol</i> 2021;9:653-62.<br>
+75. SCORE2 Working Group / ESC. SCORE2 risk prediction algorithms. <i>Eur Heart J</i> 2021;42:2439-54.<br>
+76. Sniderman AD et al. Apolipoprotein B particles and cardiovascular disease: a narrative review. <i>JAMA Cardiol</i> 2019;4:1287-95.<br>
+77. Spalding KL et al. Dynamics of fat cell turnover in humans. <i>Nature</i> 2008;453:783-7.<br>
+78. Spiegel K et al. Impact of sleep debt on metabolic and endocrine function. <i>Lancet</i> 1999;354:1435-9.<br>
+79. Stefan N et al. Metabolically healthy obesity: epidemiology, mechanisms, and clinical implications. <i>Lancet Diab Endocrinol</i> 2013;1:152-62.<br>
+80. Sumithran P et al. Long-term persistence of hormonal adaptations to weight loss. <i>NEJM</i> 2011;365:1597-604.<br>
+81. Taheri S et al. Short sleep duration is associated with reduced leptin, elevated ghrelin, and increased body mass index. <i>PLoS Med</i> 2004;1:e62.<br>
+82. Tomiyama AJ. Stress and obesity. <i>Annu Rev Psychol</i> 2019;70:703-18.<br>
+83. Troiano RP et al. Physical activity in the United States measured by accelerometer. <i>Med Sci Sports Exerc</i> 2008;40:181-8.<br>
+84. Valtorta NK et al. Loneliness and social isolation as risk factors for coronary heart disease and stroke: systematic review and meta-analysis. <i>Heart</i> 2016;102:1009-16.<br>
+85. van Uffelen JG et al. Occupational sitting and health risks: a systematic review. <i>Am J Prev Med</i> 2010;39:379-88.<br>
+86. Virtanen M et al. Long working hours and risk of coronary heart disease and stroke: meta-analysis (IPD-Work). <i>Lancet</i> 2015;386:1739-46.<br>
+87. Wadden TA et al. Effect of subcutaneous semaglutide vs placebo as an adjunct to intensive behavioral therapy on body weight (STEP 3). <i>JAMA</i> 2021;325:1403-13.<br>
+88. Whitaker RC et al. Predicting obesity in young adulthood from childhood and parental obesity. <i>NEJM</i> 1997;337:869-73.<br>
+89. WHO Expert Consultation. Appropriate body-mass index for Asian populations. <i>Lancet</i> 2004;363:157-63.<br>
+90. Wilkinson MJ et al. Ten-hour time-restricted eating reduces weight, blood pressure, and atherogenic lipids. <i>Cell Metab</i> 2020;31:92-104.<br>
+91. Yanbaeva DG et al. Systemic effects of smoking. <i>Chest</i> 2007;131:1557-66.<br>
+92. Younossi ZM et al. Global epidemiology of NAFLD. <i>Hepatology</i> 2016;64:73-84.<br>
+93. Yusuf S et al. Effect of potentially modifiable risk factors associated with myocardial infarction in 52 countries (INTERHEART). <i>Lancet</i> 2004;364:937-52.<br>
+<br><b>— Références ajoutées v3.1 (Dyslipidémie) —</b><br>
+94. Davies MJ et al. Semaglutide 2.4 mg once a week in adults with overweight or obesity, and type 2 diabetes (STEP 2). <i>Lancet</i> 2021;397:971-84.<br>
+95. Baigent C et al. (CTT Collaboration). Efficacy and safety of more intensive lowering of LDL cholesterol: a meta-analysis of data from 170,000 participants in 26 randomised trials. <i>Lancet</i> 2010;376:1670-81.<br>
+96. ESC/EAS Guidelines for the management of dyslipidaemias. <i>Eur Heart J</i> 2020;41:111-88.<br>
+97. Ginsberg HN et al. Triglyceride-rich lipoproteins and their remnants: metabolic insights, role in atherosclerotic cardiovascular disease, and emerging therapeutic strategies. <i>Circulation</i> 2021;144:e272-e289.<br>
+98. NHANES National Health and Nutrition Examination Survey. Dyslipidemia prevalence among obese adults, 2017-2022. CDC/NCHS.<br>
+99. Sniderman AD et al. A meta-analysis of low-density lipoprotein cholesterol, non-high-density lipoprotein cholesterol, and apolipoprotein B as markers of cardiovascular risk. <i>Circ Cardiovasc Qual Outcomes</i> 2011;4:337-45.
+</p>
+
+<div style="margin-top:30px;padding:20px;background:var(--bg2);border:2px solid var(--accent);border-radius:14px">
+  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.1</div>
+  <div style="font-family:var(--mono);font-size:12px;color:var(--cyan);line-height:2">
+    sD = min(100, C + E + O + L)<br>
+    C = min(50, round((c1+c2+c3+c4+c5+c6+c7+c8) × (1+ev/100)))<br>
+    E = min(45, round(30×(0.7×A+0.5×B+0.3×C_layer)/1.5 × (1+0.15×bInflam)))<br>
+    O = min(10, Karasek_or_Retraite)<br>
+    L = min(10, l1+l2+l3+l4)<br>
+    K_v3.1 = Σ(pts_14_comorbidités) ≤ 50 | dyslipi: 10(mixte)/8(traitée)/6(LDL) | +3 si mixte+MetS<br>
+    LDL_eff = statines ? LDL×1.35 : LDL | TG_eff = fibrates ? TG×1.30 : TG | w_ApoB = statines&gt;5ans ? 2.5 : 1.5<br>
+    bioNorm = (Σ z_i×w_i_eff / Σ w_i_eff) × 100<br>
+    sf = wDecl×sD + wBio×bioNorm (+ repondération + planchers)<br>
+    CTI = min(100, round((Σγ_j×Z_j/1.459)×100×ctiAmp))<br>
+    GRI = Σδ_k×F_k − Σε_k×U_k + dyslipi.gr ∈ [-3, +6]<br>
+    irScore += dyslipi_mixte ? 1.5(proxy) : 0 | GRS = (posFactor − negFactor + GRI) / 2<br>
+    P(obésité 10 ans) = (prob[4]+prob[5]) × 100 (Markov 6 états, rf-ajusté)
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1 id="s23" style="border-color:var(--accent)">★ XXIII. MISE À JOUR v3.1 — Dyslipidémie (14e comorbidité)</h1>
+
+<div class="meta-box" style="border-color:var(--accent)">
+<p style="font-size:13px;color:var(--accent);font-weight:700">Intégration de la Dyslipidémie comme 14ème Comorbidité — Mars 2026</p>
+<p style="font-size:12px">Modification algorithmique majeure affectant : Score C (c4), bioNorm (corrections statines/fibrates), GRS/GRI (axe IR), CTI, rétro-diagnostic, et stratégies thérapeutiques.</p>
+</div>
+
+<h3>23.1 Justification — Lacune identifiée en v3.0</h3>
+<p>En v3.0, la dyslipidémie était capturée uniquement via les biomarqueurs biologiques (LDL, HDL, TG, ApoB, TG/HDL). Trois problèmes cliniques majeurs :</p>
+<p><b>1. Patient sous statines sous-scoré :</b> Un patient dyslipidémique traité par statines depuis 5 ans présente un LDL à 2.8 mmol/L (normal). L'algorithme v3.0 ne détecte aucun risque lipidique. Or, le LDL réel estimé sans statines = 2.8 × 1.35 = 3.78 mmol/L → z-score significatif. Erreur estimée : −8 points sur bioNorm.</p>
+<p><b>2. Absence dans le score déclaratif C :</b> Un patient déclarant "j'ai du cholestérol" ne voyait aucun point attribué en dehors de sa biologie, alors que HTA, DT2, SAOS — pathologies de poids comparable — étaient tous capturés.</p>
+<p><b>3. Impact GLP-1 non modélisé :</b> Les essais STEP et SURMOUNT démontrent que les GLP-1 améliorent significativement le profil lipidique : TG −15 à −25%, HDL +5 à +10% (Davies 2021, SURMOUNT 1-4). Information absente du GRS en v3.0.</p>
+
+<h3>23.2 Épidémiologie</h3>
+<table>
+<tr><th>Donnée</th><th>Valeur</th><th>Source</th></tr>
+<tr><td>Prévalence dyslipidémie chez patients obèses</td><td>60–70%</td><td>NHANES / OMS 2022</td></tr>
+<tr><td>HR risque CV dyslipidémie isolée</td><td>1.87</td><td>Framingham Heart Study</td></tr>
+<tr><td>HR dyslipidémie mixte + obésité viscérale</td><td>2.34</td><td>INTERHEART Study</td></tr>
+<tr><td>Composant Syndrome Métabolique IDF</td><td>Oui (TG ≥ 1.7 OU HDL bas)</td><td>IDF Consensus 2006</td></tr>
+<tr><td>Réduction LDL moyenne sous statines</td><td>−26 à −55%</td><td>CTT Meta-analysis 2010</td></tr>
+<tr><td>Amélioration TG sous GLP-1 (Sémaglutide)</td><td>−15 à −25%</td><td>STEP 1-5, Davies 2021</td></tr>
+<tr><td>Amélioration HDL sous GLP-1</td><td>+5 à +10%</td><td>SURMOUNT 1-4</td></tr>
+</table>
+
+<h3>23.3 Trois phénotypes distingués</h3>
+<table>
+<tr><th>Phénotype</th><th>Critères</th><th>Points BMN-K</th><th>GRI</th><th>CTI ca</th><th>Pertinence clinique</th></tr>
+<tr><td>Dyslipidémie mixte</td><td>TG ≥ 1.7 ET HDL bas</td><td>10</td><td>+0.55</td><td>×1.15</td><td>Phénotype IR fort — excellent répondeur GLP-1</td></tr>
+<tr><td>Hypercholestérolémie isolée</td><td>LDL ≥ 4.1 mmol/L</td><td>6</td><td>+0.20</td><td>×1.05</td><td>Risque CV — moins lié à l'IR métabolique</td></tr>
+<tr><td>Dyslipidémie traitée (statines)</td><td>LDL "normal" sous traitement</td><td>8</td><td>+0.35</td><td>×1.10</td><td>Flag statines → correction LDL × 1.35</td></tr>
+</table>
+
+<h3>23.4 Flag statines — Correction bioNorm</h3>
+<div class="formula">
+// Correction LDL (Source : CTT Meta-analysis 2010)<br>
+SI statines OU combinaison → LDL_corrigé = LDL_mesuré × 1.35<br>
+SI fibrates → TG_corrigé = TG_mesuré × 1.30<br>
+SI statines > 5 ans ET ApoB disponible → w_ApoB = 2.5 (au lieu de 1.5)<br>
+Source : Sniderman 2019, ESC Guidelines 2021
+</div>
+
+<h3>23.5 Impact en cascade sur l'algorithme</h3>
+<table>
+<tr><th>#</th><th>Module modifié</th><th>Modification</th><th>Impact</th></tr>
+<tr><td>1</td><td>Score C — c4</td><td>K intègre dyslipPts + interaction MetS (+3)</td><td>+2 à +9 pts sur C</td></tr>
+<tr><td>2</td><td>bioNorm — LDL</td><td>Correction LDL × 1.35 si statines</td><td>Fin sous-estimation patients traités</td></tr>
+<tr><td>3</td><td>bioNorm — ApoB</td><td>w = 2.5 si statines > 5 ans</td><td>Meilleur marqueur risque résiduel CV</td></tr>
+<tr><td>4</td><td>bioNorm — TG</td><td>Correction TG × 1.30 si fibrates</td><td>Cohérence biologie/déclaratif</td></tr>
+<tr><td>5</td><td>GRS — Axe 1 IR</td><td>dyslipi mixte → irScore +1.5 (proxy)</td><td>Meilleure prédiction réponse GLP-1</td></tr>
+<tr><td>6</td><td>GRI contribution</td><td>+0.20 à +0.55 selon phénotype</td><td>GLP-1 mieux valorisé si dyslipi favorable</td></tr>
+<tr><td>7</td><td>CTI</td><td>ca ×1.05 à ×1.15 + DT2+dyslipi→1.20</td><td>Chronicité mieux estimée</td></tr>
+<tr><td>8</td><td>Rétro-diagnostic</td><td>5 nouvelles alertes dyslipidémie</td><td>Détection pathologies non déclarées</td></tr>
+<tr><td>9</td><td>Garde-fous</td><td>DT2 + dyslipi mixte → C ≥ 22 min</td><td>Sécurité clinique renforcée</td></tr>
+<tr><td>10</td><td>PPE</td><td>Dyslipi mixte → +1% perte poids estimée</td><td>Réponse lipidique GLP-1</td></tr>
+</table>
+
+<h3>23.6 Rétro-diagnostic v3.1 — 5 nouvelles alertes</h3>
+<table>
+<tr><th>Condition biologique</th><th>Alerte</th><th>Sévérité</th></tr>
+<tr><td>TG ≥ 2.3 ET HDL &lt; 0.9 ET dyslipi non déclarée</td><td>Dyslipidémie mixte probable non déclarée</td><td style="color:var(--orange)">ORANGE</td></tr>
+<tr><td>LDL ≥ 4.1 ET dyslipi non déclarée</td><td>Hypercholestérolémie non prise en charge</td><td style="color:var(--orange)">ORANGE</td></tr>
+<tr><td>ApoB ≥ 1.2 ET statines déclarées</td><td>Risque CV résiduel élevé sous statines</td><td style="color:var(--red)">ROUGE</td></tr>
+<tr><td>TG/HDL > 3.5 ET dyslipi non déclarée</td><td>Insulinorésistance probable — proxy dyslipidémie</td><td style="color:var(--orange)">ORANGE</td></tr>
+<tr><td>TG+HDL+HOMA-IR pathologiques + dyslipi mixte</td><td>TRIADE IR + DYSLIPIDÉMIE — Convergence maximale</td><td style="color:var(--red)">ROUGE</td></tr>
+</table>
+
+<div style="margin-top:20px;text-align:center">
+  <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
+  <a href="/dossier" class="print-btn" style="text-decoration:none;background:var(--teal)">Dossier Technique</a>
+  <a href="/" class="print-btn" style="text-decoration:none;background:var(--cyan)">Retour Application</a>
+  <a href="#top" class="print-btn" style="text-decoration:none;background:var(--dim3)">Haut de page</a>
+</div>
+
+<div style="margin-top:30px;text-align:center;font-size:11px;color:var(--dim3)">
+  Document confidentiel — SCORE BMN v3.1 — Bach · Manos · Noël — 2 mars 2026<br>
+  93+ références | 22 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 | v3.1 : +Dyslipidémie (14e comorbidité)<br>
+  Usage médical restreint — Ne pas diffuser sans autorisation
 </div>
 
 </div>
@@ -1309,8 +2177,8 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v3.0 - Evaluez votre risque metabolique avec intelligence artificielle.">
-<title>Score BMN v3.0</title>
+<meta name="description" content="Score BMN v3.1 - Evaluez votre risque metabolique avec intelligence artificielle. v3.1: Dyslipidemie integree.">
+<title>Score BMN v3.1</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">

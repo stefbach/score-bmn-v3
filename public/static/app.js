@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.0 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9
+// SCORE BMN v3.1 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
@@ -32,7 +32,8 @@ const COMORB=[
   {id:'ir_occ',n:'IR occulte',p:8,or:'OR 2.12',d:'TG/HDL > 3.5 non diagnostique.',ca:1.2,gr:.55,cat:'phe',gri_fav:1},
   {id:'cortis',n:'Corticoides > 3 mois',p:8,or:'HR 2.12',d:'Adipogenese viscerale iatrogene.',ca:1.6,gr:-.35,cat:'tx',gri_fav:0},
   {id:'antidep',n:'Antidepresseurs obesogenes',p:4,or:'OR 1.58',d:'Paroxetine/mirtazapine.',ca:1.1,gr:0,cat:'tx',gri_fav:0},
-  {id:'depres',n:'Depression traitee',p:6,or:'OR 1.92',d:'Impact metabolique bidirectionnel.',ca:1.2,gr:0,cat:'tx',gri_fav:0}
+  {id:'depres',n:'Depression traitee',p:6,or:'OR 1.92',d:'Impact metabolique bidirectionnel.',ca:1.2,gr:0,cat:'tx',gri_fav:0},
+  {id:'dyslipi',n:'Dyslipidemie (cholesterol / triglycerides)',p:10,or:'HR 1.87-2.34',d:'3 sous-types: mixte (TG+HDL), LDL isole, traitee (statines). Flag statines corrige bioNorm.',ca:1.15,gr:.55,cat:'dis',gri_fav:1}
 ];
 
 // ─── BIOMARKERS (SCORE2/Framingham, ADA 2024) ───
@@ -88,7 +89,7 @@ const PHQ_LABELS = ['Jamais','Plusieurs jours','Plus de la moitie du temps','Pre
 // ─── Markov (NEJM 1995 Leibel, NEJM 2011 Sumithran) ───
 const MK_ST=['Poids normal','Surpoids leger','Surpoids installe','Surpoids eleve','Obesite moderee','Obesite severe'];
 const MK_B=[[.82,.14,.03,.01,0,0],[.08,.68,.18,.05,.01,0],[.02,.11,.61,.21,.04,.01],[.01,.04,.14,.56,.21,.04],[0,.01,.03,.12,.65,.19],[0,0,.01,.03,.11,.85]];
-const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5};
+const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5,dyslipi:1.15};
 const CTI_G={dur:.185,yoyo:.249,lep:.21,micro:.18,cort:.195,meta:.2,enf:.24};
 
 // ─── STATE ───
@@ -115,6 +116,8 @@ let S={
   bes:0,
   // Comorbidities & bio
   comorbIds:[],bioValues:{},
+  // Dyslipidémie v3.1
+  dyslipi:{type:'',traitement:'',duree:''},
   // Geo
   geo:null,airData:null,weatherData:null,workGeo:null,commuteDist:null,
   geoCity:'',workCity:'',
@@ -477,7 +480,7 @@ const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
     <div class="welc-logo">B</div>
-    <h1>Score <b>BMN</b> v3.0</h1>
+    <h1>Score <b>BMN</b> v3.1</h1>
     <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
     <div class="welc-features">
       <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
@@ -732,16 +735,57 @@ const SCR=[
     return html;
   },
 
-  // 14: Comorbidities
+  // 14: Comorbidities v3.1 (14 comorbidites incluant dyslipidemie)
   ()=>{
     const dis=COMORB.filter(c=>c.cat==='dis'),phe=COMORB.filter(c=>c.cat==='phe'),tx=COMORB.filter(c=>c.cat==='tx');
-    const mk=arr=>arr.map(c=>`<div class="cm-card${S.comorbIds.includes(c.id)?' on':''}" onclick="toggleCM('${c.id}')">
-      <div class="cm-top"><span class="cm-nm">${c.n}</span><span class="cm-pts" style="color:${S.comorbIds.includes(c.id)?'var(--orange)':'var(--dim3)'}">+${c.p}</span></div>
-      <div class="cm-meta">${c.or} -- ${c.d}</div></div>`).join('');
+    const mk=arr=>arr.map(c=>{
+      const isOn=S.comorbIds.includes(c.id);
+      // v3.1: pour dyslipi, afficher les points du sous-type
+      let ptsLabel=c.p;
+      if(c.id==='dyslipi'&&isOn){
+        ptsLabel=S.dyslipi.type==='ldl_isole'?6:S.dyslipi.type==='traitee'?8:10;
+      }
+      return `<div class="cm-card${isOn?' on':''}" onclick="toggleCM('${c.id}')">
+      <div class="cm-top"><span class="cm-nm">${c.n}</span><span class="cm-pts" style="color:${isOn?'var(--orange)':'var(--dim3)'}">+${ptsLabel}</span></div>
+      <div class="cm-meta">${c.or} -- ${c.d}</div></div>`;
+    }).join('');
+    // v3.1: Arbre adaptatif dyslipidémie
+    let dyslipiHtml='';
+    if(S.comorbIds.includes('dyslipi')){
+      dyslipiHtml=`<div class="sec" style="border:2px solid var(--accent);border-radius:12px;padding:14px;margin:10px 0;background:var(--bg2)">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:13px">Dyslipidemie — Sous-typage v3.1</div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14a :</b> De quel type ?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+          ${['mixte','ldl_isole','ne_sait_pas'].map(t=>{
+            const labels={mixte:'Triglycerides eleves ET HDL bas (mixte)',ldl_isole:'Cholesterol LDL eleve uniquement',ne_sait_pas:'Je ne sais pas / les deux'};
+            const act=S.dyslipi.type===t||(t==='ne_sait_pas'&&!S.dyslipi.type);
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiType('${t}')">${labels[t]}</div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14b :</b> Etes-vous sous traitement ?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+          ${['statines','fibrates','combinaison','autre','non'].map(t=>{
+            const labels={statines:'Statines (Atorvastatine, Rosuvastatine...)',fibrates:'Fibrates (Fenofibrate...)',combinaison:'Combinaison statines + fibrates',autre:'Autre traitement',non:'Non traite(e)'};
+            const act=S.dyslipi.traitement===t||(t==='non'&&!S.dyslipi.traitement);
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiTrait('${t}')">${labels[t]}</div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14c :</b> Depuis combien de temps ?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${['<1an','1-5ans','>5ans'].map(t=>{
+            const labels={'<1an':'Moins de 1 an','1-5ans':'1 a 5 ans','>5ans':'Plus de 5 ans'};
+            const act=S.dyslipi.duree===t;
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiDuree('${t}')">${labels[t]}</div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--dim3);margin-top:8px">v3.1 : Le sous-type determine les points BMN-K (6/8/10), la correction bioNorm (LDL×1.35 si statines), et le profil GLP-1.</div>
+      </div>`;
+    }
     return `<div class="s-emoji">Sante</div>
-    <div class="s-title">Comorbidites</div>
-    <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span></div>
+    <div class="s-title">Comorbidites (v3.1 — 14 pathologies)</div>
+    <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
     <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
+    ${dyslipiHtml}
     <div class="sec"><div class="sec-tt">Phenotypes metaboliques</div>${mk(phe)}</div>
     <div class="sec"><div class="sec-tt">Traitements aggravants</div>${mk(tx)}</div>
     <div id="aiBox14"></div>`;
@@ -982,6 +1026,7 @@ const SCR=[
         z-score lineaire borne [0,1] : z = (val-normal)/(anormal-normal), cap a 1<br>
         Poids (w) proportionnels aux HR publies (>3M participants, CTT, ERFC, CKD-PC, ADA)<br>
         bioNorm = (Σ z_i×w_i / Σ w_i) × 100 — denominateur adaptatif<br>
+        v3.1 : Correction statines LDL×1.35 | fibrates TG×1.30 | ApoB w=2.5 si statines&gt;5ans<br>
         Triade inflammatoire : bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR) → E** = E* × (1+0.15×bInflam)<br>
         Integration : sf = wDecl(0.65)×sD + wBio(0.35)×bioNorm, reponderation si gap > 20<br>
         BioFloor : sf ≥ 75% bioNorm | BEF : si bio>90, sf ≥ max(80, 85%×bio)
@@ -1009,7 +1054,16 @@ const SECTIONS=[
   {from:17,to:17,name:'Resultat',ico:'[R]'}
 ];
 function getSec(step){return SECTIONS.find(s=>step>=s.from&&step<=s.to)||SECTIONS[0];}
-function toggleCM(id){if(S.comorbIds.includes(id))S.comorbIds=S.comorbIds.filter(x=>x!==id);else S.comorbIds.push(id);render(S.step,0);}
+function toggleCM(id){if(S.comorbIds.includes(id))S.comorbIds=S.comorbIds.filter(x=>x!==id);else S.comorbIds.push(id);
+  // v3.1: reset dyslipi sub-fields if deselected
+  if(id==='dyslipi'&&!S.comorbIds.includes('dyslipi')){S.dyslipi={type:'',traitement:'',duree:''};}
+  // v3.1: default dyslipi type to mixte on first select
+  if(id==='dyslipi'&&S.comorbIds.includes('dyslipi')&&!S.dyslipi.type){S.dyslipi.type='mixte';}
+  render(S.step,0);}
+// v3.1: Dyslipidemie sous-typage
+function setDyslipiType(t){S.dyslipi.type=(t==='ne_sait_pas'?'mixte':t);render(S.step,0);}
+function setDyslipiTrait(t){S.dyslipi.traitement=(t==='non'?'':t);if(t==='statines'||t==='combinaison'){S.dyslipi.type='traitee';}render(S.step,0);}
+function setDyslipiDuree(d){S.dyslipi.duree=d;render(S.step,0);}
 
 // ════════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -1066,7 +1120,7 @@ function triggerAI(step){
 }
 
 // ════════════════════════════════════════════════════════════════
-// MOTEUR DE CALCUL — Score BMN v3.0 — Architecture CLEO
+// MOTEUR DE CALCUL — Score BMN v3.1 — Architecture CLEO
 // Ref: algorithme.html BSD v4.9 + justification-bio.html BSD v4.7.1
 // ────────────────────────────────────────────────────────────────
 // FLUX:  C(0-50) + E(0-45) + O(0-10) + L(0-10) = sD(0-100)
@@ -1131,16 +1185,35 @@ function calc(){
   C+=c3;
 
   // c4 — Comorbidites (0-10 projete depuis BMN-K)
-  // BMN-K complet (0-50) utilise les 13 comorbidites
+  // BMN-K complet (0-50) utilise les 14 comorbidites (v3.1: +dyslipidemie)
   let k=0, ctiAmp=1;
   const griF=[], griU=[];
   S.comorbIds.forEach(id=>{
     const cm=COMORB.find(x=>x.id===id); if(!cm)return;
-    k+=cm.p; if(cm.ca>ctiAmp) ctiAmp=cm.ca;
-    if(cm.gri_fav && cm.gr>0) griF.push({id:cm.id,d:cm.gr});
-    else if(cm.gr<0) griU.push({id:cm.id,e:Math.abs(cm.gr)});
+    // v3.1: dyslipi points varient selon sous-type
+    let pts=cm.p;
+    if(id==='dyslipi'){
+      if(S.dyslipi.type==='ldl_isole') pts=6;
+      else if(S.dyslipi.type==='traitee') pts=8;
+      else pts=10; // mixte ou defaut
+      // v3.1: GRI contribution variable selon sous-type
+      const grVal=S.dyslipi.type==='ldl_isole'?0.20:S.dyslipi.type==='traitee'?0.35:0.55;
+      griF.push({id:'dyslipi',d:grVal});
+      // v3.1: CTI ca variable selon sous-type
+      const caVal=S.dyslipi.type==='ldl_isole'?1.05:S.dyslipi.type==='traitee'?1.10:1.15;
+      if(caVal>ctiAmp) ctiAmp=caVal;
+    } else {
+      if(cm.ca>ctiAmp) ctiAmp=cm.ca;
+      if(cm.gri_fav && cm.gr>0) griF.push({id:cm.id,d:cm.gr});
+      else if(cm.gr<0) griU.push({id:cm.id,e:Math.abs(cm.gr)});
+    }
+    k+=pts;
   });
+  // v3.1: Interaction dyslipi mixte + MetS → K += 3 (co-occurrence aggravante)
+  if(S.comorbIds.includes('dyslipi') && S.dyslipi.type==='mixte' && S.comorbIds.includes('mets')) k+=3;
   S.bmn_k=Math.min(50,k);
+  // v3.1: Interaction dyslipi + DT2 → CTI ca = max(ca_dyslipi, 1.20)
+  if(S.comorbIds.includes('dyslipi') && S.comorbIds.includes('dt2')) ctiAmp=Math.max(ctiAmp, 1.20);
   // HTA modulee par ethnie [BSD c4: htaRisk multiplier, cap 10]
   let htaPts=0;
   if(S.comorbIds.includes('hta')){
@@ -1156,7 +1229,7 @@ function calc(){
   // Projection 0-10
   let c4=Math.min(10, Math.round((htaPts+diabPts+Math.min(6,Math.round(k*6/50)))/3*10/8));
   if(c4<1&&k>0) c4=1; // minimum 1 si comorbidite presente
-  d.c4_comorb={pts:c4,max:10,label:'c4 — Comorbidites (K='+k+'/50, HTA='+htaPts+', DT='+diabPts+')',ref:'ADA 2024/IDF',grp:'C'};
+  d.c4_comorb={pts:c4,max:10,label:'c4 — Comorbidites v3.1 (K='+k+'/50, HTA='+htaPts+', DT='+diabPts+')',ref:'ADA 2024/IDF/Framingham',grp:'C'};
   C+=c4;
 
   // c5 — ATCD familiaux + genetique (0-8)
@@ -1208,6 +1281,7 @@ function calc(){
   if(S.comorbIds.includes('dt2')&&S.comorbIds.includes('hta')) gfFloor=25;
   else if(S.comorbIds.includes('dt2')&&S.comorbIds.includes('saos')) gfFloor=25;
   else if(S.comorbIds.includes('dt2')&&S.comorbIds.includes('mets')) gfFloor=22;
+  else if(S.comorbIds.includes('dt2')&&S.comorbIds.includes('dyslipi')&&S.dyslipi.type==='mixte') gfFloor=22;
   else if(S.comorbIds.includes('mets')&&S.comorbIds.includes('hta')) gfFloor=20;
   // SCS attenuation: si activite physique + alimentation OK, reduire plancher
   let scsReduction=0;
@@ -1403,18 +1477,29 @@ function calc(){
   // bioNorm = (Σ(z_i × w_i) / Σ(w_i)) × 100
   // z-score lineaire borne [0,1] pour chaque marqueur
   // Poids conformes a justification-bio.html BSD v4.7.1
+  // v3.1: Corrections statines (LDL×1.35) + fibrates (TG×1.30) + ApoB poids dominant
   // ════════════════════════════════════════════════════
+  const hasStatines=S.comorbIds.includes('dyslipi')&&(S.dyslipi.traitement==='statines'||S.dyslipi.traitement==='combinaison');
+  const hasFibrates=S.comorbIds.includes('dyslipi')&&(S.dyslipi.traitement==='fibrates'||S.dyslipi.traitement==='combinaison');
+  const statines5ans=hasStatines&&S.dyslipi.duree==='>5ans';
   let swz=0, sw=0;
   const zScores={};
   BIO.forEach(m=>{
-    const v=S.bioValues[m.id];
-    if(v===undefined || v===null) return;
+    let v_val=S.bioValues[m.id];
+    if(v_val===undefined || v_val===null) return;
+    // v3.1: Correction LDL si statines (reconstitution LDL pre-traitement)
+    let wEff=m.w;
+    if(m.id==='ldl' && hasStatines){ v_val=v_val*1.35; }
+    // v3.1: Correction TG si fibrates
+    if(m.id==='tg' && hasFibrates){ v_val=v_val*1.30; }
+    // v3.1: ApoB poids dominant si statines > 5 ans (meilleur marqueur risque residuel CV)
+    if(m.id==='apob' && statines5ans){ wEff=2.5; }
     let z;
-    if(!m.inv){ z=v<=m.nm?0:v>=m.ab?1:(v-m.nm)/(m.ab-m.nm); }
-    else { z=v>=m.nm?0:v<=m.ab?1:(m.nm-v)/(m.nm-m.ab); }
+    if(!m.inv){ z=v_val<=m.nm?0:v_val>=m.ab?1:(v_val-m.nm)/(m.ab-m.nm); }
+    else { z=v_val>=m.nm?0:v_val<=m.ab?1:(m.nm-v_val)/(m.nm-m.ab); }
     z=Math.max(0,Math.min(1,z));
     zScores[m.id]=z;
-    swz+=z*m.w; sw+=m.w;
+    swz+=z*wEff; sw+=wEff;
   });
   const bioNorm=sw>0?Math.round(swz/sw*100):0;
   S.bmn_b=bioNorm;
@@ -1557,6 +1642,11 @@ function getGLP1Profile(){
   else if(v.tghdl!==undefined && v.tghdl>2.5) irScore+=0.5;
   if(S.comorbIds.includes('sopk')) irScore+=1; // SOPK = IR feminine, tres bon repondeur
   if(S.comorbIds.includes('nafld')) irScore+=1; // Steatose = IR hepatique
+  // v3.1: Dyslipidemie mixte = proxy IR fort (correlation TG/HDL → IR)
+  if(S.comorbIds.includes('dyslipi') && S.dyslipi.type==='mixte'){
+    if(v.tghdl===undefined) irScore+=1.5; // proxy declaratif si pas de bio TG/HDL
+    else if(v.tghdl>3.5) irScore+=0.5; // bonus convergence bio+declaratif
+  }
   irScore=Math.min(10,irScore);
 
   // ── AXE 2: Score Chronicite-Resistance 0-10 ──
@@ -1765,6 +1855,12 @@ function getGLP1Profile(){
   if(v.crphs!==undefined && v.crphs>=3) efficacyFactors.push({t:'Inflammation active (CRP ≥ 3)',d:'Effet anti-inflammatoire du GLP-1 = double benefice',s:2,ref:'Pal 2022'});
   if(v.adipon!==undefined && v.adipon<6) efficacyFactors.push({t:'Adiponectine basse',d:'Tissu adipeux dysfonctionnel, GLP-1 ameliore adipokines',s:2,ref:'Meier 2022'});
   if(S.comorbIds.includes('mets')) efficacyFactors.push({t:'Syndrome metabolique',d:'GLP-1 corrige plusieurs composantes MetS simultanement',s:2,ref:'IDF/SURMOUNT'});
+  // v3.1: Dyslipidemie comme facteur d'efficacite GLP-1
+  if(S.comorbIds.includes('dyslipi')){
+    if(S.dyslipi.type==='mixte') efficacyFactors.push({t:'Dyslipidemie mixte',d:'GLP-1 ameliore TG (-15 a -25%) et HDL (+5 a +10%). Phenotype IR fort.',s:2,ref:'STEP 1-5/Davies 2021/SURMOUNT 1-4'});
+    else if(S.dyslipi.type==='traitee') efficacyFactors.push({t:'Dyslipidemie traitee (statines)',d:'GLP-1 apporte un benefice lipidique additionnel (ApoB, TG)',s:1,ref:'Sattar 2021'});
+    else efficacyFactors.push({t:'Hypercholesterolemie',d:'GLP-1 a un effet modere sur le LDL (-5 a -10%)',s:1,ref:'Sattar 2021'});
+  }
   if(age>=30 && age<=55) efficacyFactors.push({t:'Age optimal (30-55 ans)',d:'Meilleure reponse metabolique et meilleure compliance',s:1,ref:'STEP 1'});
   if(S.comorbIds.includes('dt2') && imc>=30) efficacyFactors.push({t:'DT2 + Obesite',d:'Double indication: controle glycemique + ponderal',s:2,ref:'SURMOUNT 2'});
   if(v.tghdl!==undefined && v.tghdl>3.0) efficacyFactors.push({t:'Dyslipidemie atherogenique',d:'TG/HDL eleve = IR periph., GLP-1 efficace sur ce profil',s:1,ref:'Sattar 2021'});
@@ -1803,6 +1899,7 @@ function getGLP1Profile(){
   let ppeMod=0;
   if(irScore>=4) ppeMod+=3; // Forte IR = meilleure reponse
   if(S.comorbIds.includes('sopk')) ppeMod+=2;
+  if(S.comorbIds.includes('dyslipi')&&S.dyslipi.type==='mixte') ppeMod+=1; // v3.1: reponse lipidique GLP-1
   if(chronScore>=6) ppeMod-=5; // Chronicite = diminue
   if(v.leptine!==undefined && v.leptine>=40) ppeMod-=4;
   if(psychoScore>=6) ppeMod-=3;
@@ -1912,7 +2009,7 @@ function calcMarkov(){
   return{cs,prob};
 }
 
-// ── RETRO-DIAGNOSTIC ──
+// ── RETRO-DIAGNOSTIC v3.1 ──
 function doRetro(){
   const v=S.bioValues, fl=[];
   if(v.homaIR>=4&&!S.comorbIds.includes('dt2')&&!S.comorbIds.includes('predmt'))
@@ -1929,6 +2026,17 @@ function doRetro(){
   if(v.apob>=1.2) fl.push({c:'var(--orange)',t:'ApoB>=1.2: risque CV eleve'});
   if(v.urate>=420) fl.push({c:'var(--orange)',t:'Acide urique>=420: hyperuricemie'});
   if(v.leptine>=40) fl.push({c:'var(--orange)',t:'Leptine>=40: resistance a la leptine'});
+  // v3.1: 5 alertes dyslipidemie
+  if(v.tg>=2.3&&v.hdl!==undefined&&v.hdl<0.9&&!S.comorbIds.includes('dyslipi'))
+    fl.push({c:'var(--orange)',t:'Dyslipidemie mixte probable non declaree (TG>=2.3 + HDL<0.9). Ref: Framingham/INTERHEART'});
+  if(v.ldl>=4.1&&!S.comorbIds.includes('dyslipi'))
+    fl.push({c:'var(--orange)',t:'Hypercholesterolemie non prise en charge (LDL>=4.1). Consultation CV recommandee'});
+  if(v.apob>=1.2&&S.comorbIds.includes('dyslipi')&&(S.dyslipi.traitement==='statines'||S.dyslipi.traitement==='combinaison'))
+    fl.push({c:'var(--red)',t:'Risque CV residuel eleve sous statines (ApoB>=1.2). Intensifier traitement. Ref: Sniderman 2019/ESC 2021'});
+  if(v.tghdl>3.5&&!S.comorbIds.includes('dyslipi'))
+    fl.push({c:'var(--orange)',t:'IR probable — proxy dyslipidemie mixte (TG/HDL>3.5). Bilan IR complet. Ref: McLaughlin 2005'});
+  if(v.tg>=2.3&&v.hdl!==undefined&&v.hdl<0.9&&v.homaIR>2.5&&S.comorbIds.includes('dyslipi')&&S.dyslipi.type==='mixte')
+    fl.push({c:'var(--red)',t:'TRIADE IR + DYSLIPIDEMIE — Convergence maximale (TG+HDL+HOMA-IR + dyslipi mixte). GLP-1 urgent.'});
   const el=$('retro');if(!el)return;
   el.innerHTML=fl.length
     ?fl.map(f=>`<div class="retro-alert" style="border-left-color:${f.c}"><span style="color:${f.c}">${f.t}</span></div>`).join('')
@@ -2365,7 +2473,7 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
     <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | Biswas 2015 | Cappuccio 2008 | Aubin 2012 | CAMS | Brook 2010 | ERFC 2010 | CTT 2010 | CKD-PC 2010<br>
-    <b>Score BMN v3.0</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 — Bach | Manos | Noel
+    <b>Score BMN v3.1</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 — Bach | Manos | Noel
   </div>`;
 
   return r;
