@@ -29,7 +29,7 @@ const COMORB=[
   {id:'hypo',n:'Hypothyroidie',p:6,or:'OR 1.74',d:'TSH > 4. Metabolisme ralenti -10/15%.',ca:1.3,gr:0,cat:'dis',gri_fav:0},
   {id:'mets',n:'Syndrome metabolique',p:12,or:'HR 2.64',d:'3 criteres IDF ou plus.',ca:1.3,gr:.65,cat:'dis',gri_fav:1},
   {id:'monw',n:'Phenotype MONW',p:10,or:'OR 2.38',d:'IMC < 25 mais 2+ criteres MetS.',ca:1.1,gr:.70,cat:'phe',gri_fav:1},
-  {id:'ir_occ',n:'IR occulte',p:8,or:'OR 2.12',d:'TG/HDL > 3.5 non diagnostique.',ca:1.2,gr:.55,cat:'phe',gri_fav:1},
+  // ir_occ retiré v3.1.1 : non déclarable par le patient (occulte). Détection automatique via TG/HDL > 3.5 dans le module biologique.
   {id:'cortis',n:'Corticoides > 3 mois',p:8,or:'HR 2.12',d:'Adipogenese viscerale iatrogene.',ca:1.6,gr:-.35,cat:'tx',gri_fav:0},
   {id:'antidep',n:'Antidepresseurs obesogenes',p:4,or:'OR 1.58',d:'Paroxetine/mirtazapine.',ca:1.1,gr:0,cat:'tx',gri_fav:0},
   {id:'depres',n:'Depression traitee',p:6,or:'OR 1.92',d:'Impact metabolique bidirectionnel.',ca:1.2,gr:0,cat:'tx',gri_fav:0},
@@ -735,7 +735,7 @@ const SCR=[
     return html;
   },
 
-  // 14: Comorbidities v3.1 (14 comorbidites incluant dyslipidemie)
+  // 14: Comorbidities v3.1.1 (13 comorbidites declaratives + ir_occ auto-detectee via bio)
   ()=>{
     const dis=COMORB.filter(c=>c.cat==='dis'),phe=COMORB.filter(c=>c.cat==='phe'),tx=COMORB.filter(c=>c.cat==='tx');
     const mk=arr=>arr.map(c=>{
@@ -965,6 +965,7 @@ const SCR=[
           <div style="font-size:12px;font-weight:600;color:${cls.c}">bioNorm (${filled}/${markers.length} renseignes)</div>
           <div style="font-size:9px;color:var(--dim3)">bioNorm = (Σ z_i×w_i / Σ w_i) × 100</div>
           ${S.bInflam>0?`<div style="font-size:9px;color:var(--orange);margin-top:2px">bInflam = ${S.bInflam.toFixed(2)} → E amplifiee +${Math.round(S.bInflam*15)}%</div>`:''}
+          ${S.ir_occ_auto?`<div style="font-size:9px;color:var(--red);margin-top:2px;font-weight:700">★ IR OCCULTE détectée (TG/HDL > 3.5) → +8 pts BMN-K auto</div>`:''}
         </div>
       </div>`;
     }
@@ -1185,7 +1186,7 @@ function calc(){
   C+=c3;
 
   // c4 — Comorbidites (0-10 projete depuis BMN-K)
-  // BMN-K complet (0-50) utilise les 14 comorbidites (v3.1: +dyslipidemie)
+  // BMN-K complet (0-50) utilise les 13 comorbidites declaratives (v3.1.1: ir_occ retiree, auto-detectee via bio)
   let k=0, ctiAmp=1;
   const griF=[], griU=[];
   S.comorbIds.forEach(id=>{
@@ -1505,6 +1506,29 @@ function calc(){
   S.bmn_b=bioNorm;
 
   // ════════════════════════════════════════════════════
+  // v3.1.1: IR OCCULTE — Détection automatique via biologie
+  // Si TG/HDL > 3.5 ET ir_occ non déjà dans comorbIds → injection automatique
+  // Points BMN-K (+8), GRI (+0.55), CTI ca (1.2) — McLaughlin 2005
+  // ════════════════════════════════════════════════════
+  S.ir_occ_auto=false;
+  if(S.bioValues.tghdl!==undefined && S.bioValues.tghdl>3.5){
+    S.ir_occ_auto=true;
+    // Ajouter points BMN-K si pas déjà compté
+    S.bmn_k=Math.min(50, S.bmn_k+8);
+    // Recalculer c4 avec K augmenté
+    const kNorm_ir=S.bmn_k/50*100;
+    const c4_ir=Math.min(10, Math.round(kNorm_ir/10));
+    // Ajuster C si c4 augmente (delta)
+    const c4_old=Math.min(10, Math.round(((S.bmn_k-8)/50*100)/10));
+    const c4_delta=c4_ir - c4_old;
+    if(c4_delta>0) C=Math.min(50, C+c4_delta);
+    sD=Math.min(100, C+E+O+L);
+    // GRI bonus déjà géré ligne 1568 (tghdl>3.5 → +0.55)
+    // CTI amplificateur
+    if(1.2>ctiAmp) ctiAmp=1.2;
+  }
+
+  // ════════════════════════════════════════════════════
   // SCORE FINAL sf = wDecl × sD + wBio × bioNorm
   // Reponderation dynamique si gap > 20
   // + BioFloor standard (75%) + BioEmergencyFloor (85%)
@@ -1632,7 +1656,7 @@ function getGLP1Profile(){
     if(S.comorbIds.includes('dt2')) irScore+=3;
     else if(S.comorbIds.includes('predmt')) irScore+=2;
     else if(S.comorbIds.includes('mets')) irScore+=2;
-    else if(S.comorbIds.includes('ir_occ')) irScore+=2.5;
+    // ir_occ retiré du déclaratif v3.1.1 — détection auto via TG/HDL dans la bio
     else if(imc>=e.ob+5) irScore+=1.5;
     else if(imc>=e.ob) irScore+=1;
   }
@@ -2026,6 +2050,9 @@ function doRetro(){
   if(v.apob>=1.2) fl.push({c:'var(--orange)',t:'ApoB>=1.2: risque CV eleve'});
   if(v.urate>=420) fl.push({c:'var(--orange)',t:'Acide urique>=420: hyperuricemie'});
   if(v.leptine>=40) fl.push({c:'var(--orange)',t:'Leptine>=40: resistance a la leptine'});
+  // v3.1.1: IR occulte auto-détectée
+  if(v.tghdl>3.5)
+    fl.push({c:'var(--red)',t:'★ IR OCCULTE DÉTECTÉE (TG/HDL > 3.5) — Insulinorésistance non diagnostiquée. +8 pts BMN-K automatiques. Ref: McLaughlin 2005, Circulation'});
   // v3.1: 5 alertes dyslipidemie
   if(v.tg>=2.3&&v.hdl!==undefined&&v.hdl<0.9&&!S.comorbIds.includes('dyslipi'))
     fl.push({c:'var(--orange)',t:'Dyslipidemie mixte probable non declaree (TG>=2.3 + HDL<0.9). Ref: Framingham/INTERHEART'});
