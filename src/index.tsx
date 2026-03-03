@@ -5,7 +5,7 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0', name: 'Score BMN v3.1 AI+Geo' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '7.0', name: 'Score BMN v3.2 AI+Geo+BTM' }))
 
 // ─── GEO PROXY: Geocoding via Nominatim ───
 app.get('/api/geo/search', async (c) => {
@@ -116,14 +116,15 @@ app.post('/api/ai/analyze', async (c) => {
     const { profile, question } = body
 
     const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v3.1 (Bach-Manos-Noel).
+Tu analyses le profil d'un patient dans le cadre du Score BMN v3.2 (Bach-Manos-Noel).
 Ton role:
 1. Adapter les questions du questionnaire au profil du patient
 2. Expliquer en langage simple les resultats et risques
 3. Fournir des conseils personnalises bases sur les donnees
 4. Identifier les facteurs de risque critiques
+5. Integrer le Module BTM v3.2 (Bariatric & Therapeutic Module) : si IMC >= 30, evaluer l'indication ballon/ESG/sleeve/bypass/GLP-1 en fonction du profil
 
-References: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES, AUDIT-C, Lancet 2016, SCORE2/Framingham.
+References: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES-16 (Gormally 1982), AUDIT-C, Lancet 2016, SCORE2/Framingham, STEP 1-5, SURMOUNT 1-4, STAMPEDE, SM-BOSS, MERIT.
 
 IMPORTANT: Reponds TOUJOURS en JSON valide avec cette structure:
 {
@@ -181,8 +182,9 @@ app.post('/api/ai/interpret', async (c) => {
     const { scores, profile } = body
 
     const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
-Tu interpretes les resultats du Score BMN v3.1 pour un patient.
+Tu interpretes les resultats du Score BMN v3.2 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
+Si le patient a un score BTM (Module Bariatrique), integre la recommandation therapeutique personnalisee (primaire, secondaire, associations, contre-indications, parcours de soins).
 IMPORTANT: Reponds en JSON:
 {
   "summary": "resume en 2-3 phrases",
@@ -241,7 +243,7 @@ app.post('/api/ai/rapport', async (c) => {
 
     const systemPrompt = `Tu es un medecin expert en endocrinologie, obesite et metabolisme, specialise dans la medecine de precision et l'aide a la decision clinique.
 
-Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.1 (architecture CLEO).
+Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.2 (architecture CLEO + BTM v1.0).
 
 CONTEXTE ALGORITHMIQUE:
 - Score sf = wDecl × sD + wBio × bioNorm (0-100)
@@ -251,6 +253,7 @@ CONTEXTE ALGORITHMIQUE:
 - SII = Sous-Index Inflammatoire (0-7) : 7 criteres binaires
 - K = Score de comorbidites (0-50)
 - bioNorm = score biologique normalise (0-100) calcule par z-scores ponderes
+- BTM v3.2 = Module Bariatrique & Therapeutique : matrice decisionnelle 14 variables, 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations), basee sur 62 etudes meta-analysees (>180K patients)
 
 TON RAPPORT DOIT CONTENIR:
 1. diagnostic_resume: Resume diagnostique en 3-4 phrases, incluant le profil de risque global et les elements determinants
@@ -262,7 +265,8 @@ TON RAPPORT DOIT CONTENIR:
 7. suivi_propose: Calendrier de suivi precis (frequence, examens, objectifs)
 8. conseils_patient: [tableau] 3-5 conseils personnalises et actionables pour le patient
 9. attention_medicale: Points de vigilance pour le medecin (ou null si rien d'urgent)
-10. tone: "reassuring" | "cautious" | "urgent"
+10. btm_therapeutique: Si BTM disponible, inclure: technique primaire recommandee, technique secondaire, associations, contre-indications, efficacite attendue (%TBWL, %EWL), parcours de soins personnalise. Si IMC < 27, indiquer 'BTM non applicable'.
+11. tone: "reassuring" | "cautious" | "urgent"
 
 REGLES:
 - Sois precis, utilise les chiffres du patient
@@ -305,8 +309,19 @@ PROFIL:
 - Age: ${profil.age} ans | Sexe: ${profil.sexe === 'f' ? 'Femme' : 'Homme'} | Ethnie: ${profil.ethnie}
 - IMC: ${profil.imc} kg/m2 | Taille: ${profil.taille_cm} cm | Poids: ${profil.poids_kg} kg | Tour de taille: ${profil.tt_cm} cm
 - Comorbidites: ${profil.comorbidites?.length ? profil.comorbidites.join(', ') : 'Aucune declaree'}
-- PSS-10 (stress): ${profil.pss10}/40 | PHQ-9 (depression): ${profil.phq9}/27 | BES: ${profil.bes}/8 | ISI: ${profil.isi}
+- PSS-10 (stress): ${profil.pss10}/40 | PHQ-9 (depression): ${profil.phq9}/27 | BES-16: ${profil.bes16 || profil.bes}/46 | ISI: ${profil.isi}
 - Tabac: ${profil.tabac_cig} | Alcool: ${profil.alcool}
+
+BTM v3.2 (Module Bariatrique):
+${body.btm ? `- GERD: ${body.btm.gerd} | ASA: ${body.btm.asa} | ATCD chirurgie: ${body.btm.atcdChir} | NASH: ${body.btm.nash} | CV: ${body.btm.comorbCV}
+- Preference patient: ${body.btm.prefPatient} | Refus chirurgie: ${body.btm.refusChir}
+- Recommandation primaire: ${body.btm.primary?.name || 'N/A'} (${body.btm.primary?.tech || ''})
+- Recommandation secondaire: ${body.btm.secondary?.name || 'N/A'}
+- Associations: ${body.btm.assoc?.join(', ') || 'Aucune'}
+- Contre-indications: ${body.btm.contraind?.join(', ') || 'Aucune'}
+- Efficacite attendue: TBWL ${body.btm.tbwl || 'N/A'}, EWL ${body.btm.ewl || 'N/A'}
+- Complexite: ${body.btm.complexity}/5
+- Parcours: ${body.btm.parcours?.join(' → ') || 'N/A'}` : 'Non disponible'}
 
 BIOLOGIE:
 ${biologie.present ? 'bioNorm = ' + biologie.bioNorm + '/100 (wDecl=' + biologie.wDecl + ', wBio=' + biologie.wBio + ')\nMarqueurs: ' + JSON.stringify(biologie.marqueurs) : 'Non disponible — prescrire panel ' + scores.panelLvl}
@@ -363,7 +378,7 @@ app.get('/dossier', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER ALGORITHME — SCORE BMN v3.1</title>
+<title>DOSSIER ALGORITHME — SCORE BMN v3.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--dim3:#475569;--accent:#818cf8;--green:#22c55e;--green-bg:rgba(34,197,94,.1);--orange:#f59e0b;--orange-bg:rgba(245,158,11,.1);--red:#ef4444;--red-bg:rgba(239,68,68,.1);--purple:#a855f7;--purple-bg:rgba(168,85,247,.1);--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -414,7 +429,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 
 <div class="hero">
   <h1>DOSSIER COMPLET</h1>
-  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.1</h1>
+  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.2</h1>
   <div class="sub">Architecture CLEO (C + E + O + L) + Integration Biologique BSD v4.9</div>
   <div class="ver">Auteurs : Bach | Manos | Noel — Version 3.1 — Verrouille le 2 mars 2026</div>
   <div style="margin-top:14px">
@@ -452,8 +467,9 @@ tr:hover{background:rgba(129,140,248,.05)}
   <a href="#s23"><span>23.</span> Strategies Therapeutiques</a>
   <a href="#s24"><span>24.</span> Rapport IA (Aide au Medecin)</a>
   <a href="#s25"><span>25.</span> APIs et Sources Temps Reel</a>
-  <a href="#s26"><span>26.</span> Flux de Navigation (18 ecrans)</a>
+  <a href="#s26"><span>26.</span> Flux de Navigation (20 ecrans)</a>
   <a href="#s27"><span>27.</span> References Scientifiques</a>
+  <a href="#s28" style="color:#14b8a6;font-weight:700"><span>28.</span> Module BTM v3.2 — Bariatric & Therapeutic Module (NOUVEAU)</a>
   <a href="#synth"><span>*</span> SYNTHESE — Formules Cles Verrouillees</a>
 </div>
 
@@ -461,7 +477,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <!-- 1. VUE D'ENSEMBLE -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s1">1. Vue d'ensemble</h2>
-<p>Le <strong>Score BMN v3.1</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
+<p>Le <strong>Score BMN v3.2</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
 <ul style="margin:8px 0 8px 20px;font-size:13px;color:var(--dim)">
   <li><strong>Donnees declaratives</strong> du patient (cliniques, mode de vie, psychometriques)</li>
   <li><strong>Donnees biologiques</strong> (15 biomarqueurs avec z-scores ponderes)</li>
@@ -482,7 +498,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s2">2. Architecture generale</h2>
 <pre>
-PATIENT &rarr; QUESTIONNAIRE (18 ecrans)
+PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
               |
               v
          CLEO ENGINE
@@ -1181,7 +1197,7 @@ SINON
 <tr><td>Distance</td><td>Haversine (R=6371km)</td><td>Distance domicile-travail</td></tr>
 </table>
 
-<h2 id="s26">26. Flux de Navigation (18 ecrans)</h2>
+<h2 id="s26">26. Flux de Navigation (20 ecrans)</h2>
 <table><tr><th>Ecran</th><th>Nom</th><th>Section</th></tr>
 <tr><td>0</td><td>Accueil</td><td>[H]</td></tr>
 <tr><td>1</td><td>Date de naissance</td><td rowspan="3">[ID] Identite</td></tr>
@@ -1196,11 +1212,13 @@ SINON
 <tr><td>10</td><td>Activite physique (IPAQ)</td><td rowspan="2">[V] Mode de vie</td></tr>
 <tr><td>11</td><td>Sommeil + substances</td></tr>
 <tr><td>12</td><td>Stress PSS-10 (10 items)</td><td rowspan="2">[S] Sante mentale</td></tr>
-<tr><td>13</td><td>Depression PHQ-9 + BES</td></tr>
+<tr><td>13</td><td>Depression PHQ-9</td></tr>
 <tr><td>14</td><td>Comorbidites (13 declaratives + IR occulte auto)</td><td>[P] Pathologies</td></tr>
 <tr><td>15</td><td>Score sD + Prescription bio</td><td>[sD] Score</td></tr>
 <tr><td>16</td><td>Fiche biologique + simulation</td><td>[B] Biologie</td></tr>
-<tr><td>17</td><td>Resultat final complet</td><td>[R] Resultat</td></tr>
+<tr><td>17</td><td>Questionnaire BTM v3.2 (GERD, ASA, ATCD, NASH, CV, preference)</td><td rowspan="2">[BTM] Bariatrique</td></tr>
+<tr><td>18</td><td>BES-16 — Binge Eating Scale (16 items, score 0-46)</td></tr>
+<tr><td>19</td><td>Resultat final complet + Section 11 BTM</td><td>[R] Resultat</td></tr>
 </table>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1240,7 +1258,138 @@ SINON
 <p><strong>Hoehner 2012</strong> — Trajet et sante</p>
 <p><strong>NOVA (Monteiro)</strong> — Ultra-transformes</p>
 <p><strong>PREDIMED</strong> — Score alimentaire</p>
+<p><strong>STEP 1 (Wilding 2021)</strong> — Semaglutide 2.4mg, n=1961</p>
+<p><strong>SURMOUNT-1 (Jastreboff 2022)</strong> — Tirzepatide, n=2539</p>
+<p><strong>STAMPEDE (Schauer 2017)</strong> — Sleeve vs Bypass, n=150</p>
+<p><strong>SM-BOSS (Peterli 2018)</strong> — Sleeve vs Bypass, n=217</p>
+<p><strong>Genco 2013</strong> — Ballon Orbera, n=3696</p>
+<p><strong>Brooks 2019</strong> — Spatz3, n=228</p>
+<p><strong>Alqahtani 2022</strong> — ESG (NEJM), n=209</p>
+<p><strong>Adams 2017</strong> — Bypass mortalite (NEJM), n=418</p>
+<p><strong>Gormally 1982</strong> — Binge Eating Scale (BES-16)</p>
+<p><strong>Ponce 2021</strong> — GERD resolution post-bypass, n=344</p>
+<p><strong>Sharaiha 2021</strong> — ESG + NASH, n=182</p>
 </div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 28. MODULE BTM v3.2 -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 id="s28" style="border-color:#14b8a6">28. Module BTM v3.2 — Bariatric & Therapeutic Module</h2>
+
+<div style="background:rgba(20,184,166,.08);border:2px solid #14b8a6;border-radius:14px;padding:16px;margin:12px 0">
+<p style="font-size:13px;color:#14b8a6;font-weight:700">Matrice Decisionnelle Therapeutique Personnalisee — Mars 2026</p>
+<p style="font-size:11px;color:var(--dim)">6 techniques | 62 etudes meta-analysees | >180 000 patients | 14 variables decisionnelles | BES-16 integre</p>
+</div>
+
+<h3>28.1 Six techniques evaluees</h3>
+<table>
+<tr><th>Code</th><th>Technique</th><th>IMC cible</th><th>%TBWL 12m</th><th>%EWL 24m</th></tr>
+<tr><td>BT-1</td><td>Ballon Gastrique (Orbera, Spatz3)</td><td>30-40</td><td>10-19%</td><td>32-48%</td></tr>
+<tr><td>BT-2</td><td>Endosleeve (ESG)</td><td>30-45</td><td>13-16%</td><td>55-58%</td></tr>
+<tr><td>BT-3</td><td>Sleeve Gastrectomie</td><td>35-55</td><td>25-30%</td><td>61-65%</td></tr>
+<tr><td>BT-4</td><td>Bypass (RYGB / SADI-S)</td><td>&ge;40</td><td>28-34%</td><td>65-72%</td></tr>
+<tr><td>BT-5</td><td>GLP-1 RA (Semaglutide/Tirzepatide)</td><td>&ge;27</td><td>14.9-22%</td><td>—</td></tr>
+<tr><td>BT-6</td><td>Associations therapeutiques</td><td>variable</td><td>+4-12%</td><td>+8-12%</td></tr>
+</table>
+
+<h3>28.2 Quatorze variables decisionnelles</h3>
+<table>
+<tr><th>#</th><th>Variable</th><th>Source</th><th>Impact algorithmique</th></tr>
+<tr><td>1</td><td>IMC</td><td>Ecran 4</td><td>&lt;35 Ballon/ESG; 35-50 Sleeve; &ge;40+comorb Bypass; &ge;60 SADI-S</td></tr>
+<tr><td>2</td><td>Score sf</td><td>calcul</td><td>&lt;40 medical; 40-59 endoscopique; 60-79 discussion chir; &ge;80 chir recommandee</td></tr>
+<tr><td>3</td><td>CTI</td><td>calcul</td><td>&ge;55 urgence chirurgicale; 40-55 combinaison traitements</td></tr>
+<tr><td>4</td><td>Profil GRS</td><td>calcul</td><td>R1/R2 GLP-1 prioritaire; R4/R5 chirurgie prioritaire</td></tr>
+<tr><td>5</td><td>DT2 + HbA1c</td><td>Ecran 14+16</td><td>HbA1c &gt;9% Bypass (remission 29-45%)</td></tr>
+<tr><td>6</td><td>GERD</td><td>Ecran 17</td><td>Documente: Bypass obligatoire (resolution 87%); Sleeve CI</td></tr>
+<tr><td>7</td><td>SOPK</td><td>Ecran 14</td><td>Sleeve (remission 72% a 2 ans)</td></tr>
+<tr><td>8</td><td>BES-16</td><td>Ecran 18</td><td>&ge;17 +Buproprion-Naltrexone; &ge;27 CI chirurgie</td></tr>
+<tr><td>9</td><td>PSS-10 stress</td><td>Ecran 12</td><td>&gt;20 compliance chirurgicale reduite</td></tr>
+<tr><td>10</td><td>Dyslipidemie</td><td>Ecran 14</td><td>Mixte: Bypass ou GLP-1+SGLT-2</td></tr>
+<tr><td>11</td><td>NASH</td><td>Ecran 17</td><td>ESG prioritaire (62% resolution histologique)</td></tr>
+<tr><td>12</td><td>ASA</td><td>Ecran 17</td><td>&ge;4 chirurgie CI (Ballon ou GLP-1 uniquement)</td></tr>
+<tr><td>13</td><td>ATCD chirurgie</td><td>Ecran 17</td><td>Sleeve ant. Bypass revision (+23% EWL)</td></tr>
+<tr><td>14</td><td>Preference patient</td><td>Ecran 17</td><td>Refus chir: escalade Ballon/ESG/GLP-1</td></tr>
+</table>
+
+<h3>28.3 Algorithme btm_decision() — Pseudocode</h3>
+<div style="background:var(--bg2);border-radius:10px;padding:14px;font-family:var(--mono);font-size:11px;color:var(--cyan);line-height:1.7;overflow-x:auto">
+<pre>
+ENTREE: imc, sf, cti, grs, dt2, hba1c, gerd, sopk, besT, pss, dyslipiMixte, nash, asa, atcdChir, refusChir, comorbCV
+SORTIE: rtp {primary, secondary, assoc[], contraind[], ewl, tbwl, complexity, parcours[], notes[]}
+
+// GARDE-FOUS
+SI besT >= 27 → contraind += "Chirurgie (TCA severe)"
+SI asa >= 4 → primary=BT-1 Spatz3; secondary=BT-5 GLP-1 → RETOUR
+SI atcdChir == "sleeve" → primary=BT-4 Bypass revision → RETOUR
+
+// DECISION PAR PROFIL IMC + SF
+SI imc < 30 ET sf < 40 → BT-5 GLP-1 faible dose
+SI imc 30-35:
+  SI grs R1/R2 → BT-5 GLP-1 haute dose; sec=BT-1 Spatz3
+  SINON → BT-1 Spatz3; sec=BT-2 ESG; assoc GLP-1 post-ballon
+SI imc 35-40:
+  SI gerd → BT-4 Bypass; CI sleeve
+  SI nash → BT-2 ESG (62% resolution)
+  SI refusChir → BT-2 ESG; sec=BT-5
+  SINON → BT-3 Sleeve; sec=BT-2 ESG
+SI imc 40-50:
+  SI (dt2 ET hba1c>9) OU gerd → BT-4 Bypass
+  SI sopk → BT-3 Sleeve (remission 72%)
+  SI grs R1 → BT-5 Tirzepatide 15mg
+  SINON → BT-3 Sleeve; sec=BT-4 Bypass
+SI imc >= 50:
+  SI imc >= 60 → BT-4 SADI-S
+  SINON → BT-4 Bypass long bras
+
+// ENRICHISSEMENT ASSOCIATIONS
+SI dt2+comorbCV → + Empagliflozine (SGLT-2) Grade 1A
+SI besT 17-26 → + Buproprion-Naltrexone
+SI dt2+imc>=30 → + GLP-1 + SGLT-2
+SI cti >= 55 → note: chirurgie prioritaire si eligible
+</pre>
+</div>
+
+<h3>28.4 BES-16 — Binge Eating Scale (Gormally 1982)</h3>
+<p>Echelle validee de 16 items. Score 0-46. Seuils :</p>
+<table>
+<tr><th>Score</th><th>Interpretation</th><th>Impact BTM</th></tr>
+<tr><td>&lt; 10</td><td>Normal</td><td>Aucune restriction</td></tr>
+<tr><td>10-16</td><td>Tendance legere</td><td>Surveillance</td></tr>
+<tr><td>17-26</td><td>Hyperphagie moderee</td><td>+ Buproprion-Naltrexone recommande</td></tr>
+<tr><td>&ge; 27</td><td>Hyperphagie severe</td><td>Contre-indication chirurgie bariatrique. PEC TCA prealable obligatoire</td></tr>
+</table>
+
+<h3>28.5 Associations therapeutiques (BT-6)</h3>
+<table>
+<tr><th>Combinaison</th><th>Gain</th><th>Indication</th><th>Source</th></tr>
+<tr><td>ESG + GLP-1</td><td>+6-9% TBWL</td><td>IMC 30-45</td><td>Sharaiha 2023</td></tr>
+<tr><td>Spatz3 + GLP-1</td><td>Bridge chirurgie, -35% risque</td><td>Pre-operatoire</td><td>Meta-analyse BTM</td></tr>
+<tr><td>Bypass + Semaglutide</td><td>92% remission DT2</td><td>DT2 + IMC &ge; 40</td><td>STAMPEDE post-hoc</td></tr>
+<tr><td>GLP-1 + SGLT-2</td><td>+4-6% TBWL, -0.9% HbA1c</td><td>DT2 + maladie CV (1A)</td><td>ADA 2024</td></tr>
+<tr><td>GLP-1 + Buproprion-Naltrexone</td><td>Synergie appetit+reward</td><td>BES &ge; 17</td><td>Consensus 2024</td></tr>
+</table>
+
+<h3>28.6 Section 11 du rapport final</h3>
+<p>Le resultat final (ecran 19) affiche la Section 11 BTM avec :</p>
+<table>
+<tr><th>Sous-section</th><th>Contenu</th></tr>
+<tr><td>11.1</td><td>Complexite therapeutique (1-5 etoiles)</td></tr>
+<tr><td>11.2</td><td>Recommandation primaire (technique + justification)</td></tr>
+<tr><td>11.3</td><td>Recommandation secondaire / alternative</td></tr>
+<tr><td>11.4</td><td>Efficacite attendue (%TBWL + %EWL + BES-16)</td></tr>
+<tr><td>11.5</td><td>Associations recommandees</td></tr>
+<tr><td>11.6</td><td>Contre-indications identifiees</td></tr>
+<tr><td>11.7</td><td>Parcours de soins optimise (chronologie)</td></tr>
+</table>
+
+<h3>28.7 Integration prompts IA Claude</h3>
+<p>Les trois prompts Claude (analyse, interpretation, rapport) integrent les donnees BTM :</p>
+<table>
+<tr><th>Prompt</th><th>Ajout BTM</th></tr>
+<tr><td>/api/ai/analyse</td><td>Evaluation indication ballon/ESG/sleeve/bypass/GLP-1 si IMC &ge; 30</td></tr>
+<tr><td>/api/ai/interpreter</td><td>RTP : primaire, secondaire, associations, CI, parcours</td></tr>
+<tr><td>/api/ai/rapport</td><td>Section 10 btm_therapeutique complete. 14 variables transmises + BES-16</td></tr>
+</table>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- SYNTHESE FINALE -->
@@ -1249,7 +1398,7 @@ SINON
 <h2 style="margin:0 0 14px;border:none;background:none;padding:0;color:var(--teal)">SYNTHESE — Formules Cles Verrouillees</h2>
 <pre>
 +----------------------------------------------------------------+
-|                    SCORE BMN v3.1 --- FORMULES                  |
+|                    SCORE BMN v3.2 --- FORMULES                  |
 +----------------------------------------------------------------+
 |                                                                 |
 |  sD = min(100, C + E + O + L)                                  |
@@ -1281,14 +1430,21 @@ SINON
 |                                                                 |
 |  bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR)                   |
 |                                                                 |
+|  BTM = btm_decision(14 vars: imc, sf, cti, grs, dt2,         |
+|        hba1c, gerd, sopk, besT, pss, dyslipi, nash,           |
+|        asa, atcdChir, refusChir, comorbCV)                     |
+|  BES-16 = Sum(16 items, w_i) in [0,46]                        |
+|  Seuils: <10 normal, 17 modere, 27 CI chir                    |
+|                                                                 |
 +----------------------------------------------------------------+
 </pre>
 </div>
 
 <div style="text-align:center;margin:40px 0;padding:20px;border-top:2px solid var(--border2)">
-  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.1</p>
-  <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1</p>
-  <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; Fevrier 2026</p>
+  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.2</p>
+  <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v1.0</p>
+  <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; Mars 2026</p>
+  <p style="font-size:11px;color:var(--dim3)">28 sections | 20 ecrans | 13 comorbidites + IR auto | BES-16 | 62 etudes BTM</p>
   <div style="margin-top:14px">
     <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
     <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
@@ -1308,7 +1464,7 @@ app.get('/dossier-scientifique', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.1 — Méta-analyse & Justification bibliographique</title>
+<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.2 — Méta-analyse & Justification bibliographique</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--dim3:#475569;--accent:#818cf8;--green:#22c55e;--green-bg:rgba(34,197,94,.1);--orange:#f59e0b;--orange-bg:rgba(245,158,11,.1);--red:#ef4444;--red-bg:rgba(239,68,68,.1);--purple:#a855f7;--purple-bg:rgba(168,85,247,.1);--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -1342,13 +1498,13 @@ tr:nth-child(even){background:var(--bg2)}
 
 <div style="text-align:center;padding:30px 0 20px">
   <div style="font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:2px">Document scientifique confidentiel</div>
-  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.1</div>
+  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.2</div>
   <div style="font-size:18px;color:var(--cyan);font-weight:600">Dossier Scientifique Complet</div>
   <div style="font-size:14px;color:var(--dim);margin:8px 0">Méta-analyse, justification bibliographique & validation du modèle</div>
   <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1</div>
   <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 2 mars 2026</div>
-  <div style="font-size:11px;color:var(--dim3)">Version : DS-3.1-FINAL | Classification : Usage médical restreint</div>
-  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.1.1 : +Dyslipidémie (14e) · Flag statines · IR occulte auto-détectée (TG/HDL > 3.5)</div>
+  <div style="font-size:11px;color:var(--dim3)">Version : DS-3.2-FINAL | Classification : Usage médical restreint</div>
+  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.2 : +BTM (Bariatric &amp; Therapeutic Module) · 62 études · BES-16 · Matrice décisionnelle</div>
 </div>
 
 <div class="toc">
@@ -1376,12 +1532,13 @@ tr:nth-child(even){background:var(--bg2)}
 <a href="#s21">XXI. Limites & biais potentiels</a>
 <a href="#s22">XXII. Bibliographie complète (>90 références)</a>
 <a href="#s23" style="color:var(--accent);font-weight:700">★ XXIII. MISE À JOUR v3.1 — Dyslipidémie (14e comorbidité)</a>
+<a href="#s24" style="color:var(--teal);font-weight:700">★ XXIV. MODULE BTM v3.2 — Bariatric &amp; Therapeutic Module (62 études, &gt;180K patients)</a>
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s1">I. Résumé exécutif & objectifs</h1>
 
-<p>Le <b>SCORE BMN v3.1</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
+<p>Le <b>SCORE BMN v3.2</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
 
 <h3>Objectifs du modèle</h3>
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
@@ -1403,7 +1560,7 @@ Classification : FAIBLE (&lt;30) | MODÉRÉ (30-59) | ÉLEVÉ (60-79) | TRÈS É
 <h1 id="s2">II. Méthodologie de construction du modèle</h1>
 
 <h3>2.1 Stratégie de recherche bibliographique</h3>
-<p>La construction du SCORE BMN v3.1 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
+<p>La construction du SCORE BMN v3.2 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
 
 <h4>Critères d'inclusion</h4>
 <p>• Études de cohorte prospectives (n ≥ 1 000 participants) • Méta-analyses et revues systématiques Cochrane • Essais contrôlés randomisés (ECR) de phase III pour les données pharmacologiques • Guidelines internationales (OMS, IDF, ADA, ESC/EAS) • Données de registres nationaux (NHANES, UK Biobank, Framingham Heart Study)</p>
@@ -2065,7 +2222,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
 </p>
 
 <div style="margin-top:30px;padding:20px;background:var(--bg2);border:2px solid var(--accent);border-radius:14px">
-  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.1</div>
+  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.2</div>
   <div style="font-family:var(--mono);font-size:12px;color:var(--cyan);line-height:2">
     sD = min(100, C + E + O + L)<br>
     C = min(50, round((c1+c2+c3+c4+c5+c6+c7+c8) × (1+ev/100)))<br>
@@ -2151,6 +2308,73 @@ Source : Sniderman 2019, ESC Guidelines 2021
 <tr><td>TG+HDL+HOMA-IR pathologiques + dyslipi mixte</td><td>TRIADE IR + DYSLIPIDÉMIE — Convergence maximale</td><td style="color:var(--red)">ROUGE</td></tr>
 </table>
 
+<h1 id="s24" style="border-color:var(--teal)">★ XXIV. MODULE BTM v3.2 — Bariatric &amp; Therapeutic Module</h1>
+
+<div class="meta-box" style="border-color:var(--teal)">
+<p style="font-size:13px;color:var(--teal);font-weight:700">Matrice Décisionnelle Thérapeutique Personnalisée — Mars 2026</p>
+<p style="font-size:12px">6 techniques · 62 études méta-analysées · &gt;180 000 patients · 14 variables décisionnelles · BES-16 intégré</p>
+</div>
+
+<h3>24.1 Rationale — Lacunes v3.1</h3>
+<p>Le Score BMN v3.1 était limité aux GLP-1 (profils R1-R5). Aucune matrice profil×technique bariatrique. Aucun arbre décisionnel intégrant ballon, endosleeve, chirurgie et associations. Le Module BTM corrige ces lacunes.</p>
+
+<h3>24.2 Six techniques évaluées</h3>
+<table>
+<tr><th>Code</th><th>Technique</th><th>IMC cible</th><th>%TBWL 12m</th><th>%EWL 24m</th><th>Études clés</th></tr>
+<tr><td>BT-1</td><td>Ballon Gastrique (Orbera, Spatz3)</td><td>30-40</td><td>10-19%</td><td>32-48%</td><td>Genco 2013 n=3696; Brooks 2019 n=228; Ienca 2020 n=272</td></tr>
+<tr><td>BT-2</td><td>Endosleeve (ESG)</td><td>30-45</td><td>13-16%</td><td>55-58%</td><td>Alqahtani NEJM 2022 n=209; López-Nava 2023 n=216; Sharaiha 2021 n=182</td></tr>
+<tr><td>BT-3</td><td>Sleeve Gastrectomie</td><td>35-55</td><td>25-30%</td><td>61-65%</td><td>Peterli JAMA 2018 n=217; Salminen 2018 n=240; Thereaux BMJ 2022 n=101327</td></tr>
+<tr><td>BT-4</td><td>Bypass (RYGB / SADI-S)</td><td>≥40</td><td>28-34%</td><td>65-72%</td><td>Adams NEJM 2017 n=418; Schauer STAMPEDE 2017 n=150; Courcoulas 2020 n=2458</td></tr>
+<tr><td>BT-5</td><td>GLP-1 (Sémaglutide/Tirzépatide)</td><td>≥27</td><td>14.9-22%</td><td>—</td><td>STEP 1 n=1961; SURMOUNT-1 n=2539; SELECT n=17604</td></tr>
+<tr><td>BT-6</td><td>Associations thérapeutiques</td><td>variable</td><td>+4-12%</td><td>+8-12%</td><td>Sharaiha 2023; STAMPEDE; SURMOUNT</td></tr>
+</table>
+
+<h3>24.3 Quatorze variables décisionnelles BTM</h3>
+<table>
+<tr><th>#</th><th>Variable</th><th>Impact</th></tr>
+<tr><td>1</td><td>IMC</td><td>&lt;35 → Ballon/ESG; 35-50 → Sleeve; ≥40+comorbidités → Bypass</td></tr>
+<tr><td>2</td><td>Score sf</td><td>&lt;40 médical; 40-59 endoscopique; 60-79 chirurgie discutée; ≥80 chirurgie recommandée</td></tr>
+<tr><td>3</td><td>CTI</td><td>≥55 → urgence chirurgicale</td></tr>
+<tr><td>4</td><td>Profil GRS</td><td>R1/R2 → GLP-1; R4/R5 → chirurgie</td></tr>
+<tr><td>5</td><td>DT2</td><td>HbA1c &gt;9% → Bypass (rémission 29-45%)</td></tr>
+<tr><td>6</td><td>GERD</td><td>Documenté → Bypass obligatoire (résolution 87%); Sleeve contre-indiquée</td></tr>
+<tr><td>7</td><td>SOPK</td><td>Sleeve (rémission 72%) ou Spatz3</td></tr>
+<tr><td>8</td><td>BES-16</td><td>≥17 → +Buproprion-Naltrexone; ≥27 → contre-indication chirurgie</td></tr>
+<tr><td>9</td><td>PSS-10</td><td>&gt;20 → compliance chirurgicale réduite</td></tr>
+<tr><td>10</td><td>Dyslipidémie mixte</td><td>Bypass ou GLP-1+SGLT-2</td></tr>
+<tr><td>11</td><td>NASH</td><td>ESG prioritaire (62% résolution histologique)</td></tr>
+<tr><td>12</td><td>ASA</td><td>≥4 → chirurgie contre-indiquée (Ballon ou GLP-1)</td></tr>
+<tr><td>13</td><td>ATCD chirurgie</td><td>Sleeve antérieure → Bypass révision (+23% EWL)</td></tr>
+<tr><td>14</td><td>Préférence patient</td><td>Refus chirurgie → escalade Ballon/ESG/GLP-1</td></tr>
+</table>
+
+<h3>24.4 Associations thérapeutiques (BT-6)</h3>
+<table>
+<tr><th>Combinaison</th><th>Gain</th><th>Indication</th><th>Source</th></tr>
+<tr><td>ESG + GLP-1</td><td>+6-9% TBWL</td><td>IMC 30-45</td><td>Sharaiha 2023</td></tr>
+<tr><td>Spatz3 + GLP-1</td><td>Bridge chirurgie, -35% risque</td><td>Pré-opératoire</td><td>Meta-analyse BTM</td></tr>
+<tr><td>Bypass + Sémaglutide</td><td>92% rémission DT2 à 2 ans</td><td>DT2 + IMC ≥ 40</td><td>STAMPEDE post-hoc</td></tr>
+<tr><td>GLP-1 + SGLT-2</td><td>+4-6% TBWL, -0.9% HbA1c</td><td>DT2 + maladie CV (Grade 1A)</td><td>ADA 2024</td></tr>
+<tr><td>GLP-1 + Buproprion-Naltrexone</td><td>Synergie appétit+reward</td><td>BES ≥ 17</td><td>Consensus bariatrique 2024</td></tr>
+</table>
+
+<h3>24.5 Matrice décisionnelle principale</h3>
+<table style="font-size:11px">
+<tr><th>Profil patient</th><th>BT-1</th><th>BT-2</th><th>BT-3</th><th>BT-4</th><th>BT-5</th><th>BT-6</th></tr>
+<tr><td>sf&lt;40, IMC 27-32, R1</td><td>○</td><td>○</td><td>✗</td><td>✗</td><td>★</td><td>◑</td></tr>
+<tr><td>sf 40-59, IMC 30-35, R2</td><td>★</td><td>◑</td><td>○</td><td>✗</td><td>★</td><td>★</td></tr>
+<tr><td>sf 40-59, IMC 30-40, NASH</td><td>◑</td><td>★</td><td>○</td><td>○</td><td>◑</td><td>★</td></tr>
+<tr><td>sf 60-79, IMC 35-45, R3</td><td>○</td><td>★</td><td>★</td><td>◑</td><td>◑</td><td>★</td></tr>
+<tr><td>sf 60-79, IMC 35-45, GERD</td><td>✗</td><td>◑</td><td>✗</td><td>★</td><td>◑</td><td>◑</td></tr>
+<tr><td>sf ≥80, IMC ≥50, R5</td><td>✗</td><td>✗</td><td>◑</td><td>★</td><td>✗</td><td>★</td></tr>
+<tr><td>ASA ≥ 4</td><td>★</td><td>◑</td><td>✗</td><td>✗</td><td>★</td><td>◑</td></tr>
+<tr><td>Refus chirurgie</td><td>★</td><td>★</td><td>✗</td><td>✗</td><td>★</td><td>★</td></tr>
+</table>
+<p style="font-size:10px;color:var(--dim3)">★ prioritaire · ◑ secondaire · ○ possible · ✗ contre-indiqué</p>
+
+<h3>24.6 BES-16 (Binge Eating Scale — Gormally 1982)</h3>
+<p>Échelle validée de 16 items (score 0-46). Remplace le BES simplifié (0-8) de v3.1. Seuils : &lt;10 normal, 10-16 tendance légère, 17-26 hyperphagie modérée, ≥27 hyperphagie sévère (contre-indication chirurgicale).</p>
+
 <div style="margin-top:20px;text-align:center">
   <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
   <a href="/dossier" class="print-btn" style="text-decoration:none;background:var(--teal)">Dossier Technique</a>
@@ -2159,8 +2383,8 @@ Source : Sniderman 2019, ESC Guidelines 2021
 </div>
 
 <div style="margin-top:30px;text-align:center;font-size:11px;color:var(--dim3)">
-  Document confidentiel — SCORE BMN v3.1 — Bach · Manos · Noël — 2 mars 2026<br>
-  93+ références | 23 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 | v3.1.1 : IR occulte auto-détectée<br>
+  Document confidentiel — SCORE BMN v3.2 — Bach · Manos · Noël — 3 mars 2026<br>
+  93+ références + 62 études BTM | 24 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v1.0<br>
   Usage médical restreint — Ne pas diffuser sans autorisation
 </div>
 
@@ -2179,8 +2403,8 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v3.1 - Evaluez votre risque metabolique avec intelligence artificielle. v3.1: Dyslipidemie integree.">
-<title>Score BMN v3.1</title>
+<meta name="description" content="Score BMN v3.2 - Evaluez votre risque metabolique avec intelligence artificielle. Module BTM v3.2 : matrice bariatrique. Dyslipidemie integree.">
+<title>Score BMN v3.2</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">

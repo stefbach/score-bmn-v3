@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.1 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9
+// SCORE BMN v3.2 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v1.0
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
@@ -92,6 +92,47 @@ const MK_B=[[.82,.14,.03,.01,0,0],[.08,.68,.18,.05,.01,0],[.02,.11,.61,.21,.04,.
 const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5,dyslipi:1.15};
 const CTI_G={dur:.185,yoyo:.249,lep:.21,micro:.18,cort:.195,meta:.2,enf:.24};
 
+// ─── BTM v3.2 — Bariatric & Therapeutic Module ───
+// 6 techniques évaluées, 62 études méta-analysées, >180K patients
+// Bach | Manos | Noel — 2026
+const BTM_TECH={
+  'BT-1':{id:'BT-1',name:'Ballon Gastrique',sub:{orbera:{n:'Orbera™',tbwl6:'10-12%',ewl2y:'32-38%',src:'Genco 2013, n=3696'},reshape:{n:'ReShape Duo',tbwl6:'9.8%',ewl2y:'25.1%',src:'Ponce 2015, n=326'},spatz3:{n:'Spatz3™ 12m',tbwl12:'17-19%',ewl2y:'44-48%',src:'Brooks 2019, n=228; Ienca 2020, n=272'}},imc:'30-40',compl:'7-14% intolerance',mort:'<0.01%',reversible:1},
+  'BT-2':{id:'BT-2',name:'Endosleeve (ESG)',tbwl12:'13-16%',ewl2y:'55-58%',ewl5y:'56.8%',dt2rem:'49%',nashRes:'62%',compl:'<0.5%',mort:'<0.01%',imc:'30-45',src:'Alqahtani NEJM 2022, n=209; Lopez-Nava 2023, n=216; Badurdeen 2021, n=311; Sharaiha 2021, n=182',reversible:0},
+  'BT-3':{id:'BT-3',name:'Sleeve Gastrectomie',tbwl12:'25-30%',ewl2y:'61-65%',ewl5y:'61.1%',ewl10y:'55%',dt2rem:'37%',sopkRem:'72%',mort30j:'0.09%',imc:'35-55',src:'Peterli JAMA 2018, n=217; Salminen JAMA 2018, n=240; Sieber 2023, n=167; Thereaux BMJ 2022, n=101327; Climent 2022, n=94',reversible:0},
+  'BT-4':{id:'BT-4',name:'Bypass Gastrique (RYGB)',tbwl12:'28-34%',ewl2y:'65-72%',ewl7y:'65.7%',dt2rem:'29-45%',gerdRes:'87%',mortReduct:'-40%',cancerReduct:'-33%',cvReduct:'-29%',mort30j:'0.15%',imc:'>=40',src:'Adams NEJM 2017, n=418; Schauer NEJM 2017 STAMPEDE, n=150; Courcoulas 2020, n=2458; Sjostrom 2012, n=4047; Ponce 2021, n=344',sadi:{n:'SADI-S',ewl:'80-85%',imc:'>=60'},reversible:0},
+  'BT-5':{id:'BT-5',name:'GLP-1 Receptor Agonists',sema:{n:'Semaglutide 2.4mg',tbwl:'14.9%',src:'STEP 1, Wilding NEJM 2021, n=1961; SELECT, Lincoff 2023, n=17604; FLOW, Perkovic 2024, n=3533'},tirza:{n:'Tirzepatide 15mg',tbwl:'19-22%',src:'SURMOUNT-1, Jastreboff NEJM 2022, n=2539; SURPASS-4, Del Prato 2021, n=2002'},reta:{n:'Retatrutide',tbwl:'24.2%',src:'REDEFINE-1, n=338'},cagrima:{n:'CagriSema',tbwl:'22.7%'},imc:'>=27',reversible:1},
+  'BT-6':{id:'BT-6',name:'Associations Therapeutiques',combos:[
+    {id:'esg_glp1',n:'ESG + GLP-1',gain:'+6-9% TBWL',src:'Sharaiha 2023'},
+    {id:'spatz_glp1',n:'Spatz3 + GLP-1',gain:'Bridge to surgery, -35% risque chirurgical'},
+    {id:'bypass_sema',n:'Bypass + Semaglutide',gain:'92% remission DT2 a 2 ans'},
+    {id:'glp1_sglt2',n:'GLP-1 + SGLT-2',gain:'+4-6% TBWL, -0.9% HbA1c, Grade 1A si DT2+CV'},
+    {id:'glp1_bupnal',n:'GLP-1 + Buproprion-Naltrexone',gain:'BES >= 17, synergie appetit+reward'},
+    {id:'esg_topir',n:'ESG + Topiramate/BupNal',gain:'+4-7% TBWL'},
+    {id:'sleeve_glp1',n:'Sleeve + GLP-1 post-op',gain:'+8-12% EWL si plateau'}
+  ]}
+};
+
+// BES-16 (Binge Eating Scale — Gormally 1982, validee)
+const BES16_ITEMS=[
+  {q:'Je ne me sens pas gene(e) par mon poids ou ma taille quand je suis avec d\'autres personnes.',opts:['Pas gene(e)','Un peu gene(e)','Assez gene(e)','Tres gene(e)'],w:[0,0,1,3]},
+  {q:'Je mange ce que je veux, quand je veux.',opts:['Vrai','Je mange parfois impulsivement','J\'ai un fort besoin de manger que j\'ai du mal a controler','J\'ai un besoin constant de manger que je ne controle pas'],w:[0,0,1,3]},
+  {q:'Je n\'ai aucune difficulte a manger lentement et de maniere appropriee.',opts:['Vrai','Parfois je mange vite','J\'ai tendance a engloutir ma nourriture','J\'engloutis ma nourriture sans macher'],w:[0,0,1,3]},
+  {q:'Je n\'ai jamais l\'impression de ne pas pouvoir arreter de manger.',opts:['Jamais','Parfois','Souvent','Presque toujours'],w:[0,0,1,3]},
+  {q:'Je ne mange pas plus que d\'habitude lorsque je suis seul(e).',opts:['Vrai','Parfois un peu plus','Souvent beaucoup plus','Je mange constamment quand je suis seul(e)'],w:[0,0,1,3]},
+  {q:'Apres avoir mange, je ne me sens pas coupable.',opts:['Jamais coupable','Parfois','Souvent','Presque toujours'],w:[0,0,1,3]},
+  {q:'Je ne perds pas le controle de mon alimentation.',opts:['Jamais','Rarement','Souvent','Constamment'],w:[0,0,1,3]},
+  {q:'Mon alimentation ne me cause aucun mal-etre.',opts:['Aucun','Leger','Modere','Severe'],w:[0,0,1,3]},
+  {q:'Je n\'ai pas tendance a manger plus quand je suis triste ou anxieux(se).',opts:['Non','Un peu','Souvent','Toujours'],w:[0,0,1,3]},
+  {q:'Je ne mange pas en secret.',opts:['Jamais','Rarement','Souvent','Tres souvent'],w:[0,0,1,3]},
+  {q:'Je mange des quantites normales.',opts:['Normales','Un peu plus','Nettement plus','Enormement'],w:[0,0,1,3]},
+  {q:'Je ne ressens pas de pulsion irresistible a manger.',opts:['Jamais','Parfois','Souvent','Constamment'],w:[0,0,1,3]},
+  {q:'Je n\'ai pas de periodes de fringales incontroles.',opts:['Jamais','Rarement','Regulierement','Quotidiennement'],w:[0,0,1,3]},
+  {q:'Je ne pense pas a la nourriture tout le temps.',opts:['Rarement','Parfois','Souvent','Constamment'],w:[0,0,1,3]},
+  {q:'Je n\'ai pas honte de mon poids.',opts:['Pas du tout','Un peu','Assez','Beaucoup'],w:[0,0,1,3]},
+  {q:'Mes habitudes alimentaires sont normales.',opts:['Normales','Un peu perturbees','Moderement perturbees','Severement perturbees'],w:[0,0,1,3]}
+];
+function getBesTotal(){return S.bes16.reduce((s,v,i)=>s+(BES16_ITEMS[i]?BES16_ITEMS[i].w[v]:0),0);}
+
 // ─── STATE ───
 let S={
   step:0,dob:'',sexe:'',ethnie:'eu',poids:0,taille:0,imc:0,tt:0,
@@ -112,8 +153,13 @@ let S={
   pss: [0,0,0,0,0,0,0,0,0,0],
   // PHQ-9 individual items
   phq: [0,0,0,0,0,0,0,0,0],
-  // BES
+  // BES simplifié (ancien) conservé pour compat
   bes:0,
+  // BES-16 complet (v3.2)
+  bes16:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  // BTM v3.2 — Bariatric & Therapeutic Module
+  btm:{gerd:0,asa:1,atcdChir:'aucun',refusChir:0,prefPatient:'neutre',nash:0,comorbCV:0},
+  btmResult:null,
   // Comorbidities & bio
   comorbIds:[],bioValues:{},
   // Dyslipidémie v3.1
@@ -408,9 +454,19 @@ async function requestAIReport(){
         age:getAge(), sexe:S.sexe, ethnie:ETH[S.ethnie]?.n,
         imc:S.imc?.toFixed(1), taille_cm:S.taille, poids_kg:S.poids, tt_cm:S.tt,
         comorbidites:comorbNames,
-        pss10:getPssTotal(), phq9:getPhqTotal(), bes:S.bes, isi:S.isi,
+        pss10:getPssTotal(), phq9:getPhqTotal(), bes:S.bes, bes16:getBesTotal(), isi:S.isi,
         tabac_cig:S.tabac, alcool:S.alcool
       },
+      btm:(()=>{
+        const rtp=btm_decision();
+        return rtp?{
+          gerd:S.btm.gerd,asa:S.btm.asa,atcdChir:S.btm.atcdChir,nash:S.btm.nash,comorbCV:S.btm.comorbCV,
+          prefPatient:S.btm.prefPatient,refusChir:S.btm.refusChir,
+          primary:rtp.primary,secondary:rtp.secondary,assoc:rtp.assoc,
+          contraind:rtp.contraind,tbwl:rtp.tbwl,ewl:rtp.ewl,complexity:rtp.complexity,
+          parcours:rtp.parcours,notes:rtp.notes,besTotal:getBesTotal()
+        }:null;
+      })(),
       contexte:{
         prescription_bio:bioPrx.tier,
         strategies:strats.map(s=>s.title),
@@ -474,13 +530,13 @@ function sld(label,key,val,min,max,step,unit,ref){
 }
 
 // ════════════════════════════════════════════════════════════════
-// SCREENS — 18 ecrans progressifs, grand public
+// SCREENS — 20 ecrans progressifs, grand public
 // ════════════════════════════════════════════════════════════════
 const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
     <div class="welc-logo">B</div>
-    <h1>Score <b>BMN</b> v3.1</h1>
+    <h1>Score <b>BMN</b> v3.2</h1>
     <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
     <div class="welc-features">
       <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
@@ -782,7 +838,7 @@ const SCR=[
       </div>`;
     }
     return `<div class="s-emoji">Sante</div>
-    <div class="s-title">Comorbidites (v3.1 — 14 pathologies)</div>
+    <div class="s-title">Comorbidites (v3.2 — 13 declaratives + IR auto)</div>
     <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
     <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
     ${dyslipiHtml}
@@ -1038,7 +1094,84 @@ const SCR=[
     return html;
   },
 
-  // 17: Final Result
+  // 17: BTM v3.2 — Questionnaire Bariatrique & Therapeutique
+  ()=>{
+    const besT=getBesTotal();
+    const besLvl=besT>=27?'Hyperphagie severe':besT>=17?'Hyperphagie moderee':besT>=10?'Legere tendance':'Pas d\'hyperphagie';
+    const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
+    let html=`<div class="s-emoji">BTM</div>
+    <div class="s-title">Module Bariatrique & Therapeutique v3.2</div>
+    <div class="s-sub">Matrice decisionnelle personnalisee : Ballon · Endosleeve · Chirurgie · GLP-1 · Associations. <span class="ref">62 etudes, >180K patients</span></div>`;
+
+    // GERD
+    html+=`<div class="sec"><div class="sec-tt">Reflux gastro-oesophagien (GERD)</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:'Non / pas de reflux'},{v:1,l:'Reflux occasionnel (non traite)'},{v:2,l:'GERD documente / traite (IPP)'}].map(o=>
+      `<div class="opt${S.btm.gerd===o.v?' sel':''}" onclick="S.btm.gerd=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+    if(S.btm.gerd>=2) html+=`<div style="font-size:10px;color:var(--red);margin:4px 12px">⚠ GERD documente → Bypass prioritaire (resolution 87%, Ponce 2021). Sleeve contre-indiquee.</div>`;
+
+    // ASA
+    html+=`<div class="sec"><div class="sec-tt">Score ASA (risque chirurgical)</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:1,l:'ASA 1 — Sain'},{v:2,l:'ASA 2 — Maladie legere'},{v:3,l:'ASA 3 — Maladie severe'},{v:4,l:'ASA 4 — Menace vitale'}].map(o=>
+      `<div class="opt${S.btm.asa===o.v?' sel':''}" onclick="S.btm.asa=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+    if(S.btm.asa>=4) html+=`<div style="font-size:10px;color:var(--red);margin:4px 12px">⚠ ASA ≥ 4 → Chirurgie contre-indiquee. Ballon ou GLP-1 uniquement.</div>`;
+
+    // ATCD chirurgie bariatrique
+    html+=`<div class="sec"><div class="sec-tt">Antecedent chirurgie bariatrique</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:'aucun',l:'Aucun'},{v:'ballon',l:'Ballon gastrique'},{v:'sleeve',l:'Sleeve gastrectomie'},{v:'bypass',l:'Bypass gastrique'},{v:'autre',l:'Autre intervention'}].map(o=>
+      `<div class="opt${S.btm.atcdChir===o.v?' sel':''}" onclick="S.btm.atcdChir='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+    if(S.btm.atcdChir==='sleeve') html+=`<div style="font-size:10px;color:var(--orange);margin:4px 12px">Sleeve anterieure → Bypass revision recommande (+23% EWL, Thereaux 2022)</div>`;
+
+    // NASH
+    html+=`<div class="sec"><div class="sec-tt">Steatohepatite / NASH</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:'Non / non connue'},{v:1,l:'NAFLD / steatose simple'},{v:2,l:'NASH confirmee (biopsie/FibroScan)'}].map(o=>
+      `<div class="opt${S.btm.nash===o.v?' sel':''}" onclick="S.btm.nash=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+    if(S.btm.nash>=2) html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">NASH confirmee → ESG prioritaire (62% resolution histologique, Sharaiha 2021)</div>`;
+
+    // Comorbidité CV
+    html+=`<div class="sec"><div class="sec-tt">Maladie cardiovasculaire etablie</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:'Non'},{v:1,l:'Oui (IDM, AVC, AOMI, IC...)'}].map(o=>
+      `<div class="opt${S.btm.comorbCV===o.v?' sel':''}" onclick="S.btm.comorbCV=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+
+    // Refus chirurgie
+    html+=`<div class="sec"><div class="sec-tt">Preference patient</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:'neutre',l:'Neutre (accepte toute option)'},{v:'refus_chir',l:'Refuse la chirurgie'},{v:'prefer_chir',l:'Prefere la chirurgie'},{v:'prefer_endo',l:'Prefere endoscopie (ESG/Ballon)'},{v:'prefer_med',l:'Prefere le traitement medical'}].map(o=>
+      `<div class="opt${S.btm.prefPatient===o.v?' sel':''}" onclick="S.btm.prefPatient='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+    S.btm.refusChir=(S.btm.prefPatient==='refus_chir')?1:0;
+
+    html+=`<div id="aiBox17"></div>`;
+    return html;
+  },
+
+  // 18: BES-16 — Binge Eating Scale complete (Gormally 1982)
+  ()=>{
+    const besT=getBesTotal();
+    const besLvl=besT>=27?'Hyperphagie severe (BES ≥ 27)':besT>=17?'Hyperphagie moderee (BES 17-26)':besT>=10?'Tendance legere (BES 10-16)':'Normal (BES < 10)';
+    const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
+    let html=`<div class="s-emoji">BES</div>
+    <div class="s-title">Binge Eating Scale — 16 items</div>
+    <div class="s-sub">Echelle validee d'hyperphagie boulimique. Score 0-46. <span class="ref">Gormally 1982</span></div>
+    <div class="metric-hero"><div class="metric-main" style="color:${besCol}">${besT}</div><div class="metric-lbl">${besLvl}</div></div>`;
+    if(besT>=27) html+=`<div style="background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--red);font-weight:600">⚠ BES ≥ 27 : Contre-indication chirurgie bariatrique. Prise en charge TCA prealable obligatoire.</div>`;
+    else if(besT>=17) html+=`<div style="background:rgba(245,158,11,.1);border:1px solid var(--orange);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--orange);font-weight:600">⚠ BES ≥ 17 : Ajout Buproprion-Naltrexone recommande en association.</div>`;
+
+    BES16_ITEMS.forEach((item,i)=>{
+      const val=S.bes16[i];
+      html+=`<div class="fc pss-item">
+        <div class="fc-top"><div class="fc-label">BES ${i+1}/16</div>
+        <div class="fc-score" style="color:${val>=3?'var(--red)':val>=1?'var(--orange)':'var(--green)'}">${item.w[val]}/3</div></div>
+        <div class="pss-q">${item.q}</div>
+        <div class="pss-opts">
+          ${item.opts.map((lbl,j)=>`<div class="pss-opt${val===j?' sel':''}" onclick="S.bes16[${i}]=${j};calc();render(S.step,0)"><span class="pss-opt-n">${item.w[j]}</span><span class="pss-opt-l">${lbl}</span></div>`).join('')}
+        </div>
+      </div>`;
+    });
+    // Sync ancien BES simplifié pour compat
+    S.bes=Math.min(8,Math.round(besT/46*8));
+    html+=`<div id="aiBox18"></div>`;
+    return html;
+  },
+
+  // 19: Final Result (inclut BTM Section 11)
   ()=>{calc();return '<div class="no-rise-children">'+renderFinal()+'</div>';}
 ];
 
@@ -1052,7 +1185,8 @@ const SECTIONS=[
   {from:14,to:14,name:'Pathologies',ico:'[P]'},
   {from:15,to:15,name:'Score & Strategie',ico:'[sD]'},
   {from:16,to:16,name:'Biologie',ico:'[B]'},
-  {from:17,to:17,name:'Resultat',ico:'[R]'}
+  {from:17,to:18,name:'BTM Bariatrique',ico:'[BTM]'},
+  {from:19,to:19,name:'Resultat',ico:'[R]'}
 ];
 function getSec(step){return SECTIONS.find(s=>step>=s.from&&step<=s.to)||SECTIONS[0];}
 function toggleCM(id){if(S.comorbIds.includes(id))S.comorbIds=S.comorbIds.filter(x=>x!==id);else S.comorbIds.push(id);
@@ -1121,7 +1255,7 @@ function triggerAI(step){
 }
 
 // ════════════════════════════════════════════════════════════════
-// MOTEUR DE CALCUL — Score BMN v3.1 — Architecture CLEO
+// MOTEUR DE CALCUL — Score BMN v3.2 — Architecture CLEO + BTM
 // Ref: algorithme.html BSD v4.9 + justification-bio.html BSD v4.7.1
 // ────────────────────────────────────────────────────────────────
 // FLUX:  C(0-50) + E(0-45) + O(0-10) + L(0-10) = sD(0-100)
@@ -2017,6 +2151,135 @@ function getTherapeuticStrategy(){
   return strats;
 }
 
+// ════════════════════════════════════════════════════
+// BTM v3.2 — Bariatric & Therapeutic Module Decision Engine
+// 14 variables, 62 études, >180K patients
+// Retourne Recommandation Thérapeutique Personnalisée (RTP)
+// ════════════════════════════════════════════════════
+function btm_decision(){
+  const imc=S.imc, sf=S.bmn_t||S.sD, cti=S.cti, grs=S.glp1_profile||'R3';
+  const dt2=S.comorbIds.includes('dt2'), hba1c=S.bioValues.hba1c||0;
+  const gerd=S.btm.gerd>=2, sopk=S.comorbIds.includes('sopk');
+  const besT=getBesTotal(), pss=getPssTotal();
+  const dyslipiMixte=S.comorbIds.includes('dyslipi')&&S.dyslipi.type==='mixte';
+  const nash=S.btm.nash>=2, asa=S.btm.asa, atcdChir=S.btm.atcdChir;
+  const refusChir=S.btm.refusChir||S.btm.prefPatient==='refus_chir';
+  const comorbCV=S.btm.comorbCV;
+  const rtp={primary:null,secondary:null,assoc:[],contraind:[],ewl:'',tbwl:'',parcours:[],complexity:1,notes:[]};
+
+  // ── GARDE-FOUS DE SÉCURITÉ ──
+  if(besT>=27){
+    rtp.contraind.push('Chirurgie bariatrique (BES ≥ 27 — TCA severe non stabilise)');
+    rtp.notes.push('BES ≥ 27 : Prise en charge TCA prealable obligatoire avant toute chirurgie.');
+  }
+  if(asa>=4){
+    rtp.primary={tech:'BT-1',name:'Ballon Gastrique (Spatz3)',reason:'ASA ≥ 4 — risque chirurgical trop eleve'};
+    rtp.secondary={tech:'BT-5',name:'GLP-1 (Semaglutide/Tirzepatide)',reason:'Alternative medicale'};
+    rtp.contraind.push('Toute chirurgie bariatrique (ASA ≥ 4)','ESG sous AG (ASA ≥ 4)');
+    rtp.complexity=2;rtp.ewl='25-38%';rtp.tbwl='10-15%';
+    S.btmResult=rtp;return rtp;
+  }
+  if(atcdChir==='sleeve'){
+    rtp.primary={tech:'BT-4',name:'Bypass Revision (RYGB)',reason:'Sleeve anterieure — conversion necessaire (+23% EWL)'};
+    rtp.secondary={tech:'BT-5',name:'GLP-1 post-revision',reason:'Optimisation post-chirurgicale'};
+    rtp.ewl='65-72%';rtp.tbwl='28-34%';rtp.complexity=4;
+    rtp.parcours=['J0: Bilan pre-op complet','M0: Bypass revision','M3: Controle nutritionnel','M6: Bio + GLP-1 si plateau','M12: Evaluation globale','M24: Suivi long terme'];
+    S.btmResult=rtp;return rtp;
+  }
+
+  // ── DÉCISION PAR PROFIL IMC + SF ──
+  if(imc<30 && sf<40){
+    rtp.primary={tech:'BT-5',name:'GLP-1 faible dose',reason:'IMC < 30, risque faible'};
+    rtp.ewl='8-12%';rtp.tbwl='5-8%';rtp.complexity=1;
+    rtp.parcours=['J0: Initiation Semaglutide 0.25mg/sem','M1: Titration 0.5mg','M3: Evaluation, titration 1mg si plateau','M6: Bio controle','M12: Reevaluation globale'];
+  }
+  else if(imc>=30 && imc<35){
+    if(grs==='R1'||grs==='R2'){
+      rtp.primary={tech:'BT-5',name:'GLP-1 (Semaglutide 2.4mg ou Tirzepatide)',reason:'GRS '+grs+' — excellent/bon repondeur'};
+      rtp.secondary={tech:'BT-1',name:'Ballon Spatz3 12m',reason:'Alternative si intolerances GLP-1'};
+      rtp.ewl='35-48%';rtp.tbwl='14-19%';rtp.complexity=2;
+    } else {
+      rtp.primary={tech:'BT-1',name:'Spatz3 12 mois',reason:'IMC 30-35, GRS '+grs+' — ballon intra-gastrique prioritaire'};
+      rtp.secondary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'Si insuffisant apres ballon'};
+      rtp.assoc.push('GLP-1 post-ballon (synergie +6-9% TBWL)');
+      rtp.ewl='44-58%';rtp.tbwl='13-19%';rtp.complexity=2;
+    }
+    rtp.parcours=['J0: Evaluation initiale','M0: Intervention primaire','M3: Bio + evaluation','M6: Ajout GLP-1 si plateau','M12: Evaluation globale','M24: Strategie maintenance'];
+  }
+  else if(imc>=35 && imc<40){
+    if(gerd){
+      rtp.primary={tech:'BT-4',name:'Bypass (RYGB)',reason:'GERD documente — resolution 87% (Ponce 2021)'};
+      rtp.contraind.push('Sleeve gastrectomie (aggrave GERD)');
+      rtp.ewl='65-68%';rtp.tbwl='28-32%';rtp.complexity=4;
+    } else if(nash){
+      rtp.primary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'NASH confirmee — resolution histologique 62% (Sharaiha 2021)'};
+      rtp.secondary={tech:'BT-3',name:'Sleeve',reason:'Si ESG insuffisant'};
+      rtp.assoc.push('GLP-1 + ESG (synergie +6-9% TBWL)');
+      rtp.ewl='55-65%';rtp.tbwl='13-25%';rtp.complexity=3;
+    } else if(refusChir){
+      rtp.primary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'Refus chirurgie — alternative endoscopique'};
+      rtp.secondary={tech:'BT-5',name:'GLP-1 haute dose',reason:'Alternative medicale'};
+      rtp.ewl='55-58%';rtp.tbwl='13-16%';rtp.complexity=2;
+    } else {
+      rtp.primary={tech:'BT-3',name:'Sleeve Gastrectomie',reason:'IMC 35-40 — reference chirurgicale'};
+      rtp.secondary={tech:'BT-2',name:'ESG',reason:'Alternative endoscopique'};
+      rtp.ewl='60-65%';rtp.tbwl='25-30%';rtp.complexity=3;
+    }
+    rtp.parcours=['J0: Bilan pre-op/pre-interventionnel','M0: Intervention','M1: Controle cicatrisation','M3: Bio + evaluation nutritionnelle','M6: Ajout GLP-1 si plateau','M12: Bio complete','M24: Suivi long terme'];
+  }
+  else if(imc>=40 && imc<50){
+    if((dt2&&hba1c>9)||gerd){
+      rtp.primary={tech:'BT-4',name:'Bypass (RYGB)',reason:(dt2&&hba1c>9?'DT2 desequilibre HbA1c '+hba1c.toFixed(1)+'%':'GERD documente')+' — remission DT2 29-45%'};
+      rtp.ewl='65-70%';rtp.tbwl='28-34%';rtp.complexity=4;
+      if(dt2) rtp.notes.push('DT2 remission attendue 29-45% (STAMPEDE, Schauer 2017)');
+    } else if(sopk){
+      rtp.primary={tech:'BT-3',name:'Sleeve',reason:'SOPK — remission 72% a 2 ans (Climent 2022)'};
+      rtp.assoc.push('GLP-1 post-op si plateau ponderal');
+      rtp.ewl='61-65%';rtp.tbwl='25-30%';rtp.complexity=4;
+    } else if(grs==='R1'){
+      rtp.primary={tech:'BT-5',name:'Tirzepatide 15mg',reason:'GRS R1 excellent repondeur — TBWL 19-22% (SURMOUNT-1)'};
+      rtp.secondary={tech:'BT-3',name:'Sleeve',reason:'Si plateau apres 12 mois GLP-1'};
+      rtp.ewl='50-58%';rtp.tbwl='19-22%';rtp.complexity=3;
+    } else {
+      rtp.primary={tech:'BT-3',name:'Sleeve Gastrectomie',reason:'IMC 40-50, profil standard'};
+      rtp.secondary={tech:'BT-4',name:'Bypass',reason:'Si DT2 ou GERD concomitant'};
+      rtp.ewl='61-65%';rtp.tbwl='25-30%';rtp.complexity=4;
+    }
+    rtp.parcours=['J0: Bilan pre-op complet (cardio, pneumo, psy)','M-3: Preparation nutritionnelle','M0: Chirurgie','M1: Controle post-op','M3: Bio + nutritionnel','M6: Bio + evaluation GLP-1','M12: Bilan annuel','M24: Suivi metabolique'];
+  }
+  else if(imc>=50){
+    if(imc>=60){
+      rtp.primary={tech:'BT-4',name:'SADI-S (Single Anastomosis Duodeno-Ileal)',reason:'IMC ≥ 60 — EWL 80-85%'};
+      rtp.ewl='80-85%';rtp.tbwl='35-40%';rtp.complexity=5;
+    } else {
+      rtp.primary={tech:'BT-4',name:'Bypass long bras',reason:'IMC 50-60 — malabsorption augmentee'};
+      rtp.secondary={tech:'BT-3',name:'Sleeve + GLP-1',reason:'Alternative si risque chirurgical eleve'};
+      rtp.ewl='68-72%';rtp.tbwl='30-35%';rtp.complexity=5;
+    }
+    rtp.parcours=['J0: Bilan pre-op complet multidisciplinaire','M-6: Preparation (regime, psy, kine)','M-3: Perte poids pre-op obligatoire','M0: Chirurgie','M1: Controle complications','M3: Nutritionnel intensif','M6: Bio + GLP-1 si reprise','M12: Bilan complet','M24-M60: Suivi annuel 5 ans'];
+  }
+
+  // ── ENRICHISSEMENT ASSOCIATIONS ──
+  if(dt2&&comorbCV) rtp.assoc.push('Empagliflozine (SGLT-2) — Grade 1A si DT2 + maladie CV');
+  if(besT>=17&&besT<27) rtp.assoc.push('Buproprion-Naltrexone (BES '+besT+' ≥ 17 — synergie appetit + reward)');
+  if(dyslipiMixte&&rtp.primary&&rtp.primary.tech==='BT-4') rtp.notes.push('Bypass optimise dyslipidemie via acides biliaires');
+  if(dt2&&!comorbCV&&imc>=30) rtp.assoc.push('GLP-1 + SGLT-2 (synergie +4-6% TBWL, -0.9% HbA1c)');
+  if(pss>20&&!refusChir) rtp.notes.push('PSS-10 > 20 : Compliance chirurgicale reduite. Suivi psychologique renforce recommande.');
+  if(cti>=55) rtp.notes.push('CTI ≥ 55 (chronicite installee) : chirurgie prioritaire si eligible. GLP-1 seul insuffisant.');
+  else if(cti>=40) rtp.notes.push('CTI 40-55 (chronicite avancee) : combiner traitements. Monotherapie insuffisante.');
+
+  // ── CONTRE-INDICATIONS ADDITIONNELLES ──
+  if(besT>=27) rtp.contraind.push('Toute chirurgie bariatrique jusqu\'a stabilisation TCA');
+  if(gerd) rtp.contraind.push('Sleeve gastrectomie (aggravation GERD documentee)');
+
+  // ── COMPLEXITÉ ──
+  if(rtp.assoc.length>=2) rtp.complexity=Math.min(5,rtp.complexity+1);
+  if(besT>=17) rtp.complexity=Math.min(5,rtp.complexity+1);
+
+  S.btmResult=rtp;
+  return rtp;
+}
+
 // ── MARKOV ──
 function calcMarkov(){
   const imc=S.imc, e=ETH[S.ethnie]||ETH.eu;
@@ -2212,6 +2475,7 @@ function renderFinal(){
   // 4. GLP-1 RESPONSE PROFILING — Phenotypage complet
   // ══════════════════════════════════════════════════════
   const glp1=getGLP1Profile();
+  S.glp1_profile=glp1.profileCode; // v3.2: store for BTM
   const gp=glp1.profile;
   const ax=glp1.axes;
 
@@ -2496,11 +2760,79 @@ function renderFinal(){
   r+=`</div></details>`;
 
   // ══════════════════════════════════════════════════════
-  // 11. REFERENCES
+  // 11. MODULE BTM v3.2 — Recommandation Thérapeutique Personnalisée
+  // ══════════════════════════════════════════════════════
+  const btm=btm_decision();
+  if(btm && btm.primary){
+    const cmplxCol=['','var(--green)','var(--teal)','var(--orange)','var(--red)','var(--purple)'][btm.complexity]||'var(--accent)';
+    const cmplxLbl=['','Simple','Modere','Complexe','Tres complexe','Maximal'][btm.complexity]||'';
+    const besT=getBesTotal();
+    r+=`<div style="margin-top:12px;border:2px solid var(--accent);border-radius:14px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(56,189,248,.1));padding:14px 16px;border-bottom:1px solid rgba(129,140,248,.2)">
+        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.2 — Recommandation Therapeutique</div>
+        <div style="font-size:10px;color:var(--dim2);margin-top:2px">Bariatric & Therapeutic Module — 62 etudes, >180K patients — Matrice decisionnelle personnalisee</div>
+      </div>
+      <div style="padding:12px 14px">
+        <!-- 11.1 Complexité -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="font-size:10px;color:var(--dim3)">Complexite therapeutique</div>
+          <div style="display:flex;gap:3px">${[1,2,3,4,5].map(i=>`<div style="width:20px;height:8px;border-radius:4px;background:${i<=btm.complexity?cmplxCol:'var(--bg2)'}"></div>`).join('')}</div>
+          <div style="font-size:10px;font-weight:700;color:${cmplxCol}">${btm.complexity}/5 — ${cmplxLbl}</div>
+        </div>
+        <!-- 11.2 Recommandation primaire -->
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:4px">★ Recommandation Primaire</div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">${btm.primary.name}</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.primary.reason}</div>
+          <div style="font-size:10px;color:var(--dim2);margin-top:2px">[${btm.primary.tech}]</div>
+        </div>
+        <!-- 11.3 Recommandation secondaire -->
+        ${btm.secondary?`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:4px">Alternative / Secondaire</div>
+          <div style="font-size:13px;font-weight:700;color:var(--txt)">${btm.secondary.name}</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.secondary.reason}</div>
+        </div>`:''}
+        <!-- 11.4 Efficacité attendue -->
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          ${btm.tbwl?`<div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--accent)">${btm.tbwl}</div>
+            <div style="font-size:9px;color:var(--dim3)">%TBWL estim. 12m</div>
+          </div>`:''}
+          ${btm.ewl?`<div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--teal)">${btm.ewl}</div>
+            <div style="font-size:9px;color:var(--dim3)">%EWL estim. 24m</div>
+          </div>`:''}
+          <div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:${besT>=27?'var(--red)':besT>=17?'var(--orange)':'var(--green)'}">${besT}</div>
+            <div style="font-size:9px;color:var(--dim3)">BES-16 /46</div>
+          </div>
+        </div>
+        <!-- 11.5 Associations -->
+        ${btm.assoc.length?`<div style="margin-bottom:8px">
+          <div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">Associations recommandees</div>
+          ${btm.assoc.map(a=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg2)">+ ${a}</div>`).join('')}
+        </div>`:''}
+        <!-- 11.6 Contre-indications -->
+        ${btm.contraind.length?`<div style="margin-bottom:8px">
+          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">⚠ Contre-indications identifiees</div>
+          ${btm.contraind.map(c=>`<div style="font-size:11px;color:var(--red);padding:3px 0">✗ ${c}</div>`).join('')}
+        </div>`:''}
+        <!-- 11.7 Parcours de soins -->
+        ${btm.parcours.length?`<details><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">Parcours de soins optimise (${btm.parcours.length} etapes)</summary>
+          <div style="margin-top:6px">${btm.parcours.map((p,i)=>`<div style="font-size:10px;color:var(--dim);padding:3px 0;border-left:2px solid var(--accent);padding-left:8px;margin-left:4px">${p}</div>`).join('')}</div>
+        </details>`:''}
+        <!-- Notes -->
+        ${btm.notes.length?`<div style="margin-top:6px">${btm.notes.map(n=>`<div style="font-size:10px;color:var(--dim2);padding:2px 0;font-style:italic">📋 ${n}</div>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // 12. REFERENCES
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
-    <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | Biswas 2015 | Cappuccio 2008 | Aubin 2012 | CAMS | Brook 2010 | ERFC 2010 | CTT 2010 | CKD-PC 2010<br>
-    <b>Score BMN v3.1</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 — Bach | Manos | Noel
+    <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
+    <b>Score BMN v3.2</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v1.0 — Bach | Manos | Noel
   </div>`;
 
   return r;
