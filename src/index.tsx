@@ -124,8 +124,22 @@ Ton role:
 4. Identifier les facteurs de risque critiques
 5. Integrer le Module BTM v3.4 (Bariatric & Therapeutic Module) : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). MOD-01 exclusivite IMC, MOD-05 delta normalise, MOD-09 score_pct.
 6. Integrer FNC v1.0 (Normalisation Climatique Koppen) : 6 zones, acclimatation progressive, AQI non normalise.
+7. PROFILS ETHNIQUES (12 profils) — L'algorithme utilise des seuils IMC et des multiplicateurs de risque differencies par ethnie:
+   - eu: Europeen/Caucasien (ow=25, ob=30, dR=1.0, cvR=1.0)
+   - im: Indo-Mauricien (ow=23, ob=27.5, dR=2.0, cvR=1.8) — risque DT2 x2
+   - cr: Creole Mauricien (ow=25, ob=30, dR=1.6, cvR=1.5)
+   - si: Sino-Mauricien (ow=23, ob=27.5, dR=1.7, cvR=1.4)
+   - sa: Sud-Asiatique (ow=23, ob=27.5, dR=2.0, cvR=1.8) — risque DT2 x2
+   - af: Africain/Subsaharien (ow=25, ob=30, dR=1.5, cvR=1.6, hR=1.5 HTA)
+   - ea: Est-Asiatique (ow=23, ob=27.5, dR=0.9, cvR=0.9) — risque faible
+   - se: Sud-Est Asiatique (ow=23, ob=27.5, dR=1.2, cvR=1.0)
+   - fm: Franco-Mauricien (ow=25, ob=30, dR=1.0, cvR=1.0)
+   - met: Metis Mauricien (ow=24, ob=28, dR=1.5, cvR=1.4)
+   - ar: Arabe/MENA (ow=23, ob=27.5, dR=1.7, cvR=1.5)
+   - oth: Autre/Non specifie (ow=25, ob=30, dR=1.0, cvR=1.0)
+   Impact algorithmique: seuils IMC (c3), seuil tour de taille (c5_tt), multiplicateur HTA (c4 x hR), amplification DT2 familial (c4 dR>=1.5), modulation globale C (x ev%), Layer A Exposome (x iM), SII (seuil obesite ethnique), GLP-1 profiling (dR>=1.5 = bonus), Markov (etat initial selon ow).
 
-References: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES-16 (Gormally 1982), AUDIT-C, Lancet 2016, SCORE2/Framingham, STEP 1-5, SURMOUNT 1-4, STAMPEDE, SM-BOSS, MERIT, Fothergill 2016.
+References: OMS, IDF, ADA 2024, FINDRISC, IPAQ, PHQ-9, PSS-10, ISI, BES-16 (Gormally 1982), AUDIT-C, Lancet 2016, SCORE2/Framingham, STEP 1-5, SURMOUNT 1-4, STAMPEDE, SM-BOSS, MERIT, Fothergill 2016, WHO Asia-Pacific 2004, Ramachandran 2010.
 
 IMPORTANT: Reponds TOUJOURS en JSON valide avec cette structure:
 {
@@ -187,6 +201,7 @@ Tu interpretes les resultats du Score BMN v3.4 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
 Si le patient a un score BTM v3.4 (Module Bariatrique), integre la recommandation therapeutique personnalisee (scoring matriciel, primaire, secondaire, delta normalise, confiance, BT-6 associations, contre-indications, parcours de soins).
 Si FNC est appliquee (zone != Z4), mentionne la normalisation climatique et son impact sur le score Exposome.
+IMPORTANT — 12 PROFILS ETHNIQUES avec impact algorithmique : les seuils IMC (surpoids/obesite), les seuils de tour de taille, et les multiplicateurs de risque (dR pour DT2, cvR pour CV, hR pour HTA, iM pour inflammation, ev pour modulation globale) sont differencies. Par exemple, un Indo-Mauricien (dR=2.0) a un risque DT2 double vs Europeen. Un Est-Asiatique (dR=0.9) est protege. Le profil ethnique du patient influence directement : classification IMC, Score C (via ev%), Exposome Layer A (via iM), SII (seuil obesite ethnique), GLP-1 profiling (dR>=1.5 = bonus reponse), et projection Markov.
 IMPORTANT: Reponds en JSON:
 {
   "summary": "resume en 2-3 phrases",
@@ -257,6 +272,7 @@ CONTEXTE ALGORITHMIQUE:
 - bioNorm = score biologique normalise (0-100) calcule par z-scores ponderes
 - BTM v3.4 = Module Bariatrique & Therapeutique : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). 10 MOD appliquees: MOD-01 exclusivite IMC, MOD-02 colinearite DT2/CTI, MOD-03 BT-6, MOD-04 ASA>=4 ESG+2, MOD-05 delta normalise, MOD-06 valeurs manquantes, MOD-07 GRS R4/R5 ESG+1, MOD-08 ATCD ballon-2, MOD-09 score_pct, MOD-10 zero option.
 - FNC v1.0 = Normalisation Climatique Koppen : 6 zones (Z1 Tropical humide, Z2 Desert chaud, Z3 Mediterraneen, Z4 Tempere reference, Z5 Continental, Z6 Tropical sec). Acclimatation progressive: FNC_eff = 1 - (1-FNC) * min(1, mois_residence/12). AQI NON normalise.
+- 12 PROFILS ETHNIQUES avec multiplicateurs differencies : eu (Europeen, ref), im (Indo-Mauricien, dR=2.0 cvR=1.8), cr (Creole, dR=1.6), si (Sino-Mauricien, dR=1.7), sa (Sud-Asiatique, dR=2.0), af (Africain, dR=1.5 hR=1.5), ea (Est-Asiatique, dR=0.9), se (Sud-Est Asiatique, dR=1.2), fm (Franco-Mauricien), met (Metis, dR=1.5), ar (Arabe/MENA, dR=1.7), oth (Autre, ref). Impact: seuils IMC (ow/ob), seuils TT (tf/tm), multiplicateurs HTA (hR), DT2 (dR), CV (cvR), inflammation (iM), modulation globale score C (ev%), GLP-1 profiling (dR>=1.5 bonus), Markov (ow pour etat initial).
 
 TON RAPPORT DOIT CONTENIR:
 1. diagnostic_resume: Resume diagnostique en 3-4 phrases, incluant le profil de risque global et les elements determinants
@@ -458,7 +474,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <div class="toc">
   <a href="#s1"><span>1.</span> Vue d'ensemble</a>
   <a href="#s2"><span>2.</span> Architecture generale</a>
-  <a href="#s3"><span>3.</span> Profils ethniques (9 profils)</a>
+  <a href="#s3"><span>3.</span> Profils ethniques (12 profils)</a>
   <a href="#s4"><span>4.</span> Comorbidites (13 declaratives + IR occulte auto)</a>
   <a href="#s5"><span>5.</span> Biomarqueurs (15 marqueurs)</a>
   <a href="#s6"><span>6.</span> Instruments psychometriques valides</a>
@@ -569,7 +585,7 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <!-- ═══════════════════════════════════════════ -->
 <!-- 3. PROFILS ETHNIQUES -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="s3">3. Profils Ethniques (9 profils)</h2>
+<h2 id="s3">3. Profils Ethniques (12 profils)</h2>
 <p><strong>Sources :</strong> OMS Asia-Pacific 2004, IDF 2006, Lancet 2016</p>
 <div style="overflow-x:auto">
 <table>
@@ -1631,7 +1647,7 @@ tr:nth-child(even){background:var(--bg2)}
 
 <h3>Objectifs du modèle</h3>
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
-<p>2. <b>Personnalisation ethnique</b> : intégrer les seuils spécifiques OMS/IDF pour 9 groupes ethniques, reconnaissant que les seuils européens sous-estiment le risque chez les populations sud-asiatiques et est-asiatiques.</p>
+<p>2. <b>Personnalisation ethnique</b> : intégrer les seuils spécifiques OMS/IDF pour 12 profils ethniques (eu, im, cr, si, sa, af, ea, se, fm, met, ar, oth), reconnaissant que les seuils européens sous-estiment le risque chez les populations sud-asiatiques et est-asiatiques. Chaque profil a des multiplicateurs différenciés : dR (DT2), cvR (CV), hR (HTA), cR (coronarien), iM (inflammation), ldl, ev (modulation globale).</p>
 <p>3. <b>Prédiction pharmacologique</b> : phénotyper la réponse aux agonistes GLP-1 (sémaglutide, tirzépatide) via un modèle multi-axes (GLP-1 Response Profiling Engine v2.0) pour guider la prescription.</p>
 <p>4. <b>Aide à la décision thérapeutique (BTM v2.0)</b> : scoring matriciel 27 facteurs × 6 techniques bariatriques (BT-1 à BT-6), 10 MOD conformes au Dossier Maître v3.4, avec associations thérapeutiques et normalisation climatique (FNC v1.0).</p>
 
@@ -1868,7 +1884,7 @@ de l'exposome. Les particules fines aggravent un terrain inflammatoire préexist
 <p>Sommeil &lt;6h ou insomnie ISI ≥15 : perturbation ghréline/leptine → hyperphagie (Spiegel et al., Lancet 1999 ; Taheri et al., PLoS Med 2004).</p>
 
 <!-- ═══════════════════════════════════════════════ -->
-<h1 id="s9">IX. Profils ethniques — 9 groupes, seuils & multiplicateurs</h1>
+<h1 id="s9">IX. Profils ethniques — 12 profils, seuils & multiplicateurs</h1>
 
 <h3>9.1 Justification des seuils IMC ethniques</h3>
 <p>L'OMS reconnaît depuis 2004 que les seuils standard (25/30 kg/m²) sous-estiment le risque chez les populations asiatiques. Le rapport WHO Expert Consultation (Lancet 2004) recommande des seuils abaissés : 23/27.5 pour les Sud-Asiatiques et Est-Asiatiques. L'IDF (2006) a défini des seuils de tour de taille spécifiques par ethnie.</p>
