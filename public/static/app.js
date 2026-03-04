@@ -1,22 +1,89 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.2 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v1.0
+// SCORE BMN v3.4 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
+// BTM v3.4: 10 MOD (exclusivite IMC, colinearite DT2/CTI, BT-6, delta normalise)
+// FNC v1.0: Normalisation climatique Koppen (6 zones, acclimatation progressive)
 // ════════════════════════════════════════════════════════════════
 
-// ─── ETHNICITY (WHO Asia-Pacific + IDF 2006 + Lancet 2016) ───
+// ─── ETHNICITY v3.4 (WHO Asia-Pacific + IDF 2006 + Lancet 2016 + MultCV §9) ───
+// dR=MultDT2, cvR=MultCV, ow=IMC seuil surpoids (ethnique)
 const ETH={
-  eu:{n:'Europeen / Caucasien',ow:25,ob:30,tf:88,tm:102,dR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1},
-  im:{n:'Indo-Mauricien',ow:23,ob:27.5,tf:80,tm:90,dR:2,hR:1.2,cR:1.4,iM:1.2,ldl:1.3,ev:-1.5,p:1},
-  cr:{n:'Creole Mauricien',ow:25,ob:30,tf:84,tm:94,dR:1.3,hR:1.4,cR:1.2,iM:1.2,ldl:1,ev:-2,p:1},
-  si:{n:'Sino-Mauricien',ow:23,ob:27.5,tf:80,tm:90,dR:1,hR:.9,cR:.6,iM:.9,ldl:.9,ev:1.5,p:1.1},
-  sa:{n:'Sud-Asiatique',ow:23,ob:27.5,tf:80,tm:90,dR:2,hR:1.3,cR:1.5,iM:1.2,ldl:1.3,ev:-1.5,p:1},
-  af:{n:'Africain / Subsaharien',ow:25,ob:30,tf:88,tm:102,dR:1.3,hR:1.5,cR:1.2,iM:1.3,ldl:1,ev:-1.5,p:1},
-  ea:{n:'Est-Asiatique',ow:23,ob:27.5,tf:80,tm:88,dR:.9,hR:.9,cR:.7,iM:.9,ldl:.9,ev:1.5,p:1.1},
-  se:{n:'Sud-Est Asiatique',ow:23,ob:27.5,tf:80,tm:90,dR:1.2,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1},
-  fm:{n:'Franco-Mauricien',ow:25,ob:30,tf:88,tm:102,dR:.8,hR:1,cR:.9,iM:1,ldl:1,ev:1,p:1}
+  eu:{n:'Europeen / Caucasien',ow:25,ob:30,tf:88,tm:102,dR:1,cvR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1},
+  im:{n:'Indo-Mauricien',ow:23,ob:27.5,tf:80,tm:90,dR:2,cvR:1.8,hR:1.2,cR:1.4,iM:1.2,ldl:1.3,ev:-1.5,p:1},
+  cr:{n:'Creole Mauricien',ow:25,ob:30,tf:84,tm:94,dR:1.6,cvR:1.5,hR:1.4,cR:1.2,iM:1.2,ldl:1,ev:-2,p:1},
+  si:{n:'Sino-Mauricien',ow:23,ob:27.5,tf:80,tm:90,dR:1.7,cvR:1.4,hR:.9,cR:.6,iM:.9,ldl:.9,ev:1.5,p:1.1},
+  sa:{n:'Sud-Asiatique',ow:23,ob:27.5,tf:80,tm:90,dR:2,cvR:1.8,hR:1.3,cR:1.5,iM:1.2,ldl:1.3,ev:-1.5,p:1},
+  af:{n:'Africain / Subsaharien',ow:25,ob:30,tf:88,tm:102,dR:1.5,cvR:1.6,hR:1.5,cR:1.2,iM:1.3,ldl:1,ev:-1.5,p:1},
+  ea:{n:'Est-Asiatique',ow:23,ob:27.5,tf:80,tm:88,dR:.9,cvR:.9,hR:.9,cR:.7,iM:.9,ldl:.9,ev:1.5,p:1.1},
+  se:{n:'Sud-Est Asiatique',ow:23,ob:27.5,tf:80,tm:90,dR:1.2,cvR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1},
+  fm:{n:'Franco-Mauricien',ow:25,ob:30,tf:88,tm:102,dR:1,cvR:1,hR:1,cR:.9,iM:1,ldl:1,ev:1,p:1},
+  met:{n:'Metis Mauricien',ow:24,ob:28,tf:84,tm:94,dR:1.5,cvR:1.4,hR:1.2,cR:1.1,iM:1.1,ldl:1,ev:-.5,p:1},
+  ar:{n:'Arabe / MENA',ow:23,ob:27.5,tf:80,tm:90,dR:1.7,cvR:1.5,hR:1.2,cR:1.2,iM:1.1,ldl:1.1,ev:-1,p:1},
+  oth:{n:'Autre / Non specifie',ow:25,ob:30,tf:88,tm:102,dR:1,cvR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1}
 };
+
+// ─── FNC v1.0 — Normalisation Climatique Koppen (§5 Dossier v3.4) ───
+// Zone => {FNC_temp, FNC_uv, label}
+// AQI n'est PAS normalise (pollution = meme impact partout)
+// FNC_eff = 1 - (1 - FNC) * min(1, mois_residence / 12)
+const FNC_ZONES={
+  Z1:{ft:0.55,fu:0.50,l:'Tropical humide'},
+  Z2:{ft:0.50,fu:0.55,l:'Desert chaud'},
+  Z3:{ft:0.70,fu:0.70,l:'Mediterraneen'},
+  Z4:{ft:1.00,fu:1.00,l:'Tempere oceanique (reference)'},
+  Z5:{ft:1.10,fu:1.00,l:'Continental'},
+  Z6:{ft:0.60,fu:0.55,l:'Tropical sec / savane'}
+};
+
+// ─── BTM MATRIX v3.4 — 27 facteurs × 6 techniques (§4 Dossier v3.4) ───
+// MOD-01: IMC exclusif (PREMIER_VRAI du plus haut)
+// MOD-03: colonne BT6 ajoutee
+// MOD-04: ASA>=4 ESG = +2 (corrige de -2)
+// MOD-07: GRS R4/R5 ESG = +1 (prudence biblio)
+// MOD-08: ATCD Ballon BT1 = -2 (corrige de -3)
+const BTM_MATRIX={
+  // IMC ranges (exclusifs MOD-01)
+  'IMC_27_30' :{BT1:2,BT2:0,BT3:-5,BT4:-5,BT5:4,BT6:2},
+  'IMC_30_35' :{BT1:3,BT2:3,BT3:-2,BT4:-4,BT5:4,BT6:3},
+  'IMC_35_40' :{BT1:1,BT2:2,BT3:4,BT4:2,BT5:2,BT6:4},
+  'IMC_40_50' :{BT1:-1,BT2:0,BT3:4,BT4:4,BT5:1,BT6:2},
+  'IMC_50_60' :{BT1:-3,BT2:-2,BT3:2,BT4:5,BT5:-1,BT6:-1},
+  'IMC_60+'   :{BT1:-5,BT2:-4,BT3:1,BT4:5,BT5:-2,BT6:-2},
+  // Facteurs non-IMC
+  'GERD_SEV'  :{BT1:-1,BT2:-1,BT3:-5,BT4:5,BT5:0,BT6:-1,cond:(v)=>v.gerd>=2},
+  'GERD_LEG'  :{BT1:0,BT2:0,BT3:-3,BT4:3,BT5:0,BT6:0,cond:(v)=>v.gerd===1},
+  'DT2_HBA_9+':{BT1:-1,BT2:1,BT3:2,BT4:5,BT5:2,BT6:4,cond:(v)=>v.dt2&&v.hba1c>9},
+  'DT2_HBA_79':{BT1:0,BT2:1,BT3:3,BT4:4,BT5:3,BT6:3,cond:(v)=>v.dt2&&v.hba1c>=7&&v.hba1c<=9},
+  'SOPK'      :{BT1:1,BT2:1,BT3:4,BT4:1,BT5:3,BT6:2,cond:(v)=>v.sopk},
+  'NASH_SEV'  :{BT1:1,BT2:4,BT3:2,BT4:2,BT5:2,BT6:5,cond:(v)=>v.nash>=2},
+  'DYSLIPI_MX':{BT1:0,BT2:1,BT3:2,BT4:3,BT5:3,BT6:3,cond:(v)=>v.dyslipiMixte},
+  'COMORB_CV' :{BT1:1,BT2:1,BT3:2,BT4:3,BT5:4,BT6:4,cond:(v)=>v.comorbCV},
+  'CTI_55+'   :{BT1:-2,BT2:0,BT3:3,BT4:4,BT5:-1,BT6:2,cond:(v)=>v.cti>55},
+  'CTI_40_55' :{BT1:0,BT2:2,BT3:2,BT4:2,BT5:2,BT6:3,cond:(v)=>v.cti>=40&&v.cti<=55},
+  'GRS_R1'    :{BT1:0,BT2:0,BT3:-1,BT4:-2,BT5:5,BT6:3,cond:(v)=>v.grs==='R1'},
+  'GRS_R2'    :{BT1:0,BT2:1,BT3:0,BT4:-1,BT5:4,BT6:4,cond:(v)=>v.grs==='R2'},
+  'GRS_R4R5'  :{BT1:1,BT2:1,BT3:3,BT4:4,BT5:-3,BT6:-1,cond:(v)=>v.grs==='R4'||v.grs==='R5'},
+  'SF_80+'    :{BT1:-1,BT2:1,BT3:3,BT4:4,BT5:1,BT6:2,cond:(v)=>v.sf>=80},
+  'ASA_4+'    :{BT1:3,BT2:2,BT3:-5,BT4:-5,BT5:3,BT6:1,cond:(v)=>v.asa>=4},
+  'BES_27+'   :{BT1:-2,BT2:-2,BT3:-5,BT4:-5,BT5:2,BT6:-2,cond:(v)=>v.besT>=27},
+  'BES_17_26' :{BT1:-1,BT2:-1,BT3:-1,BT4:-1,BT5:1,BT6:2,cond:(v)=>v.besT>=17&&v.besT<27},
+  'PSS_20+'   :{BT1:0,BT2:0,BT3:-1,BT4:-1,BT5:0,BT6:0,cond:(v)=>v.pss>20},
+  'ATCD_SLEEV':{BT1:-3,BT2:-2,BT3:-5,BT4:5,BT5:1,BT6:1,cond:(v)=>v.atcdChir==='sleeve'},
+  'ATCD_BALL' :{BT1:-2,BT2:2,BT3:2,BT4:2,BT5:2,BT6:2,cond:(v)=>v.atcdBallon},
+  'REFUS_CHIR':{BT1:3,BT2:3,BT3:-5,BT4:-5,BT5:3,BT6:3,cond:(v)=>v.refusChir}
+};
+const BT_NAMES={BT1:'Ballon Gastrique',BT2:'Endosleeve (ESG)',BT3:'Sleeve Gastrectomie',BT4:'Bypass (RYGB)',BT5:'GLP-1 RA',BT6:'Association'};
+
+// ─── BT-6 Sous-categories efficacite (§4b Dossier v3.4) ───
+const BT6_ASSOC=[
+  {id:'6a',n:'ESG + GLP-1 RA',tbwl6:'16-20%',tbwl12:'20-25%',tbwl24:'22-27%',dt2r:'65-70%',grade:'1B'},
+  {id:'6b',n:'Bypass RYGB + Semaglutide 2.4mg',tbwl6:'25-30%',tbwl12:'32-38%',tbwl24:'35-42%',dt2r:'85-92%',grade:'1B'},
+  {id:'6c',n:'GLP-1 RA + SGLT-2i + Metformine',tbwl6:'10-14%',tbwl12:'14-19%',tbwl24:'15-20%',dt2r:'HbA1c -3.2%',grade:'1A'},
+  {id:'6d',n:'Ballon Spatz3 + GLP-1 (pont)',tbwl6:'13-17%',tbwl12:'18-22%',tbwl24:'—',dt2r:'Risque -35%',grade:'2A'},
+  {id:'6e',n:'ESG + Buproprion-Naltrexone',tbwl6:'14-18%',tbwl12:'18-22%',tbwl24:'19-24%',dt2r:'BES -8 pts',grade:'2A'}
+];
 
 // ─── COMORBIDITIES (ADA 2024, IDF MetS, DPP) ───
 const COMORB=[
@@ -92,7 +159,7 @@ const MK_B=[[.82,.14,.03,.01,0,0],[.08,.68,.18,.05,.01,0],[.02,.11,.61,.21,.04,.
 const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5,dyslipi:1.15};
 const CTI_G={dur:.185,yoyo:.249,lep:.21,micro:.18,cort:.195,meta:.2,enf:.24};
 
-// ─── BTM v3.2 — Bariatric & Therapeutic Module ───
+// ─── BTM v3.4 — Bariatric & Therapeutic Module ───
 // 6 techniques évaluées, 62 études méta-analysées, >180K patients
 // Bach | Manos | Noel — 2026
 const BTM_TECH={
@@ -155,11 +222,14 @@ let S={
   phq: [0,0,0,0,0,0,0,0,0],
   // BES simplifié (ancien) conservé pour compat
   bes:0,
-  // BES-16 complet (v3.2)
+  // BES-16 complet (v3.4)
   bes16:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // BTM v3.2 — Bariatric & Therapeutic Module
-  btm:{gerd:0,asa:1,atcdChir:'aucun',refusChir:0,prefPatient:'neutre',nash:0,comorbCV:0},
+  // BTM v3.4 — Bariatric & Therapeutic Module (MOD-01 a MOD-10)
+  btm:{gerd:0,asa:1,atcdChir:'aucun',atcdBallon:0,atcdBallonType:'',refusChir:0,prefPatient:'neutre',nash:0,comorbCV:0},
   btmResult:null,
+  // FNC v1.0 — Normalisation climatique
+  fncZone:'Z4', // Koppen zone par defaut (tempere oceanique)
+  residenceMois:12, // mois de residence (pour acclimatation progressive)
   // Comorbidities & bio
   comorbIds:[],bioValues:{},
   // Dyslipidémie v3.1
@@ -458,15 +528,21 @@ async function requestAIReport(){
         tabac_cig:S.tabac, alcool:S.alcool
       },
       btm:(()=>{
-        const rtp=btm_decision();
+        const rtp=S.btmResult||btm_decision();
         return rtp?{
           gerd:S.btm.gerd,asa:S.btm.asa,atcdChir:S.btm.atcdChir,nash:S.btm.nash,comorbCV:S.btm.comorbCV,
+          atcdBallon:S.btm.atcdBallon,atcdBallonType:S.btm.atcdBallonType,
           prefPatient:S.btm.prefPatient,refusChir:S.btm.refusChir,
-          primary:rtp.primary,secondary:rtp.secondary,assoc:rtp.assoc,
+          primary:rtp.primary,secondary:rtp.secondary,
+          ranked:rtp.ranked,score_brut:rtp.score_brut,score_pct:rtp.score_pct,
+          delta_abs:rtp.delta_abs,delta_rel:rtp.delta_rel,confiance:rtp.confiance,
+          bt6_type:rtp.bt6_type,assoc:rtp.assoc,
           contraind:rtp.contraind,tbwl:rtp.tbwl,ewl:rtp.ewl,complexity:rtp.complexity,
-          parcours:rtp.parcours,notes:rtp.notes,besTotal:getBesTotal()
+          facteurs_actifs:rtp.facteurs_actifs?.length||0,facteurs_manquants:rtp.facteurs_manquants||[],
+          parcours:rtp.parcours,notes:rtp.notes,alarmes:rtp.alarmes||[],besTotal:getBesTotal()
         }:null;
       })(),
+      fnc:{zone:S.fncZone,residenceMois:S.residenceMois,label:FNC_ZONES[S.fncZone]?.l||''},
       contexte:{
         prescription_bio:bioPrx.tier,
         strategies:strats.map(s=>s.title),
@@ -536,7 +612,7 @@ const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
     <div class="welc-logo">B</div>
-    <h1>Score <b>BMN</b> v3.2</h1>
+    <h1>Score <b>BMN</b> v3.4</h1>
     <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
     <div class="welc-features">
       <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
@@ -574,13 +650,13 @@ const SCR=[
       <div class="opt-chk">${S.sexe===x.v?'OK':''}</div></div>`).join('')}</div>`;
   },
 
-  // 3: Ethnicity
+  // 3: Ethnicity v3.4 (+ MultCV, Metis, Arabe, Autre)
   ()=>{const list=Object.entries(ETH).map(([k,v])=>({k,...v}));
     return `<div class="s-emoji">Origine</div>
     <div class="s-title">Origine ethnique</div>
     <div class="s-sub">Les seuils d'obesite et les risques metaboliques varient significativement selon l'origine. <span class="ref">OMS 2004</span> <span class="ref">IDF 2006</span> <span class="ref">Lancet 2016</span></div>
     <div class="opts opts-compact">${list.map(o=>`<div class="opt${S.ethnie===o.k?' sel':''}" onclick="S.ethnie='${o.k}';render(S.step,0)">
-      <div class="opt-txt"><b>${o.n}</b><small>Surpoids des ${o.ow} | Obesite des ${o.ob} | Diabete x${o.dR} | CV x${o.cR}</small></div>
+      <div class="opt-txt"><b>${o.n}</b><small>Surpoids des ${o.ow} | Obesite des ${o.ob} | DT2 x${o.dR} | CV x${o.cvR||1}</small></div>
       <div class="opt-chk">${S.ethnie===o.k?'OK':''}</div></div>`).join('')}</div>`;
   },
 
@@ -838,7 +914,7 @@ const SCR=[
       </div>`;
     }
     return `<div class="s-emoji">Sante</div>
-    <div class="s-title">Comorbidites (v3.2 — 13 declaratives + IR auto)</div>
+    <div class="s-title">Comorbidites (v3.4 — 13 declaratives + IR auto)</div>
     <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
     <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
     ${dyslipiHtml}
@@ -1094,14 +1170,14 @@ const SCR=[
     return html;
   },
 
-  // 17: BTM v3.2 — Questionnaire Bariatrique & Therapeutique
+  // 17: BTM v3.4 — Questionnaire Bariatrique & Therapeutique
   ()=>{
     const besT=getBesTotal();
     const besLvl=besT>=27?'Hyperphagie severe':besT>=17?'Hyperphagie moderee':besT>=10?'Legere tendance':'Pas d\'hyperphagie';
     const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
     let html=`<div class="s-emoji">BTM</div>
-    <div class="s-title">Module Bariatrique & Therapeutique v3.2</div>
-    <div class="s-sub">Matrice decisionnelle personnalisee : Ballon · Endosleeve · Chirurgie · GLP-1 · Associations. <span class="ref">62 etudes, >180K patients</span></div>`;
+    <div class="s-title">Module Bariatrique & Therapeutique v3.4</div>
+    <div class="s-sub">Scoring matriciel 27 facteurs x 6 techniques. MOD-01 a MOD-10 conformes au Dossier Maitre v3.4. <span class="ref">62+ etudes, >180K patients</span></div>`;
 
     // GERD
     html+=`<div class="sec"><div class="sec-tt">Reflux gastro-oesophagien (GERD)</div></div>`;
@@ -1121,6 +1197,14 @@ const SCR=[
       `<div class="opt${S.btm.atcdChir===o.v?' sel':''}" onclick="S.btm.atcdChir='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     if(S.btm.atcdChir==='sleeve') html+=`<div style="font-size:10px;color:var(--orange);margin:4px 12px">Sleeve anterieure → Bypass revision recommande (+23% EWL, Thereaux 2022)</div>`;
 
+    // MOD-08: ATCD Ballon type (Orbera vs Spatz3)
+    if(S.btm.atcdChir==='ballon'){
+      html+=`<div class="sec"><div class="sec-tt">Type de ballon anterieur (MOD-08)</div></div>`;
+      html+=`<div class="opts opts-compact">${[{v:'orbera',l:'Orbera (6 mois)'},{v:'spatz3',l:'Spatz3 (12 mois, ajustable)'},{v:'autre_ballon',l:'Autre / inconnu'}].map(o=>
+        `<div class="opt${S.btm.atcdBallonType===o.v?' sel':''}" onclick="S.btm.atcdBallonType='${o.v}';S.btm.atcdBallon=1;render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
+      if(S.btm.atcdBallonType==='spatz3') html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">Spatz3 (mecanisme distinct, ajustable) — Re-pose possible. Poids BTM -2 (MOD-08).</div>`;
+    }
+
     // NASH
     html+=`<div class="sec"><div class="sec-tt">Steatohepatite / NASH</div></div>`;
     html+=`<div class="opts">${[{v:0,l:'Non / non connue'},{v:1,l:'NAFLD / steatose simple'},{v:2,l:'NASH confirmee (biopsie/FibroScan)'}].map(o=>
@@ -1137,6 +1221,20 @@ const SCR=[
     html+=`<div class="opts opts-compact">${[{v:'neutre',l:'Neutre (accepte toute option)'},{v:'refus_chir',l:'Refuse la chirurgie'},{v:'prefer_chir',l:'Prefere la chirurgie'},{v:'prefer_endo',l:'Prefere endoscopie (ESG/Ballon)'},{v:'prefer_med',l:'Prefere le traitement medical'}].map(o=>
       `<div class="opt${S.btm.prefPatient===o.v?' sel':''}" onclick="S.btm.prefPatient='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     S.btm.refusChir=(S.btm.prefPatient==='refus_chir')?1:0;
+
+    // FNC v3.4 — Zone climatique Koppen
+    html+=`<div class="sec"><div class="sec-tt">Zone climatique de residence (FNC v3.4)</div>
+      <div style="font-size:10px;color:var(--dim3)">Normalise le score Exposome selon l'acclimatation climatique. AQI non normalise.</div></div>`;
+    html+=`<div class="opts opts-compact">${Object.entries(FNC_ZONES).map(([k,z])=>
+      `<div class="opt${S.fncZone===k?' sel':''}" onclick="S.fncZone='${k}';render(S.step,0)"><span>${k}: ${z.l}</span></div>`).join('')}</div>`;
+    if(S.fncZone!=='Z4'){
+      const fnc=FNC_ZONES[S.fncZone];
+      html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">FNC ${S.fncZone} (${fnc.l}) — Temp x${fnc.ft}, UV x${fnc.fu}. Residence: ${S.residenceMois||12} mois.</div>`;
+    }
+    // Durée de résidence
+    html+=`<div class="sec"><div class="sec-tt">Duree de residence (mois)</div></div>`;
+    html+=`<div class="range-wrap"><input type="range" min="0" max="120" value="${S.residenceMois||12}" oninput="S.residenceMois=+this.value;render(S.step,0)"><span class="range-val">${S.residenceMois||12} mois</span></div>`;
+    if(S.residenceMois<12) html+=`<div style="font-size:10px;color:var(--orange);margin:4px 12px">Residence < 12 mois — FNC progressif applique (acclimatation partielle).</div>`;
 
     html+=`<div id="aiBox17"></div>`;
     return html;
@@ -1255,7 +1353,7 @@ function triggerAI(step){
 }
 
 // ════════════════════════════════════════════════════════════════
-// MOTEUR DE CALCUL — Score BMN v3.2 — Architecture CLEO + BTM
+// MOTEUR DE CALCUL — Score BMN v3.4 — Architecture CLEO + BTM + FNC
 // Ref: algorithme.html BSD v4.9 + justification-bio.html BSD v4.7.1
 // ────────────────────────────────────────────────────────────────
 // FLUX:  C(0-50) + E(0-45) + O(0-10) + L(0-10) = sD(0-100)
@@ -1438,10 +1536,16 @@ function calc(){
   // Layer B = Trajet + sedentarite (attenuee par AP)
   // Layer C = Perturbateurs (ultra-transformes, fast-food)
   // ════════════════════════════════════════════════════
-  // Layer A — Environnement physique (0-1)
+  // Layer A — Environnement physique (0-1) + FNC v3.4
+  // FNC: Facteur Normalisation Climatique Koppen (§5 Dossier v3.4)
+  // AQI n'est PAS normalise — pollution = meme impact partout
+  // FNC_eff = 1 - (1 - FNC) * min(1, mois_residence / 12)
+  const fnc=FNC_ZONES[S.fncZone]||FNC_ZONES.Z4;
+  const fncEff_t=1-(1-fnc.ft)*Math.min(1,(S.residenceMois||12)/12);
+  const fncEff_u=1-(1-fnc.fu)*Math.min(1,(S.residenceMois||12)/12);
   const a_air=Math.min(1, S.expo.air/8);
-  const a_temp=Math.min(1, S.expo.temp/4);
-  const a_uv=Math.min(1, S.expo.uv/3);
+  const a_temp=Math.min(1, S.expo.temp/4 * fncEff_t);
+  const a_uv=Math.min(1, S.expo.uv/3 * fncEff_u);
   let layerA=Math.min(1, (a_air+a_temp+a_uv)/3 * (e.iM||1));
 
   // Layer B — Trajet + sedentarite (0-1)
@@ -2152,129 +2256,170 @@ function getTherapeuticStrategy(){
 }
 
 // ════════════════════════════════════════════════════
-// BTM v3.2 — Bariatric & Therapeutic Module Decision Engine
-// 14 variables, 62 études, >180K patients
-// Retourne Recommandation Thérapeutique Personnalisée (RTP)
+// BTM v3.4 — Bariatric & Therapeutic Module Decision Engine
+// MOD-01 a MOD-10 conformes au Dossier Maitre v3.4
+// Scoring matriciel 27 facteurs × 6 techniques
 // ════════════════════════════════════════════════════
 function btm_decision(){
-  const imc=S.imc, sf=S.bmn_t||S.sD, cti=S.cti, grs=S.glp1_profile||'R3';
+  const imc=S.imc, sf=S.bmn_t||S.sD, cti=S.cti;
+  const grs=S.glp1_profile||'R3';
   const dt2=S.comorbIds.includes('dt2'), hba1c=S.bioValues.hba1c||0;
-  const gerd=S.btm.gerd>=2, sopk=S.comorbIds.includes('sopk');
+  const gerd=S.btm.gerd||0, sopk=S.comorbIds.includes('sopk');
   const besT=getBesTotal(), pss=getPssTotal();
   const dyslipiMixte=S.comorbIds.includes('dyslipi')&&S.dyslipi.type==='mixte';
-  const nash=S.btm.nash>=2, asa=S.btm.asa, atcdChir=S.btm.atcdChir;
+  const nash=S.btm.nash||0, asa=S.btm.asa||1, atcdChir=S.btm.atcdChir;
+  const atcdBallon=S.btm.atcdBallon||0;
   const refusChir=S.btm.refusChir||S.btm.prefPatient==='refus_chir';
   const comorbCV=S.btm.comorbCV;
-  const rtp={primary:null,secondary:null,assoc:[],contraind:[],ewl:'',tbwl:'',parcours:[],complexity:1,notes:[]};
 
-  // ── GARDE-FOUS DE SÉCURITÉ ──
+  const rtp={primary:null,secondary:null,ranked:[],score_brut:{BT1:0,BT2:0,BT3:0,BT4:0,BT5:0,BT6:0},
+    score_pct:{},delta_abs:0,delta_rel:0,confiance:'',
+    facteurs_actifs:[],facteurs_manquants:[],
+    assoc:[],contraind:[],bt6_type:null,ewl:'',tbwl:'',parcours:[],complexity:1,notes:[],alarmes:[]};
+
+  // ── MOD-01: IMC EXCLUSIF (PREMIER_VRAI du plus haut) ──
+  let imcRange=null;
+  if(imc>=60) imcRange='IMC_60+';
+  else if(imc>=50) imcRange='IMC_50_60';
+  else if(imc>=40) imcRange='IMC_40_50';
+  else if(imc>=35) imcRange='IMC_35_40';
+  else if(imc>=30) imcRange='IMC_30_35';
+  else if(imc>=27) imcRange='IMC_27_30';
+
+  // Appliquer poids IMC exclusif
+  if(imcRange && BTM_MATRIX[imcRange]){
+    const w=BTM_MATRIX[imcRange];
+    ['BT1','BT2','BT3','BT4','BT5','BT6'].forEach(t=>{rtp.score_brut[t]+=w[t]||0;});
+    rtp.facteurs_actifs.push({f:imcRange,w});
+  }
+
+  // ── SCORING MATRICIEL : 20 facteurs non-IMC ──
+  const vars={imc,sf,cti,grs,dt2,hba1c,gerd,sopk,besT,pss,dyslipiMixte,nash,asa,atcdChir,atcdBallon,refusChir,comorbCV};
+  // Liste des facteurs optionnels potentiellement manquants (MOD-06)
+  const optionalFactors=['GERD_SEV','GERD_LEG','NASH_SEV','BES_27+','BES_17_26'];
+
+  Object.keys(BTM_MATRIX).forEach(fk=>{
+    if(fk.startsWith('IMC_')) return; // deja traite
+    const row=BTM_MATRIX[fk];
+    if(!row.cond) return;
+    // MOD-06: gestion valeurs manquantes
+    try{
+      if(row.cond(vars)){
+        ['BT1','BT2','BT3','BT4','BT5','BT6'].forEach(t=>{rtp.score_brut[t]+=(row[t]||0);});
+        rtp.facteurs_actifs.push({f:fk,w:{BT1:row.BT1,BT2:row.BT2,BT3:row.BT3,BT4:row.BT4,BT5:row.BT5,BT6:row.BT6}});
+      }
+    }catch(e){
+      rtp.facteurs_manquants.push(fk);
+    }
+  });
+
+  // ── MOD-02: NOTE COLLINEARITE DT2/CTI ──
+  if(dt2&&hba1c>9&&cti>55){
+    rtp.notes.push('Colinearite DT2 severe (HbA1c>9%) + CTI eleve (>55) — cumul +9 Bypass assume (STAMPEDE + Fothergill 2016).');
+  }
+
+  // ── CLASSEMENT ──
+  const techs=['BT1','BT2','BT3','BT4','BT5','BT6'];
+  rtp.ranked=techs.slice().sort((a,b)=>rtp.score_brut[b]-rtp.score_brut[a]);
+
+  // ── MOD-10: CAS LIMITE ZERO OPTION ──
+  if(rtp.score_brut[rtp.ranked[0]]<=0){
+    rtp.alarmes.push('AUCUNE OPTION STANDARD DISPONIBLE — Concertation pluridisciplinaire obligatoire.');
+    rtp.primary={tech:rtp.ranked[0],name:BT_NAMES[rtp.ranked[0]],reason:'Score maximal <= 0. Decision pluridisciplinaire requise.',score:rtp.score_brut[rtp.ranked[0]]};
+    S.btmResult=rtp; return rtp;
+  }
+
+  // ── MOD-05: DELTA NORMALISE ──
+  rtp.delta_abs=rtp.score_brut[rtp.ranked[0]] - rtp.score_brut[rtp.ranked[1]];
+  rtp.delta_rel=rtp.score_brut[rtp.ranked[0]]>0 ? Math.round(rtp.delta_abs / rtp.score_brut[rtp.ranked[0]] * 100) : 0;
+  if(rtp.delta_rel>=25) rtp.confiance='INDICATION CLAIRE';
+  else if(rtp.delta_rel>=10) rtp.confiance='DISCUSSION PATIENT';
+  else rtp.confiance='DECISION PLURIDISCIPLINAIRE';
+
+  // ── MOD-09: SCORE NORMALISE % ──
+  // Calculer max possible pour chaque technique
+  const maxPoss={BT1:0,BT2:0,BT3:0,BT4:0,BT5:0,BT6:0};
+  Object.values(BTM_MATRIX).forEach(row=>{
+    techs.forEach(t=>{if((row[t]||0)>0) maxPoss[t]+=(row[t]||0);});
+  });
+  techs.forEach(t=>{rtp.score_pct[t]=maxPoss[t]>0?Math.round(rtp.score_brut[t]/maxPoss[t]*100):0;});
+
+  // ── PRIMARY & SECONDARY ──
+  rtp.primary={tech:rtp.ranked[0],name:BT_NAMES[rtp.ranked[0]],reason:'Score matriciel: '+rtp.score_brut[rtp.ranked[0]]+' pts ('+rtp.score_pct[rtp.ranked[0]]+'%)',score:rtp.score_brut[rtp.ranked[0]]};
+  rtp.secondary={tech:rtp.ranked[1],name:BT_NAMES[rtp.ranked[1]],reason:'Alternative: '+rtp.score_brut[rtp.ranked[1]]+' pts ('+rtp.score_pct[rtp.ranked[1]]+'%)',score:rtp.score_brut[rtp.ranked[1]]};
+
+  // ── GARDE-FOUS ABSOLUS ──
   if(besT>=27){
-    rtp.contraind.push('Chirurgie bariatrique (BES ≥ 27 — TCA severe non stabilise)');
-    rtp.notes.push('BES ≥ 27 : Prise en charge TCA prealable obligatoire avant toute chirurgie.');
+    rtp.contraind.push('CI chirurgie bariatrique — TCA severe non stabilise (BES >= 27)');
+    rtp.notes.push('BES >= 27 : Prise en charge TCA prealable obligatoire avant toute chirurgie.');
   }
   if(asa>=4){
-    rtp.primary={tech:'BT-1',name:'Ballon Gastrique (Spatz3)',reason:'ASA ≥ 4 — risque chirurgical trop eleve'};
-    rtp.secondary={tech:'BT-5',name:'GLP-1 (Semaglutide/Tirzepatide)',reason:'Alternative medicale'};
-    rtp.contraind.push('Toute chirurgie bariatrique (ASA ≥ 4)','ESG sous AG (ASA ≥ 4)');
-    rtp.complexity=2;rtp.ewl='25-38%';rtp.tbwl='10-15%';
-    S.btmResult=rtp;return rtp;
+    rtp.contraind.push('CI chirurgie sous AG (ASA >= 4)');
+    rtp.notes.push('ASA >= 4 : ESG ou Ballon recommandes (pas AG). GLP-1 en alternative.');
   }
   if(atcdChir==='sleeve'){
-    rtp.primary={tech:'BT-4',name:'Bypass Revision (RYGB)',reason:'Sleeve anterieure — conversion necessaire (+23% EWL)'};
-    rtp.secondary={tech:'BT-5',name:'GLP-1 post-revision',reason:'Optimisation post-chirurgicale'};
-    rtp.ewl='65-72%';rtp.tbwl='28-34%';rtp.complexity=4;
-    rtp.parcours=['J0: Bilan pre-op complet','M0: Bypass revision','M3: Controle nutritionnel','M6: Bio + GLP-1 si plateau','M12: Evaluation globale','M24: Suivi long terme'];
-    S.btmResult=rtp;return rtp;
+    rtp.notes.push('ATCD Sleeve : Bypass revision prioritaire si reintervention necessaire (+23% EWL).');
   }
 
-  // ── DÉCISION PAR PROFIL IMC + SF ──
-  if(imc<30 && sf<40){
-    rtp.primary={tech:'BT-5',name:'GLP-1 faible dose',reason:'IMC < 30, risque faible'};
-    rtp.ewl='8-12%';rtp.tbwl='5-8%';rtp.complexity=1;
-    rtp.parcours=['J0: Initiation Semaglutide 0.25mg/sem','M1: Titration 0.5mg','M3: Evaluation, titration 1mg si plateau','M6: Bio controle','M12: Reevaluation globale'];
-  }
-  else if(imc>=30 && imc<35){
-    if(grs==='R1'||grs==='R2'){
-      rtp.primary={tech:'BT-5',name:'GLP-1 (Semaglutide 2.4mg ou Tirzepatide)',reason:'GRS '+grs+' — excellent/bon repondeur'};
-      rtp.secondary={tech:'BT-1',name:'Ballon Spatz3 12m',reason:'Alternative si intolerances GLP-1'};
-      rtp.ewl='35-48%';rtp.tbwl='14-19%';rtp.complexity=2;
-    } else {
-      rtp.primary={tech:'BT-1',name:'Spatz3 12 mois',reason:'IMC 30-35, GRS '+grs+' — ballon intra-gastrique prioritaire'};
-      rtp.secondary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'Si insuffisant apres ballon'};
-      rtp.assoc.push('GLP-1 post-ballon (synergie +6-9% TBWL)');
-      rtp.ewl='44-58%';rtp.tbwl='13-19%';rtp.complexity=2;
-    }
-    rtp.parcours=['J0: Evaluation initiale','M0: Intervention primaire','M3: Bio + evaluation','M6: Ajout GLP-1 si plateau','M12: Evaluation globale','M24: Strategie maintenance'];
-  }
-  else if(imc>=35 && imc<40){
-    if(gerd){
-      rtp.primary={tech:'BT-4',name:'Bypass (RYGB)',reason:'GERD documente — resolution 87% (Ponce 2021)'};
-      rtp.contraind.push('Sleeve gastrectomie (aggrave GERD)');
-      rtp.ewl='65-68%';rtp.tbwl='28-32%';rtp.complexity=4;
-    } else if(nash){
-      rtp.primary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'NASH confirmee — resolution histologique 62% (Sharaiha 2021)'};
-      rtp.secondary={tech:'BT-3',name:'Sleeve',reason:'Si ESG insuffisant'};
-      rtp.assoc.push('GLP-1 + ESG (synergie +6-9% TBWL)');
-      rtp.ewl='55-65%';rtp.tbwl='13-25%';rtp.complexity=3;
-    } else if(refusChir){
-      rtp.primary={tech:'BT-2',name:'Endosleeve (ESG)',reason:'Refus chirurgie — alternative endoscopique'};
-      rtp.secondary={tech:'BT-5',name:'GLP-1 haute dose',reason:'Alternative medicale'};
-      rtp.ewl='55-58%';rtp.tbwl='13-16%';rtp.complexity=2;
-    } else {
-      rtp.primary={tech:'BT-3',name:'Sleeve Gastrectomie',reason:'IMC 35-40 — reference chirurgicale'};
-      rtp.secondary={tech:'BT-2',name:'ESG',reason:'Alternative endoscopique'};
-      rtp.ewl='60-65%';rtp.tbwl='25-30%';rtp.complexity=3;
-    }
-    rtp.parcours=['J0: Bilan pre-op/pre-interventionnel','M0: Intervention','M1: Controle cicatrisation','M3: Bio + evaluation nutritionnelle','M6: Ajout GLP-1 si plateau','M12: Bio complete','M24: Suivi long terme'];
-  }
-  else if(imc>=40 && imc<50){
-    if((dt2&&hba1c>9)||gerd){
-      rtp.primary={tech:'BT-4',name:'Bypass (RYGB)',reason:(dt2&&hba1c>9?'DT2 desequilibre HbA1c '+hba1c.toFixed(1)+'%':'GERD documente')+' — remission DT2 29-45%'};
-      rtp.ewl='65-70%';rtp.tbwl='28-34%';rtp.complexity=4;
-      if(dt2) rtp.notes.push('DT2 remission attendue 29-45% (STAMPEDE, Schauer 2017)');
-    } else if(sopk){
-      rtp.primary={tech:'BT-3',name:'Sleeve',reason:'SOPK — remission 72% a 2 ans (Climent 2022)'};
-      rtp.assoc.push('GLP-1 post-op si plateau ponderal');
-      rtp.ewl='61-65%';rtp.tbwl='25-30%';rtp.complexity=4;
-    } else if(grs==='R1'){
-      rtp.primary={tech:'BT-5',name:'Tirzepatide 15mg',reason:'GRS R1 excellent repondeur — TBWL 19-22% (SURMOUNT-1)'};
-      rtp.secondary={tech:'BT-3',name:'Sleeve',reason:'Si plateau apres 12 mois GLP-1'};
-      rtp.ewl='50-58%';rtp.tbwl='19-22%';rtp.complexity=3;
-    } else {
-      rtp.primary={tech:'BT-3',name:'Sleeve Gastrectomie',reason:'IMC 40-50, profil standard'};
-      rtp.secondary={tech:'BT-4',name:'Bypass',reason:'Si DT2 ou GERD concomitant'};
-      rtp.ewl='61-65%';rtp.tbwl='25-30%';rtp.complexity=4;
-    }
-    rtp.parcours=['J0: Bilan pre-op complet (cardio, pneumo, psy)','M-3: Preparation nutritionnelle','M0: Chirurgie','M1: Controle post-op','M3: Bio + nutritionnel','M6: Bio + evaluation GLP-1','M12: Bilan annuel','M24: Suivi metabolique'];
-  }
-  else if(imc>=50){
-    if(imc>=60){
-      rtp.primary={tech:'BT-4',name:'SADI-S (Single Anastomosis Duodeno-Ileal)',reason:'IMC ≥ 60 — EWL 80-85%'};
-      rtp.ewl='80-85%';rtp.tbwl='35-40%';rtp.complexity=5;
-    } else {
-      rtp.primary={tech:'BT-4',name:'Bypass long bras',reason:'IMC 50-60 — malabsorption augmentee'};
-      rtp.secondary={tech:'BT-3',name:'Sleeve + GLP-1',reason:'Alternative si risque chirurgical eleve'};
-      rtp.ewl='68-72%';rtp.tbwl='30-35%';rtp.complexity=5;
-    }
-    rtp.parcours=['J0: Bilan pre-op complet multidisciplinaire','M-6: Preparation (regime, psy, kine)','M-3: Perte poids pre-op obligatoire','M0: Chirurgie','M1: Controle complications','M3: Nutritionnel intensif','M6: Bio + GLP-1 si reprise','M12: Bilan complet','M24-M60: Suivi annuel 5 ans'];
+  // ── BT-6 TYPE DETERMINATION ──
+  if(rtp.ranked[0]==='BT6'||(rtp.ranked[1]==='BT6'&&rtp.delta_rel<10)){
+    // Determiner la sous-categorie BT-6
+    if(dt2&&comorbCV) rtp.bt6_type=BT6_ASSOC.find(a=>a.id==='6c'); // GLP1+SGLT2+Met
+    else if(rtp.facteurs_actifs.some(f=>f.f==='DT2_HBA_9+')&&(rtp.score_brut.BT4>0)) rtp.bt6_type=BT6_ASSOC.find(a=>a.id==='6b'); // Bypass+Sema
+    else if(nash>=2&&imc>=30) rtp.bt6_type=BT6_ASSOC.find(a=>a.id==='6a'); // ESG+GLP1
+    else if(besT>=17&&besT<27) rtp.bt6_type=BT6_ASSOC.find(a=>a.id==='6e'); // ESG+Bupropion
+    else rtp.bt6_type=BT6_ASSOC.find(a=>a.id==='6a'); // defaut ESG+GLP1
   }
 
-  // ── ENRICHISSEMENT ASSOCIATIONS ──
-  if(dt2&&comorbCV) rtp.assoc.push('Empagliflozine (SGLT-2) — Grade 1A si DT2 + maladie CV');
-  if(besT>=17&&besT<27) rtp.assoc.push('Buproprion-Naltrexone (BES '+besT+' ≥ 17 — synergie appetit + reward)');
-  if(dyslipiMixte&&rtp.primary&&rtp.primary.tech==='BT-4') rtp.notes.push('Bypass optimise dyslipidemie via acides biliaires');
+  // ── ASSOCIATIONS POST-TRAITEMENT ──
+  if(dt2&&comorbCV) rtp.assoc.push('GLP-1 + SGLT-2i (Grade 1A — SELECT trial)');
+  if(besT>=17&&besT<27) rtp.assoc.push('Buproprion-Naltrexone (BES '+besT+' >= 17 — synergie appetit + reward)');
+  if(rtp.ranked[0]==='BT2'&&imc>=30) rtp.assoc.push('ESG + GLP-1 synergique (TBWL +6-9%)');
+  if(rtp.ranked[0]==='BT4'&&dt2) rtp.assoc.push('Bypass + Semaglutide (remission DT2 92%)');
+  if(dyslipiMixte&&rtp.ranked[0]==='BT4') rtp.notes.push('Bypass optimise dyslipidemie via acides biliaires.');
   if(dt2&&!comorbCV&&imc>=30) rtp.assoc.push('GLP-1 + SGLT-2 (synergie +4-6% TBWL, -0.9% HbA1c)');
   if(pss>20&&!refusChir) rtp.notes.push('PSS-10 > 20 : Compliance chirurgicale reduite. Suivi psychologique renforce recommande.');
-  if(cti>=55) rtp.notes.push('CTI ≥ 55 (chronicite installee) : chirurgie prioritaire si eligible. GLP-1 seul insuffisant.');
+  if(cti>55) rtp.notes.push('CTI > 55 (chronicite installee) : chirurgie prioritaire si eligible. GLP-1 seul insuffisant.');
   else if(cti>=40) rtp.notes.push('CTI 40-55 (chronicite avancee) : combiner traitements. Monotherapie insuffisante.');
+
+  // ── MOD-08: ATCD BALLON ──
+  if(atcdBallon&&S.btm.atcdBallonType==='spatz3'){
+    rtp.notes.push('ATCD Ballon Spatz3 (12 mois, ajustable) — mecanisme distinct d\'Orbera. Re-pose possible.');
+  } else if(atcdBallon){
+    rtp.notes.push('ATCD Ballon (Orbera 6 mois) — re-pose deconseille, envisager ESG ou chirurgie.');
+  }
 
   // ── CONTRE-INDICATIONS ADDITIONNELLES ──
   if(besT>=27) rtp.contraind.push('Toute chirurgie bariatrique jusqu\'a stabilisation TCA');
-  if(gerd) rtp.contraind.push('Sleeve gastrectomie (aggravation GERD documentee)');
+  if(gerd>=2) rtp.contraind.push('Sleeve gastrectomie (aggravation GERD documentee)');
 
-  // ── COMPLEXITÉ ──
+  // ── COMPLEXITE & EFFICACITE ──
   if(rtp.assoc.length>=2) rtp.complexity=Math.min(5,rtp.complexity+1);
   if(besT>=17) rtp.complexity=Math.min(5,rtp.complexity+1);
+  if(asa>=4) rtp.complexity=Math.min(5,rtp.complexity+1);
+  // Estimation TBWL/EWL basee sur technique primaire
+  const effMap={BT1:{ewl:'25-45%',tbwl:'10-19%'},BT2:{ewl:'50-58%',tbwl:'13-16%'},BT3:{ewl:'60-65%',tbwl:'25-30%'},
+    BT4:{ewl:'65-72%',tbwl:'28-34%'},BT5:{ewl:'35-48%',tbwl:'14-22%'},BT6:{ewl:'50-70%',tbwl:'16-38%'}};
+  const eff=effMap[rtp.ranked[0]]||{ewl:'—',tbwl:'—'};
+  rtp.ewl=eff.ewl; rtp.tbwl=eff.tbwl;
+
+  // ── PARCOURS TYPE ──
+  rtp.parcours=['J0: Evaluation initiale multidisciplinaire','M-3: Preparation (nutrition, psycho, kine)',
+    'M0: Intervention primaire ('+BT_NAMES[rtp.ranked[0]]+')',
+    'M1: Controle post-intervention','M3: Bio + evaluation nutritionnelle',
+    'M6: Ajustement therapeutique (ajout GLP-1 si plateau)','M12: Bilan annuel complet',
+    'M24: Suivi long terme + strategie maintenance'];
+
+  // ── MOD-06: RAPPORT VALEURS MANQUANTES ──
+  if(rtp.facteurs_manquants.length>0){
+    rtp.notes.push('Facteurs non documentes: '+rtp.facteurs_manquants.join(', ')+'. Pour affiner: documenter GERD, BES-16, GRS R (P10 min).');
+  }
+
+  // ── FNC NOTE ──
+  if(S.fncZone && S.fncZone!=='Z4'){
+    const z=FNC_ZONES[S.fncZone];
+    if(z) rtp.notes.push('FNC '+S.fncZone+' ('+z.l+') appliquee — Score Exposome normalise pour acclimatation climatique.');
+  }
 
   S.btmResult=rtp;
   return rtp;
@@ -2475,7 +2620,7 @@ function renderFinal(){
   // 4. GLP-1 RESPONSE PROFILING — Phenotypage complet
   // ══════════════════════════════════════════════════════
   const glp1=getGLP1Profile();
-  S.glp1_profile=glp1.profileCode; // v3.2: store for BTM
+  S.glp1_profile=glp1.profileCode; // v3.4: store for BTM
   const gp=glp1.profile;
   const ax=glp1.axes;
 
@@ -2760,69 +2905,96 @@ function renderFinal(){
   r+=`</div></details>`;
 
   // ══════════════════════════════════════════════════════
-  // 11. MODULE BTM v3.2 — Recommandation Thérapeutique Personnalisée
+  // 11. MODULE BTM v3.4 — Recommandation Thérapeutique Personnalisée
+  // MOD-01 à MOD-10 conformes au Dossier Maître v3.4
   // ══════════════════════════════════════════════════════
   const btm=btm_decision();
   if(btm && btm.primary){
     const cmplxCol=['','var(--green)','var(--teal)','var(--orange)','var(--red)','var(--purple)'][btm.complexity]||'var(--accent)';
     const cmplxLbl=['','Simple','Modere','Complexe','Tres complexe','Maximal'][btm.complexity]||'';
     const besT=getBesTotal();
+    const confCol=btm.confiance==='INDICATION CLAIRE'?'var(--green)':btm.confiance==='DISCUSSION PATIENT'?'var(--orange)':'var(--red)';
     r+=`<div style="margin-top:12px;border:2px solid var(--accent);border-radius:14px;overflow:hidden">
       <div style="background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(56,189,248,.1));padding:14px 16px;border-bottom:1px solid rgba(129,140,248,.2)">
-        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.2 — Recommandation Therapeutique</div>
-        <div style="font-size:10px;color:var(--dim2);margin-top:2px">Bariatric & Therapeutic Module — 62 etudes, >180K patients — Matrice decisionnelle personnalisee</div>
+        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.4 — Recommandation Therapeutique</div>
+        <div style="font-size:10px;color:var(--dim2);margin-top:2px">Bariatric & Therapeutic Module — Scoring matriciel 27 facteurs x 6 techniques — 62+ etudes</div>
       </div>
       <div style="padding:12px 14px">
-        <!-- 11.1 Complexité -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="font-size:10px;color:var(--dim3)">Complexite therapeutique</div>
+        <!-- 11.1 Score BTM Global + Confiance -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <div style="font-size:10px;color:var(--dim3)">Complexite</div>
           <div style="display:flex;gap:3px">${[1,2,3,4,5].map(i=>`<div style="width:20px;height:8px;border-radius:4px;background:${i<=btm.complexity?cmplxCol:'var(--bg2)'}"></div>`).join('')}</div>
           <div style="font-size:10px;font-weight:700;color:${cmplxCol}">${btm.complexity}/5 — ${cmplxLbl}</div>
+          <div style="margin-left:auto;font-size:9px;font-weight:800;color:${confCol};background:${confCol}15;padding:2px 8px;border-radius:6px">${btm.confiance} (delta ${btm.delta_rel}%)</div>
         </div>
-        <!-- 11.2 Recommandation primaire -->
+        ${btm.alarmes.length?btm.alarmes.map(a=>`<div style="background:rgba(239,68,68,.15);border:2px solid var(--red);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;font-weight:800;color:var(--red)">⚠ ${a}</div>`).join(''):''}
+        <!-- 11.2 Recommandation primaire (MOD-05/09) -->
         <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
           <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:4px">★ Recommandation Primaire</div>
           <div style="font-size:14px;font-weight:800;color:var(--txt)">${btm.primary.name}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.primary.reason}</div>
-          <div style="font-size:10px;color:var(--dim2);margin-top:2px">[${btm.primary.tech}]</div>
+          <div style="font-size:10px;color:var(--dim2);margin-top:2px">[${btm.primary.tech}] — Score ${btm.score_brut[btm.primary.tech]||0} pts (${btm.score_pct[btm.primary.tech]||0}%)</div>
         </div>
-        <!-- 11.3 Recommandation secondaire -->
+        <!-- 11.3 Recommandation secondaire + delta -->
         ${btm.secondary?`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-          <div style="font-size:10px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:4px">Alternative / Secondaire</div>
+          <div style="font-size:10px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:4px">Alternative / Secondaire (delta relatif: ${btm.delta_rel}%)</div>
           <div style="font-size:13px;font-weight:700;color:var(--txt)">${btm.secondary.name}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.secondary.reason}</div>
         </div>`:''}
         <!-- 11.4 Efficacité attendue -->
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          ${btm.tbwl?`<div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          ${btm.tbwl?`<div style="flex:1;min-width:70px;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
             <div style="font-size:18px;font-weight:800;color:var(--accent)">${btm.tbwl}</div>
             <div style="font-size:9px;color:var(--dim3)">%TBWL estim. 12m</div>
           </div>`:''}
-          ${btm.ewl?`<div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+          ${btm.ewl?`<div style="flex:1;min-width:70px;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
             <div style="font-size:18px;font-weight:800;color:var(--teal)">${btm.ewl}</div>
             <div style="font-size:9px;color:var(--dim3)">%EWL estim. 24m</div>
           </div>`:''}
-          <div style="flex:1;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+          <div style="flex:1;min-width:70px;background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
             <div style="font-size:18px;font-weight:800;color:${besT>=27?'var(--red)':besT>=17?'var(--orange)':'var(--green)'}">${besT}</div>
             <div style="font-size:9px;color:var(--dim3)">BES-16 /46</div>
           </div>
         </div>
-        <!-- 11.5 Associations -->
+        <!-- Score par technique (MOD-09) -->
+        <details style="margin-bottom:8px"><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">Scores par technique (6 familles)</summary>
+          <div style="margin-top:4px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+            ${['BT1','BT2','BT3','BT4','BT5','BT6'].map(t=>{
+              const sc=btm.score_brut[t]||0;const pct=btm.score_pct[t]||0;
+              const isPrim=btm.ranked[0]===t;
+              return `<div style="background:${isPrim?'rgba(129,140,248,.15)':'var(--bg2)'};border-radius:6px;padding:4px 6px;text-align:center;border:${isPrim?'1px solid var(--accent)':'none'}">
+                <div style="font-size:9px;color:var(--dim3)">${BT_NAMES[t]?.split(' ')[0]||t}</div>
+                <div style="font-size:14px;font-weight:800;color:${sc>0?'var(--txt)':'var(--dim3)'}">${sc}</div>
+                <div style="font-size:8px;color:var(--dim3)">${pct}%</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </details>
+        <!-- 11.5 Associations + BT-6 type -->
+        ${btm.bt6_type?`<div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:8px;padding:8px 12px;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--purple);font-weight:700;margin-bottom:4px">BT-6 Association recommandee</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">${btm.bt6_type.n}</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:2px">TBWL 12m: ${btm.bt6_type.tbwl12} | DT2: ${btm.bt6_type.dt2r} | Grade ${btm.bt6_type.grade}</div>
+        </div>`:''}
         ${btm.assoc.length?`<div style="margin-bottom:8px">
           <div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">Associations recommandees</div>
           ${btm.assoc.map(a=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg2)">+ ${a}</div>`).join('')}
         </div>`:''}
         <!-- 11.6 Contre-indications -->
         ${btm.contraind.length?`<div style="margin-bottom:8px">
-          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">⚠ Contre-indications identifiees</div>
-          ${btm.contraind.map(c=>`<div style="font-size:11px;color:var(--red);padding:3px 0">✗ ${c}</div>`).join('')}
+          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">Contre-indications identifiees</div>
+          ${btm.contraind.map(c=>`<div style="font-size:11px;color:var(--red);padding:3px 0">${c}</div>`).join('')}
         </div>`:''}
         <!-- 11.7 Parcours de soins -->
         ${btm.parcours.length?`<details><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">Parcours de soins optimise (${btm.parcours.length} etapes)</summary>
           <div style="margin-top:6px">${btm.parcours.map((p,i)=>`<div style="font-size:10px;color:var(--dim);padding:3px 0;border-left:2px solid var(--accent);padding-left:8px;margin-left:4px">${p}</div>`).join('')}</div>
         </details>`:''}
-        <!-- Notes -->
-        ${btm.notes.length?`<div style="margin-top:6px">${btm.notes.map(n=>`<div style="font-size:10px;color:var(--dim2);padding:2px 0;font-style:italic">📋 ${n}</div>`).join('')}</div>`:''}
+        <!-- Notes + FNC -->
+        ${btm.notes.length?`<div style="margin-top:6px">${btm.notes.map(n=>`<div style="font-size:10px;color:var(--dim2);padding:2px 0;font-style:italic">${n}</div>`).join('')}</div>`:''}
+        <!-- Facteurs actifs -->
+        ${btm.facteurs_actifs.length?`<details style="margin-top:6px"><summary style="font-size:9px;color:var(--dim3);cursor:pointer">${btm.facteurs_actifs.length} facteurs actifs dans le scoring</summary>
+          <div style="margin-top:4px;font-size:9px;color:var(--dim3)">${btm.facteurs_actifs.map(f=>f.f).join(', ')}</div>
+        </details>`:''}
       </div>
     </div>`;
   }
@@ -2832,7 +3004,7 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
     <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
-    <b>Score BMN v3.2</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v1.0 — Bach | Manos | Noel
+    <b>Score BMN v3.4</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
   </div>`;
 
   return r;
