@@ -1293,7 +1293,7 @@ SINON
 
 <div style="background:rgba(20,184,166,.08);border:2px solid #14b8a6;border-radius:14px;padding:16px;margin:12px 0">
 <p style="font-size:13px;color:#14b8a6;font-weight:700">Matrice Decisionnelle Therapeutique Personnalisee — Mars 2026</p>
-<p style="font-size:11px;color:var(--dim)">6 techniques | 62 etudes meta-analysees | >180 000 patients | 14 variables decisionnelles | BES-16 integre</p>
+<p style="font-size:11px;color:var(--dim)">6 techniques | 62 etudes meta-analysees | >180 000 patients | 27 facteurs x 6 techniques | MOD-01 a MOD-10 | BES-16 integre</p>
 </div>
 
 <h3>28.1 Six techniques evaluees</h3>
@@ -1307,7 +1307,7 @@ SINON
 <tr><td>BT-6</td><td>Associations therapeutiques</td><td>variable</td><td>+4-12%</td><td>+8-12%</td></tr>
 </table>
 
-<h3>28.2 Quatorze variables decisionnelles</h3>
+<h3>28.2 Vingt-sept facteurs decisionnels (14 variables cliniques)</h3>
 <table>
 <tr><th>#</th><th>Variable</th><th>Source</th><th>Impact algorithmique</th></tr>
 <tr><td>1</td><td>IMC</td><td>Ecran 4</td><td>&lt;35 Ballon/ESG; 35-50 Sleeve; &ge;40+comorb Bypass; &ge;60 SADI-S</td></tr>
@@ -1504,11 +1504,19 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 |                                                                 |
 |  bInflam = moy(z_CRP, z_TG/HDL, z_HOMA-IR)                   |
 |                                                                 |
-|  BTM = btm_decision(14 vars: imc, sf, cti, grs, dt2,         |
-|        hba1c, gerd, sopk, besT, pss, dyslipi, nash,           |
-|        asa, atcdChir, refusChir, comorbCV)                     |
-|  BES-16 = Sum(16 items, w_i) in [0,46]                        |
-|  Seuils: <10 normal, 17 modere, 27 CI chir                    |
+|  BTM = btm_decision(27 facteurs × 6 techniques)             |
+|  Matrice: score_brut[t] = Sum poids[facteur][technique]      |
+|  MOD-01: IMC exclusif (PREMIER_VRAI du plus haut)            |
+|  MOD-05: delta_rel = (p-s)/p*100 (25/10/0%)                |
+|  MOD-09: score_pct = score/max_possible*100                  |
+|  MOD-10: alarme si primary <= 0                              |
+|                                                              |
+|  FNC v1.0 (Koppen):                                         |
+|  FNC_eff = 1-(1-FNC)*min(1,mois/12)                         |
+|  A_norm = min(1,(air/8+temp/4*FNC_t+UV/3*FNC_u)/3*iM)      |
+|                                                              |
+|  BES-16 = Sum(16 items, w_i) in [0,46]                      |
+|  Seuils: <10 normal, 17 modere, 27 CI chir                  |
 |                                                                 |
 +----------------------------------------------------------------+
 </pre>
@@ -1516,9 +1524,9 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 
 <div style="text-align:center;margin:40px 0;padding:20px;border-top:2px solid var(--border2)">
   <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.4</p>
-  <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v1.0</p>
-  <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; Mars 2026</p>
-  <p style="font-size:11px;color:var(--dim3)">28 sections | 20 ecrans | 13 comorbidites + IR auto | BES-16 | 62 etudes BTM</p>
+  <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</p>
+  <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; 4 Mars 2026</p>
+  <p style="font-size:11px;color:var(--dim3)">29 sections | 20 ecrans | 13 comorbidites + IR auto | BES-16 | 62 etudes BTM | 10 MOD | FNC 6 zones | 12 profils ethniques</p>
   <div style="margin-top:14px">
     <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
     <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
@@ -1575,10 +1583,10 @@ tr:nth-child(even){background:var(--bg2)}
   <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.4</div>
   <div style="font-size:18px;color:var(--cyan);font-weight:600">Dossier Scientifique Complet</div>
   <div style="font-size:14px;color:var(--dim);margin:8px 0">Méta-analyse, justification bibliographique & validation du modèle</div>
-  <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1</div>
-  <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 2 mars 2026</div>
-  <div style="font-size:11px;color:var(--dim3)">Version : DS-3.2-FINAL | Classification : Usage médical restreint</div>
-  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.4 : +BTM (Bariatric &amp; Therapeutic Module) · 62 études · BES-16 · Matrice décisionnelle</div>
+  <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</div>
+  <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 4 mars 2026</div>
+  <div style="font-size:11px;color:var(--dim3)">Version : DS-3.4-FINAL | Classification : Usage médical restreint</div>
+  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.4 : +BTM v2.0 (10 MOD, 27×6) · +FNC v1.0 (Köppen 6 zones) · 62 études · BES-16 · 12 profils ethniques</div>
 </div>
 
 <div class="toc">
@@ -1591,7 +1599,7 @@ tr:nth-child(even){background:var(--bg2)}
 <a href="#s6">VI. Phase E — Score Exposome (0-45) : justification des couches A/B/C</a>
 <a href="#s7">VII. Phase O — Score Occupationnel (0-10) : données probantes</a>
 <a href="#s8">VIII. Phase L — Score Lifestyle (0-10) : justification IPAQ/PREDIMED/AUDIT-C</a>
-<a href="#s9">IX. Profils ethniques (9 groupes) : seuils & multiplicateurs</a>
+<a href="#s9">IX. Profils ethniques (12 groupes) : seuils & multiplicateurs</a>
 <a href="#s10">X. Comorbidités (14 items) : HR/OR & méta-analyses</a>
 <a href="#s11">XI. Instruments psychométriques validés (PSS-10, PHQ-9, BES, ISI)</a>
 <a href="#s12">XII. Panel biologique (15 biomarqueurs) : justification de chaque poids</a>
@@ -1619,7 +1627,7 @@ tr:nth-child(even){background:var(--bg2)}
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
 <p>2. <b>Personnalisation ethnique</b> : intégrer les seuils spécifiques OMS/IDF pour 9 groupes ethniques, reconnaissant que les seuils européens sous-estiment le risque chez les populations sud-asiatiques et est-asiatiques.</p>
 <p>3. <b>Prédiction pharmacologique</b> : phénotyper la réponse aux agonistes GLP-1 (sémaglutide, tirzépatide) via un modèle multi-axes (GLP-1 Response Profiling Engine v2.0) pour guider la prescription.</p>
-<p>4. <b>Projection longitudinale</b> : estimer la probabilité d'obésité à 10 ans via un modèle de Markov calibré sur les cohortes NHANES, Framingham et UK Biobank.</p>
+<p>4. <b>Aide à la décision thérapeutique (BTM v2.0)</b> : scoring matriciel 27 facteurs × 6 techniques bariatriques (BT-1 à BT-6), 10 MOD conformes au Dossier Maître v3.4, avec associations thérapeutiques et normalisation climatique (FNC v1.0).</p>
 
 <h3>Design du modèle</h3>
 <div class="formula">
@@ -2449,6 +2457,65 @@ Source : Sniderman 2019, ESC Guidelines 2021
 
 <h3>24.6 BES-16 (Binge Eating Scale — Gormally 1982)</h3>
 <p>Échelle validée de 16 items (score 0-46). Remplace le BES simplifié (0-8) de v3.1. Seuils : &lt;10 normal, 10-16 tendance légère, 17-26 hyperphagie modérée, ≥27 hyperphagie sévère (contre-indication chirurgicale).</p>
+
+<h3>24.7 Dix modifications BTM (MOD-01 à MOD-10)</h3>
+<p>La v3.4 introduit 10 modifications conformes au Dossier Maître :</p>
+<table>
+<tr><th>MOD</th><th>Description</th><th>Justification</th></tr>
+<tr><td>MOD-01</td><td>Exclusivité IMC : PREMIER_VRAI du plus haut range. Un seul range IMC actif dans le scoring.</td><td>Évite la double comptabilisation IMC entre catégories adjacentes</td></tr>
+<tr><td>MOD-02</td><td>Collinéarité DT2 sévère (HbA1c &gt;9 %) + CTI élevé (&gt;55) : cumul +9 pts Bypass assumé</td><td>STAMPEDE + Fothergill 2016 : DT2 sévère + chronicité = indication forte chirurgie</td></tr>
+<tr><td>MOD-03</td><td>Colonne BT-6 (Associations) ajoutée à la matrice 27×6</td><td>Sharaiha 2023 : les associations ESG+GLP-1 surpassent les monothérapies de +6-9 % TBWL</td></tr>
+<tr><td>MOD-04</td><td>ASA ≥ 4 poids ESG : corrigé de –2 à <b>+2</b></td><td>ESG sous sédation (pas AG) est faisable ASA 4 (López-Nava 2022)</td></tr>
+<tr><td>MOD-05</td><td>Delta normalisé : delta_rel = (score[p]–score[s]) / score[p] × 100. Seuils : ≥25 % indication claire, 10-24 % discussion, &lt;10 % pluridisciplinaire</td><td>Standardise la confiance indépendamment du score absolu</td></tr>
+<tr><td>MOD-06</td><td>Valeurs manquantes = 0 (neutre). Rapport obligatoire des facteurs non documentés (priorité : GERD, BES-16, GRS R)</td><td>Évite les biais de scoring en cas de données incomplètes</td></tr>
+<tr><td>MOD-07</td><td>GRS R4/R5 poids ESG : corrigé de +2 à <b>+1</b> (prudence bibliographique)</td><td>Données ESG chez non-répondeurs GLP-1 encore limitées (n &lt; 50)</td></tr>
+<tr><td>MOD-08</td><td>ATCD Ballon poids BT-1 : corrigé de –3 à <b>–2</b>. Distinction Orbera (6 mois) vs Spatz3 (12 mois, ajustable)</td><td>Spatz3 : mécanisme distinct, re-pose possible, durée double (Ienca 2020)</td></tr>
+<tr><td>MOD-09</td><td>Score normalisé % : score_pct[t] = score[t] / max_possible[t] × 100</td><td>Permet la comparaison inter-techniques indépendamment des échelles absolues</td></tr>
+<tr><td>MOD-10</td><td>Alarme « AUCUNE OPTION STANDARD DISPONIBLE » si score primaire ≤ 0</td><td>Cas limites : concertation pluridisciplinaire obligatoire</td></tr>
+</table>
+
+<h3>24.8 Matrice révisée v3.4 — 27 facteurs × 6 techniques (valeurs numériques)</h3>
+<table style="font-size:10px">
+<tr><th>Facteur</th><th>BT-1</th><th>BT-2</th><th>BT-3</th><th>BT-4</th><th>BT-5</th><th>BT-6</th></tr>
+<tr><td>IMC 27-30</td><td>+2</td><td>0</td><td>-5</td><td>-5</td><td>+4</td><td>+2</td></tr>
+<tr><td>IMC 30-35</td><td>+3</td><td>+3</td><td>-2</td><td>-4</td><td>+4</td><td>+3</td></tr>
+<tr><td>IMC 35-40</td><td>+1</td><td>+2</td><td>+4</td><td>+2</td><td>+2</td><td>+4</td></tr>
+<tr><td>IMC 40-50</td><td>-1</td><td>0</td><td>+4</td><td>+4</td><td>+1</td><td>+2</td></tr>
+<tr><td>IMC 50-60</td><td>-3</td><td>-2</td><td>+2</td><td>+5</td><td>-1</td><td>-1</td></tr>
+<tr><td>IMC ≥60</td><td>-5</td><td>-4</td><td>+1</td><td>+5</td><td>-2</td><td>-2</td></tr>
+<tr><td>GERD sévère</td><td>-1</td><td>-1</td><td>-5</td><td>+5</td><td>0</td><td>-1</td></tr>
+<tr><td>GERD léger</td><td>0</td><td>0</td><td>-3</td><td>+3</td><td>0</td><td>0</td></tr>
+<tr><td>DT2 HbA1c &gt;9 %</td><td>-1</td><td>+1</td><td>+2</td><td>+5</td><td>+2</td><td>+4</td></tr>
+<tr><td>DT2 HbA1c 7-9 %</td><td>0</td><td>+1</td><td>+3</td><td>+4</td><td>+3</td><td>+3</td></tr>
+<tr><td>SOPK</td><td>+1</td><td>+1</td><td>+4</td><td>+1</td><td>+3</td><td>+2</td></tr>
+<tr><td>NASH sévère</td><td>+1</td><td>+4</td><td>+2</td><td>+2</td><td>+2</td><td>+5</td></tr>
+<tr><td>Dyslipidémie mixte</td><td>0</td><td>+1</td><td>+2</td><td>+3</td><td>+3</td><td>+3</td></tr>
+<tr><td>Comorbidité CV</td><td>+1</td><td>+1</td><td>+2</td><td>+3</td><td>+4</td><td>+4</td></tr>
+<tr><td>CTI &gt;55</td><td>-2</td><td>0</td><td>+3</td><td>+4</td><td>-1</td><td>+2</td></tr>
+<tr><td>CTI 40-55</td><td>0</td><td>+2</td><td>+2</td><td>+2</td><td>+2</td><td>+3</td></tr>
+<tr><td>GRS R1</td><td>0</td><td>0</td><td>-1</td><td>-2</td><td>+5</td><td>+3</td></tr>
+<tr><td>GRS R2</td><td>0</td><td>+1</td><td>0</td><td>-1</td><td>+4</td><td>+4</td></tr>
+<tr><td>GRS R4/R5</td><td>+1</td><td><b>+1</b></td><td>+3</td><td>+4</td><td>-3</td><td>-1</td></tr>
+<tr><td>sf ≥80</td><td>-1</td><td>+1</td><td>+3</td><td>+4</td><td>+1</td><td>+2</td></tr>
+<tr><td>ASA ≥4</td><td>+3</td><td><b>+2</b></td><td>-5</td><td>-5</td><td>+3</td><td>+1</td></tr>
+<tr><td>BES ≥27</td><td>-2</td><td>-2</td><td>-5</td><td>-5</td><td>+2</td><td>-2</td></tr>
+<tr><td>BES 17-26</td><td>-1</td><td>-1</td><td>-1</td><td>-1</td><td>+1</td><td>+2</td></tr>
+<tr><td>PSS &gt;20</td><td>0</td><td>0</td><td>-1</td><td>-1</td><td>0</td><td>0</td></tr>
+<tr><td>ATCD Sleeve</td><td>-3</td><td>-2</td><td>-5</td><td>+5</td><td>+1</td><td>+1</td></tr>
+<tr><td>ATCD Ballon</td><td><b>-2</b></td><td>+2</td><td>+2</td><td>+2</td><td>+2</td><td>+2</td></tr>
+<tr><td>Refus chirurgie</td><td>+3</td><td>+3</td><td>-5</td><td>-5</td><td>+3</td><td>+3</td></tr>
+</table>
+<p class="ref">Valeurs en gras : modifiées par MOD-04 (ASA ≥4 ESG +2), MOD-07 (GRS R4/R5 ESG +1), MOD-08 (ATCD Ballon -2).</p>
+
+<h3>24.9 Table d'efficacité BT-6 (§4b Dossier v3.4)</h3>
+<table>
+<tr><th>ID</th><th>Association</th><th>TBWL 6m</th><th>TBWL 12m</th><th>TBWL 24m</th><th>DT2 / effet</th><th>Grade</th></tr>
+<tr><td>6a</td><td>ESG + GLP-1 RA</td><td>16-20 %</td><td>20-25 %</td><td>22-27 %</td><td>Rémission 65-70 %</td><td>1B</td></tr>
+<tr><td>6b</td><td>Bypass RYGB + Sémaglutide 2.4 mg</td><td>25-30 %</td><td>32-38 %</td><td>35-42 %</td><td>Rémission 85-92 %</td><td>1B</td></tr>
+<tr><td>6c</td><td>GLP-1 RA + SGLT-2i + Metformine</td><td>10-14 %</td><td>14-19 %</td><td>15-20 %</td><td>HbA1c -3.2 %</td><td>1A</td></tr>
+<tr><td>6d</td><td>Ballon Spatz3 + GLP-1 (pont)</td><td>13-17 %</td><td>18-22 %</td><td>—</td><td>Risque -35 %</td><td>2A</td></tr>
+<tr><td>6e</td><td>ESG + Buproprion-Naltrexone</td><td>14-18 %</td><td>18-22 %</td><td>19-24 %</td><td>BES -8 pts</td><td>2A</td></tr>
+</table>
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- XXV. FNC v1.0 — Normalisation Climatique Köppen -->
