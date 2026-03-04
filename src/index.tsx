@@ -573,19 +573,23 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <p><strong>Sources :</strong> OMS Asia-Pacific 2004, IDF 2006, Lancet 2016</p>
 <div style="overflow-x:auto">
 <table>
-<tr><th>Code</th><th>Nom</th><th>Surpoids</th><th>Obesite</th><th>TT F</th><th>TT M</th><th>Diab.</th><th>HTA</th><th>CV</th><th>Inflam</th><th>LDL</th><th>Var%</th></tr>
-<tr><td><code>eu</code></td><td>Europeen / Caucasien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td></tr>
-<tr><td><code>im</code></td><td>Indo-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.2</td><td>1.4</td><td>1.2</td><td>1.3</td><td>-1.5</td></tr>
-<tr><td><code>cr</code></td><td>Creole Mauricien</td><td>25</td><td>30</td><td>84</td><td>94</td><td>1.3</td><td>1.4</td><td>1.2</td><td>1.2</td><td>1.0</td><td>-2</td></tr>
-<tr><td><code>si</code></td><td>Sino-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.0</td><td>0.9</td><td>0.6</td><td>0.9</td><td>0.9</td><td>+1.5</td></tr>
-<tr><td><code>sa</code></td><td>Sud-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>-1.5</td></tr>
-<tr><td><code>af</code></td><td>Africain / Subsaharien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>1.0</td><td>-1.5</td></tr>
-<tr><td><code>ea</code></td><td>Est-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>88</td><td>0.9</td><td>0.9</td><td>0.7</td><td>0.9</td><td>0.9</td><td>+1.5</td></tr>
-<tr><td><code>se</code></td><td>Sud-Est Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.2</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td></tr>
-<tr><td><code>fm</code></td><td>Franco-Mauricien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>0.8</td><td>1.0</td><td>0.9</td><td>1.0</td><td>1.0</td><td>+1</td></tr>
+<tr><th>Code</th><th>Nom</th><th>Surpoids</th><th>Obesite</th><th>TT F</th><th>TT M</th><th>dR (DT2)</th><th>cvR (CV)</th><th>hR (HTA)</th><th>cR</th><th>iM</th><th>LDL</th><th>ev%</th></tr>
+<tr><td><code>eu</code></td><td>Europeen / Caucasien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td></tr>
+<tr><td><code>im</code></td><td>Indo-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.8</td><td>1.2</td><td>1.4</td><td>1.2</td><td>1.3</td><td>-1.5</td></tr>
+<tr><td><code>cr</code></td><td>Creole Mauricien</td><td>25</td><td>30</td><td>84</td><td>94</td><td>1.6</td><td>1.5</td><td>1.4</td><td>1.2</td><td>1.2</td><td>1.0</td><td>-2</td></tr>
+<tr><td><code>si</code></td><td>Sino-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.7</td><td>1.4</td><td>0.9</td><td>0.6</td><td>0.9</td><td>0.9</td><td>+1.5</td></tr>
+<tr><td><code>sa</code></td><td>Sud-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.8</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>-1.5</td></tr>
+<tr><td><code>af</code></td><td>Africain / Subsaharien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.5</td><td>1.6</td><td>1.5</td><td>1.2</td><td>1.3</td><td>1.0</td><td>-1.5</td></tr>
+<tr><td><code>ea</code></td><td>Est-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>88</td><td>0.9</td><td>0.9</td><td>0.9</td><td>0.7</td><td>0.9</td><td>0.9</td><td>+1.5</td></tr>
+<tr><td><code>se</code></td><td>Sud-Est Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.2</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td></tr>
+<tr><td><code>fm</code></td><td>Franco-Mauricien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0.9</td><td>1.0</td><td>1.0</td><td>+1</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td><code>met</code></td><td>Metis Mauricien</td><td>24</td><td>28</td><td>84</td><td>94</td><td>1.5</td><td>1.4</td><td>1.2</td><td>1.1</td><td>1.1</td><td>1.0</td><td>-0.5</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td><code>ar</code></td><td>Arabe / MENA</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.7</td><td>1.5</td><td>1.2</td><td>1.2</td><td>1.1</td><td>1.1</td><td>-1</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td><code>oth</code></td><td>Autre / Non specifie</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td></tr>
 </table>
 </div>
-<p><code>ow</code> = seuil surpoids IMC | <code>ob</code> = seuil obesite IMC | <code>tf/tm</code> = tour de taille seuil F/M (cm) | <code>dR</code> = risque diabetique | <code>hR</code> = risque HTA | <code>cR</code> = risque CV | <code>iM</code> = multiplicateur inflammation Layer A | <code>ev</code> = variation ethnique % appliquee a C</p>
+<p><code>ow</code> = seuil surpoids IMC | <code>ob</code> = seuil obesite IMC | <code>tf/tm</code> = tour de taille seuil F/M (cm) | <code>dR</code> = multiplicateur DT2 | <code>cvR</code> = multiplicateur CV | <code>hR</code> = risque HTA | <code>cR</code> = risque coronarien | <code>iM</code> = multiplicateur inflammation Layer A | <code>ev</code> = variation ethnique % appliquee a C</p>
+<p style="font-size:10px;color:var(--teal)">v3.4 : 12 profils (9 §Dossier Maitre + Est-Asiatique, Sud-Est Asiatique, Autre). Lignes vertes = ajouts v3.4 (Metis, Arabe/MENA, Autre).</p>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- 4. COMORBIDITES -->
@@ -1870,16 +1874,19 @@ de l'exposome. Les particules fines aggravent un terrain inflammatoire préexist
 <p>L'OMS reconnaît depuis 2004 que les seuils standard (25/30 kg/m²) sous-estiment le risque chez les populations asiatiques. Le rapport WHO Expert Consultation (Lancet 2004) recommande des seuils abaissés : 23/27.5 pour les Sud-Asiatiques et Est-Asiatiques. L'IDF (2006) a défini des seuils de tour de taille spécifiques par ethnie.</p>
 
 <table>
-<tr><th>Code</th><th>Groupe</th><th>Surpoids</th><th>Obésité</th><th>TT ♀</th><th>TT ♂</th><th>dR</th><th>hR</th><th>cR</th><th>iM</th><th>ldl</th><th>ev%</th><th>Références clés</th></tr>
-<tr><td>eu</td><td>Européen</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>OMS standard</td></tr>
-<tr><td>im</td><td>Indo-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.2</td><td>1.4</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>WHO 2004, IDF 2006, Ramachandran 2010</td></tr>
-<tr><td>cr</td><td>Créole Mauricien</td><td>25</td><td>30</td><td>84</td><td>94</td><td>1.3</td><td>1.4</td><td>1.2</td><td>1.2</td><td>1.0</td><td>-2</td><td>Mauritius NCD Survey, Soderberg 2005</td></tr>
-<tr><td>si</td><td>Sino-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.0</td><td>0.9</td><td>0.6</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO Asia-Pacific 2000, Chan 2009</td></tr>
-<tr><td>sa</td><td>Sud-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>Joshi 2007, INTERHEART SA</td></tr>
-<tr><td>af</td><td>Africain</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>1.0</td><td>-1.5</td><td>Peer 2012, IDF Africa</td></tr>
-<tr><td>ea</td><td>Est-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>88</td><td>0.9</td><td>0.9</td><td>0.7</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO 2004, Wen 2009</td></tr>
-<tr><td>se</td><td>Sud-Est Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.2</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>IDF 2006, Aekplakorn 2007</td></tr>
-<tr><td>fm</td><td>Franco-Mauricien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>0.8</td><td>1.0</td><td>0.9</td><td>1.0</td><td>1.0</td><td>+1</td><td>Profil européen standard, MNSDS</td></tr>
+<tr><th>Code</th><th>Groupe</th><th>Surpoids</th><th>Obésité</th><th>TT ♀</th><th>TT ♂</th><th>dR (DT2)</th><th>cvR (CV)</th><th>hR</th><th>cR</th><th>iM</th><th>ldl</th><th>ev%</th><th>Références clés</th></tr>
+<tr><td>eu</td><td>Européen</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>OMS standard</td></tr>
+<tr><td>im</td><td>Indo-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.8</td><td>1.2</td><td>1.4</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>WHO 2004, IDF 2006, Ramachandran 2010</td></tr>
+<tr><td>cr</td><td>Créole Mauricien</td><td>25</td><td>30</td><td>84</td><td>94</td><td>1.6</td><td>1.5</td><td>1.4</td><td>1.2</td><td>1.2</td><td>1.0</td><td>-2</td><td>Mauritius NCD Survey, Soderberg 2005</td></tr>
+<tr><td>si</td><td>Sino-Mauricien</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.7</td><td>1.4</td><td>0.9</td><td>0.6</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO Asia-Pacific 2000, Chan 2009</td></tr>
+<tr><td>sa</td><td>Sud-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>2.0</td><td>1.8</td><td>1.3</td><td>1.5</td><td>1.2</td><td>1.3</td><td>-1.5</td><td>Joshi 2007, INTERHEART SA</td></tr>
+<tr><td>af</td><td>Africain / Subsaharien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.5</td><td>1.6</td><td>1.5</td><td>1.2</td><td>1.3</td><td>1.0</td><td>-1.5</td><td>Peer 2012, IDF Africa</td></tr>
+<tr><td>ea</td><td>Est-Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>88</td><td>0.9</td><td>0.9</td><td>0.9</td><td>0.7</td><td>0.9</td><td>0.9</td><td>+1.5</td><td>WHO 2004, Wen 2009</td></tr>
+<tr><td>se</td><td>Sud-Est Asiatique</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.2</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>IDF 2006, Aekplakorn 2007</td></tr>
+<tr><td>fm</td><td>Franco-Mauricien</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0.9</td><td>1.0</td><td>1.0</td><td>+1</td><td>Profil européen standard, MNSDS</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td>met</td><td>Métis Mauricien</td><td>24</td><td>28</td><td>84</td><td>94</td><td>1.5</td><td>1.4</td><td>1.2</td><td>1.1</td><td>1.1</td><td>1.0</td><td>-0.5</td><td>Profil mixte, Mauritius NCD Survey</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td>ar</td><td>Arabe / MENA</td><td>23</td><td>27.5</td><td>80</td><td>90</td><td>1.7</td><td>1.5</td><td>1.2</td><td>1.2</td><td>1.1</td><td>1.1</td><td>-1</td><td>IDF MENA, Motala 2008, Al-Rubeaan 2015</td></tr>
+<tr style="background:rgba(20,184,166,.08)"><td>oth</td><td>Autre / Non spécifié</td><td>25</td><td>30</td><td>88</td><td>102</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>0</td><td>Profil Caucasien par défaut</td></tr>
 </table>
 
 <h3>9.2 Justification du multiplicateur diabète (dR)</h3>
