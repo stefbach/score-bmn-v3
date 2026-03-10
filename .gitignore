@@ -5,3 +5,5 @@ dist/
 *.pid
 *.log
 .pm2/
+__pycache__/
+*.pyc
