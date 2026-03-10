@@ -63,13 +63,12 @@ N_BOOTSTRAP = 2000            # Bootstrap replicates for CI
 CONFIDENCE_LEVEL = 0.95       # CI level
 MC_NOISE_SCALE = 0.05         # Monte Carlo perturbation scale for sensitivity
 
-# NHANES cycles to retrieve
+# NHANES cycles to retrieve — (cycle_label, suffix, start_year)
 NHANES_CYCLES = {
-    '2011-2012': 'G',
-    '2013-2014': 'H',
-    '2015-2016': 'I',
-    '2017-2018': 'J',
-    '2017-2020': 'P',   # Pre-pandemic
+    '2011-2012': ('G', 2011),
+    '2013-2014': ('H', 2013),
+    '2015-2016': ('I', 2015),
+    '2017-2018': ('J', 2017),
 }
 
 # NHANES data tables needed for BMN
@@ -108,11 +107,11 @@ print()
 # PART 1: NHANES DATA RETRIEVAL — COMPLETE COHORT
 # ═══════════════════════════════════════════════════════════════════════════
 
-def download_xpt(table_name, suffix, cycle_label, max_retries=3):
-    """Download a single NHANES XPT file from CDC."""
-    base_url = "https://wwwn.cdc.gov/Nchs/Nhanes"
+def download_xpt(table_name, suffix, start_year, max_retries=3):
+    """Download a single NHANES XPT file from CDC Public Data endpoint."""
+    # CDC Public Data endpoint (returns raw XPT, not HTML wrapper)
     filename = f"{table_name}_{suffix}.XPT"
-    url = f"{base_url}/{cycle_label}/{filename}"
+    url = f"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{start_year}/DataFiles/{filename}"
 
     cache_dir = os.path.join(OUTPUT_DIR, '.cache')
     os.makedirs(cache_dir, exist_ok=True)
@@ -129,10 +128,14 @@ def download_xpt(table_name, suffix, cycle_label, max_retries=3):
         try:
             print(f"    Downloading {filename}...", end=' ', flush=True)
             req = urllib.request.Request(url, headers={
-                'User-Agent': 'Mozilla/5.0 (BMN Research/3.4)'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             })
             with urllib.request.urlopen(req, timeout=60) as response:
+                content_type = response.headers.get('Content-Type', '')
                 data = response.read()
+                # Verify we got binary XPT, not HTML
+                if data[:15].startswith(b'<!DOCTYPE') or b'<html' in data[:100]:
+                    raise ValueError("Received HTML instead of XPT")
             df = pd.read_sas(BytesIO(data), format='xport')
             df.to_pickle(cache_file)
             print(f"OK ({len(df)} rows)")
@@ -146,13 +149,13 @@ def download_xpt(table_name, suffix, cycle_label, max_retries=3):
     return None
 
 
-def fetch_nhanes_cycle(cycle_label, suffix):
+def fetch_nhanes_cycle(cycle_label, suffix, start_year):
     """Fetch all NHANES tables for a given cycle."""
-    print(f"\n  Cycle {cycle_label} (suffix _{suffix}):")
+    print(f"\n  Cycle {cycle_label} (suffix _{suffix}, year={start_year}):")
     tables = {}
 
     for table_name in NHANES_TABLES:
-        df = download_xpt(table_name, suffix, cycle_label)
+        df = download_xpt(table_name, suffix, start_year)
         if df is not None:
             tables[table_name] = df
 
@@ -166,8 +169,8 @@ def fetch_complete_nhanes():
     print("━" * 78)
 
     all_cycles = {}
-    for cycle_label, suffix in NHANES_CYCLES.items():
-        tables = fetch_nhanes_cycle(cycle_label, suffix)
+    for cycle_label, (suffix, start_year) in NHANES_CYCLES.items():
+        tables = fetch_nhanes_cycle(cycle_label, suffix, start_year)
         if tables:
             all_cycles[cycle_label] = tables
 
@@ -1126,10 +1129,12 @@ def compute_bmn_score(row):
         val = row.get(bid)
         if val is None or (isinstance(val, float) and np.isnan(val)):
             continue
+        denom_inv = bdef['normal'] - bdef['abnormal']
+        denom_dir = bdef['abnormal'] - bdef['normal']
         if bdef['inv']:
-            z = (bdef['normal'] - val) / (bdef['normal'] - bdef['abnormal'])
+            z = (bdef['normal'] - val) / denom_inv if denom_inv != 0 else (1.0 if val < bdef['normal'] else 0.0)
         else:
-            z = (val - bdef['normal']) / (bdef['abnormal'] - bdef['normal'])
+            z = (val - bdef['normal']) / denom_dir if denom_dir != 0 else (1.0 if val > bdef['normal'] else 0.0)
         z = max(0, min(1, z))
         sumZW += z * bdef['w']
         sumW += bdef['w']
