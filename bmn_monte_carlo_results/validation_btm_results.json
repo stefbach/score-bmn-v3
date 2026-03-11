@@ -1,0 +1,218 @@
+{
+  "validation": {
+    "auc_grs_responder": 0.6503,
+    "auc_grs_resp_ci_low": 0.6402,
+    "auc_grs_resp_ci_high": 0.6604,
+    "auc_grs_super": 0.9963,
+    "auc_grs_super_ci_low": 0.9941,
+    "auc_grs_super_ci_high": 0.9982,
+    "auc_gri_responder": 0.5576,
+    "profile_R1_n": 386,
+    "profile_R1_resp_rate": 100.0,
+    "profile_R1_super_rate": 3.1,
+    "profile_R1_mean_tbwl": 15.8,
+    "profile_R2_n": 2761,
+    "profile_R2_resp_rate": 87.3,
+    "profile_R2_super_rate": 0.0,
+    "profile_R2_mean_tbwl": 12.9,
+    "profile_R3_n": 7658,
+    "profile_R3_resp_rate": 68.3,
+    "profile_R3_super_rate": 0.0,
+    "profile_R3_mean_tbwl": 10.6,
+    "profile_R4_n": 1644,
+    "profile_R4_resp_rate": 48.2,
+    "profile_R4_super_rate": 0.0,
+    "profile_R4_mean_tbwl": 9.9,
+    "profile_R5_n": 6,
+    "profile_R5_resp_rate": 0.0,
+    "profile_R5_super_rate": 0.0,
+    "profile_R5_mean_tbwl": 3.1,
+    "profile_CI_n": 278,
+    "profile_CI_resp_rate": 0.0,
+    "profile_CI_super_rate": 0.0,
+    "profile_CI_mean_tbwl": 4.9,
+    "brier_resp": 0.1866,
+    "nri": -0.4919,
+    "nri_events": -0.7192,
+    "nri_nonevents": 0.2273,
+    "idi": -0.0996,
+    "auc_baseline_lr": 0.7902,
+    "n_eligible": 12733
+  },
+  "subgroups": {
+    "Male": {
+      "n": 6006,
+      "auc": 0.6351,
+      "ci_lower": 0.6185,
+      "ci_upper": 0.6534,
+      "resp_rate": 78.4,
+      "mean_tbwl": 11.4
+    },
+    "Female": {
+      "n": 6727,
+      "auc": 0.6533,
+      "ci_lower": 0.641,
+      "ci_upper": 0.6669,
+      "resp_rate": 61.0,
+      "mean_tbwl": 10.7
+    },
+    "Age_18-39": {
+      "n": 4086,
+      "auc": 0.6287,
+      "ci_lower": 0.6093,
+      "ci_upper": 0.6494,
+      "resp_rate": 74.5,
+      "mean_tbwl": 10.9
+    },
+    "Age_40-59": {
+      "n": 4410,
+      "auc": 0.6142,
+      "ci_lower": 0.5947,
+      "ci_upper": 0.6342,
+      "resp_rate": 76.0,
+      "mean_tbwl": 11.3
+    },
+    "Age_60+": {
+      "n": 4237,
+      "auc": 0.7602,
+      "ci_lower": 0.7482,
+      "ci_upper": 0.7739,
+      "resp_rate": 57.1,
+      "mean_tbwl": 10.8
+    },
+    "BMI_27-30": {
+      "n": 4169,
+      "auc": 0.6895,
+      "ci_lower": 0.6672,
+      "ci_upper": 0.71,
+      "resp_rate": 81.1,
+      "mean_tbwl": 11.3
+    },
+    "BMI_30-35": {
+      "n": 4647,
+      "auc": 0.6803,
+      "ci_lower": 0.6631,
+      "ci_upper": 0.6977,
+      "resp_rate": 78.6,
+      "mean_tbwl": 11.4
+    },
+    "BMI_35-40": {
+      "n": 2183,
+      "auc": 0.7093,
+      "ci_lower": 0.689,
+      "ci_upper": 0.7309,
+      "resp_rate": 67.4,
+      "mean_tbwl": 11.3
+    },
+    "BMI_40+": {
+      "n": 1734,
+      "auc": 0.8448,
+      "ci_lower": 0.8222,
+      "ci_upper": 0.8659,
+      "resp_rate": 18.1,
+      "mean_tbwl": 9.0
+    },
+    "Eth_European": {
+      "n": 8643,
+      "auc": 0.6434,
+      "ci_lower": 0.6305,
+      "ci_upper": 0.6562,
+      "resp_rate": 69.1,
+      "mean_tbwl": 11.0
+    },
+    "Eth_African": {
+      "n": 3250,
+      "auc": 0.6731,
+      "ci_lower": 0.6535,
+      "ci_upper": 0.69,
+      "resp_rate": 65.5,
+      "mean_tbwl": 11.0
+    },
+    "Eth_EastAsian": {
+      "n": 840,
+      "auc": 0.6803,
+      "ci_lower": 0.6273,
+      "ci_upper": 0.7271,
+      "resp_rate": 85.7,
+      "mean_tbwl": 11.9
+    },
+    "DT2_Yes": {
+      "n": 2752,
+      "auc": 0.7806,
+      "ci_lower": 0.7614,
+      "ci_upper": 0.7997,
+      "resp_rate": 65.0,
+      "mean_tbwl": 12.0
+    },
+    "DT2_No": {
+      "n": 9981,
+      "auc": 0.652,
+      "ci_lower": 0.6405,
+      "ci_upper": 0.6635,
+      "resp_rate": 70.4,
+      "mean_tbwl": 10.8
+    },
+    "MetS_Yes": {
+      "n": 4777,
+      "auc": 0.7283,
+      "ci_lower": 0.7135,
+      "ci_upper": 0.7422,
+      "resp_rate": 67.2,
+      "mean_tbwl": 11.5
+    },
+    "MetS_No": {
+      "n": 7956,
+      "auc": 0.6751,
+      "ci_lower": 0.6622,
+      "ci_upper": 0.6887,
+      "resp_rate": 70.5,
+      "mean_tbwl": 10.8
+    }
+  },
+  "axis_sensitivity": {
+    "irScore": 0.5104,
+    "chronScore": 0.8129,
+    "inflamScore": 0.4664,
+    "psychoScore": 0.698,
+    "iatroScore": 0.5009,
+    "demoBonus": 0.533
+  },
+  "cohort_stats": {
+    "n_total": 22807,
+    "n_eligible_bmi27": 12733,
+    "mean_age": "48.1",
+    "pct_female": "51.7",
+    "mean_bmi": "29.1",
+    "mean_grs": "0.90",
+    "mean_gri": "0.76"
+  },
+  "mc_parameters": {
+    "n_mc_treatment": 1000,
+    "n_bootstrap": 2000,
+    "responder_threshold": 10.0,
+    "super_resp_threshold": 20.0
+  },
+  "profile_distribution": {
+    "R1": 436,
+    "R2": 3544,
+    "R3": 13458,
+    "R4": 4987,
+    "R5": 12,
+    "CI": 370
+  },
+  "molecule_distribution": {
+    "Semaglutide": 15901,
+    "Essai_GLP1": 4987,
+    "Tirzepatide": 1537,
+    "CI_redirect": 370,
+    "Chirurgie": 12
+  },
+  "strategy_distribution": {
+    "BT-5_GLP1": 15413,
+    "Surveillance": 6633,
+    "BT-2_ESG": 275,
+    "BT-3_Sleeve": 240,
+    "BT-6_ESG+GLP1": 139,
+    "BT-4_Bypass": 107
+  }
+}
