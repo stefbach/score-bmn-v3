@@ -640,7 +640,7 @@ def identify_missing_bmn_indicators(df):
         # Indicators NOT available in NHANES (must be modeled via Monte Carlo)
         'missing_from_nhanes': ['adipon', 'leptine', 'apob', 'tsh',
                                  'pss10', 'isi', 'bes',
-                                 'predimed']
+                                 'predimed', 'cpep', 'fgf21', 'glucag']
     }
 
     print("\n  BMN Indicator Availability Analysis:")
@@ -805,7 +805,68 @@ def monte_carlo_model_missing_indicators(df, n_simulations=N_MC_SIMULATIONS):
     ]
     df['predimed'] = (predimed_mu + np.random.normal(0, predimed_sigma, n)).clip(0, 14).astype(int)
 
-    print(f"\n  Monte Carlo modeling complete: 8 missing indicators modeled")
+    # ─── C-peptide (ng/mL) ───
+    # Literature: correlated with insulin resistance, BMI, beta-cell function
+    # Ref: Leighton et al. 2017; fasting C-peptide normal 0.8-3.1 ng/mL
+    print("  [MC] Modeling C-peptide (cpep)...")
+    # C-peptide correlates with HOMA-IR (r≈0.6) and BMI (r≈0.4)
+    cpep_mu = 0.8 + 0.15 * homa_vals + 0.02 * (bmi_vals - 25).clip(0, 20)
+    # T2DM with long duration may have low C-peptide (beta-cell depletion)
+    if 'has_diabetes' in df.columns and 'hba1c' in df.columns:
+        hba1c_vals = df['hba1c'].fillna(5.5)
+        # High HbA1c with low HOMA → beta-cell failure → low C-peptide
+        depletion_mask = (df['has_diabetes'] == 1) & (hba1c_vals >= 8.5)
+        cpep_mu = cpep_mu.copy()
+        cpep_mu[depletion_mask] = 0.4 + np.random.normal(0, 0.15, depletion_mask.sum())
+    cpep_mu = cpep_mu.clip(0.1, 5.0)
+    cpep_sigma = 0.4
+
+    df['cpep_mc_samples'] = [
+        np.random.normal(mu, cpep_sigma, n_simulations).clip(0.1, 6.0)
+        for mu in cpep_mu
+    ]
+    df['cpep'] = cpep_mu + np.random.normal(0, cpep_sigma, n)
+    df['cpep'] = df['cpep'].clip(0.1, 6.0)
+
+    # ─── FGF21 (pg/mL) ───
+    # Literature: elevated in obesity, NAFLD, MetS (paradoxical = FGF21 resistance)
+    # Ref: Fisher et al. 2010; normal <200, resistance >500
+    print("  [MC] Modeling FGF21 (fgf21)...")
+    # FGF21 increases with BMI, liver fat, and metabolic stress
+    fgf21_mu = 80 + 5.0 * (bmi_vals - 25).clip(0, 25) + 15.0 * homa_vals
+    if 'ggt' in df.columns:
+        ggt_vals = df['ggt'].fillna(30)
+        fgf21_mu += 0.5 * ggt_vals.clip(0, 200)
+    fgf21_mu = fgf21_mu.clip(30, 800)
+    fgf21_sigma = 80
+
+    df['fgf21_mc_samples'] = [
+        np.random.normal(mu, fgf21_sigma, n_simulations).clip(10, 1200)
+        for mu in fgf21_mu
+    ]
+    df['fgf21'] = fgf21_mu + np.random.normal(0, fgf21_sigma, n)
+    df['fgf21'] = df['fgf21'].clip(10, 1200)
+
+    # ─── Fasting Glucagon (pg/mL) ───
+    # Literature: elevated in T2DM and insulin resistance (alpha-cell dysregulation)
+    # Ref: Lund et al. 2014; normal 40-100, elevated >180
+    print("  [MC] Modeling Fasting Glucagon (glucag)...")
+    glucag_mu = 60 + 4.0 * homa_vals + 1.0 * (bmi_vals - 25).clip(0, 20)
+    if 'has_diabetes' in df.columns:
+        dt2_mask = df['has_diabetes'] == 1
+        glucag_mu = glucag_mu.copy()
+        glucag_mu[dt2_mask] += 30  # T2DM = hyperglucagonemia
+    glucag_mu = glucag_mu.clip(20, 300)
+    glucag_sigma = 25
+
+    df['glucag_mc_samples'] = [
+        np.random.normal(mu, glucag_sigma, n_simulations).clip(10, 400)
+        for mu in glucag_mu
+    ]
+    df['glucag'] = glucag_mu + np.random.normal(0, glucag_sigma, n)
+    df['glucag'] = df['glucag'].clip(10, 400)
+
+    print(f"\n  Monte Carlo modeling complete: 11 missing indicators modeled")
     print(f"  Each with {n_simulations} MC samples for sensitivity analysis")
 
     return df
@@ -950,6 +1011,9 @@ BIOMARKERS_DEF = {
     'asat':    {'w': 1.0, 'normal': 40,  'abnormal': 60,  'inv': False},
     'ggt':     {'w': 0.8, 'normal': 50,  'abnormal': 80,  'inv': False},
     'urate':   {'w': 0.8, 'normal': 360, 'abnormal': 420, 'inv': False},
+    'cpep':    {'w': 2.0, 'normal': 1.1, 'abnormal': 0.4, 'inv': True},
+    'fgf21':   {'w': 1.5, 'normal': 200, 'abnormal': 500, 'inv': False},
+    'glucag':  {'w': 1.3, 'normal': 100, 'abnormal': 180, 'inv': False},
 }
 
 
@@ -1288,6 +1352,9 @@ def monte_carlo_sensitivity_analysis(df, n_mc=200):
         'adipon': 2.0,             # ±2 μg/mL
         'leptine': 8.0,            # ±8 ng/mL
         'tghdl': 0.5,              # ±0.5
+        'cpep': 0.3,               # ±0.3 ng/mL
+        'fgf21': 60.0,             # ±60 pg/mL
+        'glucag': 20.0,            # ±20 pg/mL
     }
 
     sensitivity_results = {}
@@ -1989,7 +2056,8 @@ def generate_publication_figures(scored_datasets, validation_results,
 
     # ── Figure 6: Biomarker Heatmap ──
     biomarker_cols = ['homaIR', 'hba1c', 'crphs', 'tg', 'hdl', 'ldl',
-                       'glyc', 'adipon', 'leptine', 'tghdl', 'urate']
+                       'glyc', 'adipon', 'leptine', 'tghdl', 'urate',
+                       'cpep', 'fgf21', 'glucag']
     available_bio = [c for c in biomarker_cols if c in df_valid.columns]
     if available_bio:
         fig, ax = plt.subplots(1, 1, figsize=(10, 8))
@@ -2031,7 +2099,7 @@ def generate_publication_figures(scored_datasets, validation_results,
         print("    Fig 7: Model comparison saved")
 
     # ── Figure 8: MC Imputation Distributions ──
-    mc_indicators = ['adipon', 'leptine', 'apob', 'tsh', 'pss10', 'isi', 'bes', 'predimed']
+    mc_indicators = ['adipon', 'leptine', 'apob', 'tsh', 'pss10', 'isi', 'bes', 'predimed', 'cpep', 'fgf21', 'glucag']
     available_mc = [c for c in mc_indicators if c in df_valid.columns]
     if available_mc:
         n_cols = 4
@@ -2101,7 +2169,7 @@ OBJECTIVE: To validate the BMN v3.4 algorithm on the complete NHANES cohort
 recovery and comprehensive statistical metrics.
 
 METHODS: We analyzed {cohort_stats['n_total']} adults ≥18 years from {cohort_stats['n_cycles']}
-NHANES cycles ({cohort_stats['cycles']}). Missing BMN indicators (adiponectin,
+NHANES cycles ({cohort_stats['cycles']}). Missing BMN indicators (adiponectin, C-peptide, FGF21, glucagon,
 leptin, ApoB, TSH, PSS-10, ISI, BES, PREDIMED) were modeled using Monte Carlo
 simulation based on established literature distributions and available NHANES
 correlates. Multiple Imputation by Chained Equations (MICE, m={N_IMPUTATIONS})

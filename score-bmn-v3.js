@@ -822,7 +822,7 @@ export function computeGLP1Engine(patient, activeComorbidities, cti, bioValues) 
     profile = 'R2';
     respProb = '60-85%';
     firstLine = 'Semaglutide';
-  } else if (grs >= 0.3 && axes.chronAxis <= 6) {
+  } else if (grs >= 0.5 && axes.chronAxis <= 6 && axes.irAxis >= 1) {
     profile = 'R3';
     respProb = '30-60%';
     firstLine = 'Semaglutide + multimodal';

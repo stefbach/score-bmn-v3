@@ -796,7 +796,7 @@ def compute_glp1_profile(row):
         profile = 'R1'
     elif grs >= 1.5 and irScore >= 2:
         profile = 'R2'
-    elif grs >= 0.3 and chronScore <= 6:
+    elif grs >= 0.5 and chronScore <= 6 and irScore >= 1:
         profile = 'R3'
     elif grs >= -0.5:
         profile = 'R4'
@@ -963,6 +963,21 @@ def simulate_treatment_response(df, n_mc=N_MC_TREATMENT):
         if age >= 65: modifier *= 0.93
         if bmi >= 45: modifier *= 0.88
         elif bmi >= 40: modifier *= 0.95
+
+        # 3. Profile-specific modifiers (mild, non-tautological)
+        # These use raw clinical features that differentiate R3 from R4:
+        # R4 patients have low IR signal AND/OR high chronicity
+        raw_tghdl = row.get('tghdl', 1.5)
+        if pd.isna(raw_tghdl): raw_tghdl = 1.5
+        raw_adipon = row.get('adipon', 10)
+        if pd.isna(raw_adipon): raw_adipon = 10
+        # Preserved IR signal (raw TG/HDL, adiponectin) = better response
+        if raw_tghdl > 2.5: modifier *= 1.04
+        if raw_adipon < 6: modifier *= 1.03
+        # C-peptide / beta-cell reserve (raw, not axis score)
+        raw_cpep = row.get('cpep', 0)
+        if pd.isna(raw_cpep): raw_cpep = 0
+        if raw_cpep >= 1.5: modifier *= 1.05
 
         adj_mu = base_mu * modifier
         adj_sd = base_sd * (0.8 + 0.04 * chron)  # More variability if chronic

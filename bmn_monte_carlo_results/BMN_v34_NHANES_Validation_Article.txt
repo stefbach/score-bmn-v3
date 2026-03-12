@@ -22,7 +22,7 @@ OBJECTIVE: To validate the BMN v3.4 algorithm on the complete NHANES cohort
 recovery and comprehensive statistical metrics.
 
 METHODS: We analyzed 22807 adults ≥18 years from 4
-NHANES cycles (2011-2012, 2013-2014, 2015-2016, 2017-2018). Missing BMN indicators (adiponectin,
+NHANES cycles (2011-2012, 2013-2014, 2015-2016, 2017-2018). Missing BMN indicators (adiponectin, C-peptide, FGF21, glucagon,
 leptin, ApoB, TSH, PSS-10, ISI, BES, PREDIMED) were modeled using Monte Carlo
 simulation based on established literature distributions and available NHANES
 correlates. Multiple Imputation by Chained Equations (MICE, m=25)
@@ -30,10 +30,10 @@ handled partially-missing NHANES variables. Primary endpoints: Metabolic Syndrom
 (IDF-harmonized) and Obesity (BMI ≥30 kg/m²).
 
 RESULTS: The BMN v3.4 algorithm achieved:
-  - MetS: AUC-ROC = 0.875 (95% CI: 0.873–0.877)
-  - Obesity: AUC-ROC = 0.776 (95% CI: 0.774–0.779)
-  - Brier Score (MetS): 0.1732
-  - NRI vs Logistic Regression: -0.226 (p=0.0000)
+  - MetS: AUC-ROC = 0.876 (95% CI: 0.875–0.878)
+  - Obesity: AUC-ROC = 0.778 (95% CI: 0.776–0.780)
+  - Brier Score (MetS): 0.1771
+  - NRI vs Logistic Regression: -0.211 (p=0.0000)
 Monte Carlo indicator recovery validation showed 95% coverage probabilities
 ≥56%
 for all tested variables.
@@ -201,14 +201,14 @@ Table 1. BMN v3.4 Performance for Metabolic Syndrome Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ AUC-ROC (Rubin's)        │    0.875         │ 0.873–0.877       ║
-║ AUC-ROC (Bootstrap)      │    0.875         │ 0.874–0.876       ║
-║ Brier Score               │   0.1732         │ ±0.0000          ║
-║ NRI (vs LogReg)           │   -0.226         │ p=0.0000          ║
-║   NRI (events)            │   -0.282         │                  ║
-║   NRI (non-events)        │   +0.056         │                  ║
-║ IDI                       │  -0.1741         │                  ║
-║ Hosmer-Lemeshow χ²        │   3686.8         │ p=0.0000          ║
+║ AUC-ROC (Rubin's)        │    0.876         │ 0.875–0.878       ║
+║ AUC-ROC (Bootstrap)      │    0.876         │ 0.875–0.877       ║
+║ Brier Score               │   0.1771         │ ±0.0000          ║
+║ NRI (vs LogReg)           │   -0.211         │ p=0.0000          ║
+║   NRI (events)            │   -0.254         │                  ║
+║   NRI (non-events)        │   +0.043         │                  ║
+║ IDI                       │  -0.1702         │                  ║
+║ Hosmer-Lemeshow χ²        │   4186.0         │ p=0.0000          ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 3.3 Secondary Validation: Obesity
@@ -217,16 +217,16 @@ Table 2. BMN v3.4 Performance for Obesity Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ AUC-ROC (Rubin's)        │    0.776         │ 0.774–0.779       ║
-║ Brier Score               │   0.2106         │ ±0.0000          ║
-║ NRI (vs LogReg)           │   -0.083         │ p=0.0000          ║
+║ AUC-ROC (Rubin's)        │    0.778         │ 0.776–0.780       ║
+║ Brier Score               │   0.2151         │ ±0.0000          ║
+║ NRI (vs LogReg)           │   -0.064         │ p=0.0000          ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 3.4 Comparative Model Analysis
 
 Table 3. Comparison with Machine Learning Models (MetS)
 ╔════════════════════════════════════════════════════════════════╗
-║ BMN v3.4                  │ 0.875 (0.870–0.879) │
+║ BMN v3.4                  │ 0.876 (0.871–0.880) │
 ║ Logistic Regression       │ 0.907 (0.903–0.911) │
 ║ Random Forest             │ 0.946 (0.944–0.949) │
 ║ Gradient Boosting         │ 0.949 (0.947–0.952) │
@@ -237,16 +237,16 @@ Table 3. Comparison with Machine Learning Models (MetS)
 The sensitivity analysis (Figure 4) revealed the following variable importance
 ranking for the BMN final score (sf), measured as mean absolute change in sf
 per unit perturbation:
-   1. hba1c                 : Δsf = 1.11 (P5-P95: -1.0 to 2.0)
-   2. adipon                : Δsf = 0.54 (P5-P95: -2.0 to 2.0)
-   3. leptine               : Δsf = 0.38 (P5-P95: -1.0 to 1.0)
-   4. homaIR                : Δsf = 0.28 (P5-P95: -1.0 to 1.0)
-   5. sleepHours            : Δsf = 0.26 (P5-P95: 0.0 to 2.0)
-   6. bmi                   : Δsf = 0.25 (P5-P95: -1.0 to 1.0)
-   7. ldl                   : Δsf = 0.23 (P5-P95: -1.0 to 1.0)
-   8. glyc                  : Δsf = 0.19 (P5-P95: 0.0 to 1.0)
-   9. pss10                 : Δsf = 0.13 (P5-P95: -1.0 to 1.0)
-  10. hdl                   : Δsf = 0.13 (P5-P95: 0.0 to 1.0)
+   1. hba1c                 : Δsf = 1.11 (P5-P95: -1.0 to 1.0)
+   2. adipon                : Δsf = 0.42 (P5-P95: -1.0 to 2.0)
+   3. leptine               : Δsf = 0.30 (P5-P95: -1.0 to 1.0)
+   4. cpep                  : Δsf = 0.30 (P5-P95: -1.0 to 1.0)
+   5. sleepHours            : Δsf = 0.28 (P5-P95: 0.0 to 2.0)
+   6. bmi                   : Δsf = 0.27 (P5-P95: -1.0 to 1.0)
+   7. homaIR                : Δsf = 0.22 (P5-P95: -1.0 to 1.0)
+   8. ldl                   : Δsf = 0.19 (P5-P95: -1.0 to 1.0)
+   9. glyc                  : Δsf = 0.15 (P5-P95: 0.0 to 1.0)
+  10. pss10                 : Δsf = 0.15 (P5-P95: -1.0 to 1.0)
 
 The most influential variables are anthropometric measures (BMI, waist
 circumference) and metabolic biomarkers (HOMA-IR, HbA1c), consistent with
@@ -255,24 +255,24 @@ known pathophysiology of metabolic syndrome.
 3.6 Subgroup Analysis
 
 Table 4. AUC-ROC by Subgroup (MetS)
-  Age: 18-39                         : 0.875 (0.867–0.883)
-  Age: 40-59                         : 0.857 (0.849–0.866)
-  Age: 60+                           : 0.836 (0.827–0.845)
-  BMI: Normal (<25)                  : 0.883 (0.872–0.893)
-  BMI: Obese (≥30)                   : 0.829 (0.820–0.837)
-  BMI: Overweight (25-30)            : 0.845 (0.837–0.854)
-  Ethnicity: af                      : 0.887 (0.878–0.896)
-  Ethnicity: ea                      : 0.875 (0.861–0.887)
-  Ethnicity: eu                      : 0.877 (0.871–0.882)
-  Sex: F                             : 0.868 (0.861–0.874)
-  Sex: M                             : 0.882 (0.876–0.889)
+  Age: 18-39                         : 0.876 (0.867–0.884)
+  Age: 40-59                         : 0.858 (0.850–0.866)
+  Age: 60+                           : 0.837 (0.829–0.846)
+  BMI: Normal (<25)                  : 0.884 (0.874–0.893)
+  BMI: Obese (≥30)                   : 0.830 (0.822–0.839)
+  BMI: Overweight (25-30)            : 0.848 (0.839–0.857)
+  Ethnicity: af                      : 0.891 (0.883–0.900)
+  Ethnicity: ea                      : 0.878 (0.865–0.891)
+  Ethnicity: eu                      : 0.877 (0.872–0.883)
+  Sex: F                             : 0.868 (0.862–0.874)
+  Sex: M                             : 0.884 (0.878–0.890)
 
 3.7 Monte Carlo Indicator Recovery Validation
 
 Table 5. Validation of MC-Modeled Indicators
-  HOMA-IR   : Coverage=62.2%, r=0.242, RMSE=8.120, Bias=-3.482
-  hs-CRP    : Coverage=55.8%, r=0.275, RMSE=7.778, Bias=-3.404
-  HDL       : Coverage=89.1%, r=0.398, RMSE=0.383, Bias=-0.054
+  HOMA-IR   : Coverage=62.3%, r=0.243, RMSE=8.121, Bias=-3.483
+  hs-CRP    : Coverage=55.7%, r=0.276, RMSE=7.777, Bias=-3.404
+  HDL       : Coverage=89.2%, r=0.399, RMSE=0.383, Bias=-0.054
 
 The Monte Carlo modeling approach achieved ≥80% coverage probabilities
 for all tested variables, validating the approach for indicators absent
@@ -285,8 +285,8 @@ from NHANES.
 4.1 Principal Findings
 
 The BMN v3.4 algorithm demonstrates robust discriminative performance for
-metabolic syndrome prediction on the NHANES cohort, with AUC-ROC = 0.875
-(95% CI: 0.873–0.877). This is consistent with our
+metabolic syndrome prediction on the NHANES cohort, with AUC-ROC = 0.876
+(95% CI: 0.875–0.878). This is consistent with our
 previous single-cycle validation (AUC 0.849 on NHANES 2017-2018) and compares
 favorably with established metabolic risk scores:
 

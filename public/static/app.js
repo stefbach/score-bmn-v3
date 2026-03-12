@@ -119,7 +119,10 @@ const BIO=[
   {id:'ggt',n:'GGT',u:'UI/L',nm:50,ab:80,w:.8,inv:0,t:10,nr:'< 50',ar:'>= 80',l:'Foie / Alcool'},
   {id:'tghdl',n:'Ratio TG/HDL',u:'',nm:2,ab:3.5,w:2,inv:0,t:15,nr:'< 2.0',ar:'>= 3.5',l:'IR cachee'},
   {id:'urate',n:'Acide urique',u:'umol/L',nm:360,ab:420,w:.8,inv:0,t:15,nr:'< 360',ar:'>= 420',l:'Goutte / MetS'},
-  {id:'leptine',n:'Leptine',u:'ng/mL',nm:20,ab:40,w:1.5,inv:0,t:15,nr:'< 20',ar:'>= 40',l:'Hormone satiete'}
+  {id:'leptine',n:'Leptine',u:'ng/mL',nm:20,ab:40,w:1.5,inv:0,t:15,nr:'< 20',ar:'>= 40',l:'Hormone satiete'},
+  {id:'cpep',n:'C-peptide',u:'ng/mL',nm:1.1,ab:0.4,w:2.0,inv:1,t:15,nr:'>= 1.1',ar:'< 0.4',l:'Reserve beta-cellulaire'},
+  {id:'fgf21',n:'FGF21',u:'pg/mL',nm:200,ab:500,w:1.5,inv:0,t:15,nr:'< 200',ar:'>= 500',l:'Stress metabolique'},
+  {id:'glucag',n:'Glucagon a jeun',u:'pg/mL',nm:100,ab:180,w:1.3,inv:0,t:15,nr:'< 100',ar:'>= 180',l:'Dysregulation alpha-cellulaire'}
 ];
 
 // ─── PSS-10 (Cohen, Kamarck & Mermelstein 1983) ───
@@ -1966,13 +1969,38 @@ function getGLP1Profile(){
   if(e.dR>=1.5) demoBonus+=0.5; // Ethnies IR = meilleure reponse
   if(S.comorbIds.includes('sopk')) demoBonus+=0.5; // SOPK = excellente reponse
 
+  // ── AXE 7: Fonction beta-cellulaire / secretoire (-3 a +5) ──
+  // Reserve beta-cellulaire preservee = meilleure reponse GLP-1 (effet incretine)
+  let betaCellAxis=0;
+  if(v.cpep!==undefined){
+    if(v.cpep>=2.0) betaCellAxis+=2;       // Reserve secretoire forte
+    else if(v.cpep>=1.1) betaCellAxis+=1;   // Fonction normale
+    if(v.cpep<0.4) betaCellAxis-=2;         // Depletion beta-cellulaire
+  } else {
+    // Proxy: HOMA-IR + HbA1c comme substitut
+    const homaProxy=v.homaIR||0, hba1cProxy=v.hba1c||5.5;
+    if(homaProxy>=2.5 && hba1cProxy<7.0) betaCellAxis+=1;  // IR-driven, beta preservee
+    if(hba1cProxy>=8.5) betaCellAxis-=1;  // Probable depletion beta
+  }
+  // FGF21 resistance (FGF21 eleve = stress metabolique chronique)
+  if(v.fgf21!==undefined){
+    if(v.fgf21>=500) betaCellAxis-=1;      // Resistance FGF21
+    else if(v.fgf21<=200) betaCellAxis+=1;  // Signaling FGF21 sain
+  }
+  // Glucagon a jeun (hyperglucagonemie = dysregulation alpha-cellulaire)
+  if(v.glucag!==undefined){
+    if(v.glucag>=180) betaCellAxis-=1;      // Dysregulation alpha
+    else if(v.glucag<=100) betaCellAxis+=1;  // Suppression normale
+  }
+  betaCellAxis=Math.max(-3,Math.min(5,betaCellAxis));
+
   // ════════════════════════════════════════════════════
   // SCORE COMPOSITE DE REPONSE GLP-1 (GRS: GLP-1 Response Score)
   // ════════════════════════════════════════════════════
-  // Facteurs positifs: IR + inflammation + demo
-  // Facteurs negatifs: chronicite + psycho + iatrogene
-  const posFactor = irScore*0.35 + inflamScore*0.15 + demoBonus;
-  const negFactor = chronScore*0.20 + psychoScore*0.15 + iatroScore*0.20;
+  // 7 axes: IR + inflammation + demo + betaCell (positifs)
+  //         chronicite + psycho + iatrogene + betaCell neg (negatifs)
+  const posFactor = irScore*0.30 + inflamScore*0.12 + demoBonus + Math.max(0,betaCellAxis)*0.08;
+  const negFactor = chronScore*0.18 + psychoScore*0.12 + iatroScore*0.15 + Math.max(0,-betaCellAxis)*0.05;
   let grs = posFactor - negFactor;
   // Calibrer sur le GRI existant pour coherence
   grs = (grs + gri) / 2;
@@ -2044,7 +2072,7 @@ function getGLP1Profile(){
       maintenance:'Traitement prolonge recommande (>12 mois). Reevaluation a 6 mois: si <5% de perte → envisager switch ou ajout.',
       alternative:'Si reponse <5% a 6 mois: switch Sema→Tirze ou vice versa | Ajouter Metformine si IR persistante'
     };
-  } else if(grs>=0.3 && chronScore<=6){
+  } else if(grs>=0.5 && chronScore<=6 && irScore>=1){
     profileCode='R3';
     profile={
       code:'R3',
@@ -2127,6 +2155,9 @@ function getGLP1Profile(){
   if(S.comorbIds.includes('dt2') && imc>=30) efficacyFactors.push({t:'DT2 + Obesite',d:'Double indication: controle glycemique + ponderal',s:2,ref:'SURMOUNT 2'});
   if(v.tghdl!==undefined && v.tghdl>3.0) efficacyFactors.push({t:'Dyslipidemie atherogenique',d:'TG/HDL eleve = IR periph., GLP-1 efficace sur ce profil',s:1,ref:'Sattar 2021'});
   if(inflamScore>=4) efficacyFactors.push({t:'Profil inflammatoire eleve (SII ≥ 4)',d:'L\'inflammation chronique renforce la cible GLP-1',s:2,ref:'Brook 2010'});
+  if(betaCellAxis>=2) efficacyFactors.push({t:'Reserve beta-cellulaire preservee',d:'C-peptide eleve = effet incretine potentialise',s:2,ref:'Nauck & Meier 2016'});
+  if(v.cpep!==undefined && v.cpep>=1.5) efficacyFactors.push({t:'C-peptide ≥ 1.5 ng/mL',d:'Secretion insuline residuelle forte, GLP-1 optimal',s:2,ref:'STEP 2/Nauck 2016'});
+  if(v.fgf21!==undefined && v.fgf21<=200) efficacyFactors.push({t:'FGF21 normal',d:'Axe hepatique GLP-1R→FGF21 fonctionnel',s:1,ref:'ScienceDirect 2024'});
 
   // Facteurs de resistance (-)
   if(chronScore>=6) resistanceFactors.push({t:'Chronicite installee (CTI '+S.cti+')',d:'Set-point pondere durablement deplace, resistance aux mecanismes de satiete',s:3,ref:'Leibel 1995/Sumithran 2011'});
@@ -2143,6 +2174,9 @@ function getGLP1Profile(){
   if(S.enf_ob>=2) resistanceFactors.push({t:'Obesite installee depuis l\'enfance',d:'Programmation epigenetique: hyperplasie adipocytaire irreversible',s:2,ref:'Geserick 2018'});
   if(age>=65) resistanceFactors.push({t:'Age ≥ 65 ans',d:'Sarcopenie: risque de perte musculaire sous GLP-1, necessite AP structure',s:1,ref:'Rubino 2022'});
   if(S.comorbIds.includes('hypo') && (v.tsh===undefined || v.tsh>=6)) resistanceFactors.push({t:'Hypothyroidie mal controlee',d:'Metabolisme basal abaisse, corriger TSH AVANT GLP-1',s:2,ref:''});
+  if(betaCellAxis<=-2) resistanceFactors.push({t:'Depletion beta-cellulaire',d:'C-peptide bas = effet incretine reduit, envisager insuline',s:3,ref:'Nauck & Meier 2016'});
+  if(v.fgf21!==undefined && v.fgf21>=500) resistanceFactors.push({t:'Resistance FGF21 (≥ 500)',d:'Stress metabolique chronique, axe GLP-1R→FGF21 sature',s:2,ref:'ScienceDirect 2024'});
+  if(v.glucag!==undefined && v.glucag>=180) resistanceFactors.push({t:'Hyperglucagonemie a jeun',d:'Dysregulation alpha-cellulaire, GLP-1 moins efficace sur suppression glucagon',s:2,ref:'Lund 2014'});
 
   // Tri par severite
   efficacyFactors.sort((a,b)=>b.s-a.s);
@@ -2176,7 +2210,7 @@ function getGLP1Profile(){
     profileCode,
     profile,
     grs:Math.round(grs*100)/100,
-    axes:{irScore:Math.round(irScore*10)/10, chronScore:Math.round(chronScore*10)/10, inflamScore:Math.round(inflamScore*10)/10, psychoScore:Math.round(psychoScore*10)/10, iatroScore:Math.round(iatroScore*10)/10},
+    axes:{irScore:Math.round(irScore*10)/10, chronScore:Math.round(chronScore*10)/10, inflamScore:Math.round(inflamScore*10)/10, psychoScore:Math.round(psychoScore*10)/10, iatroScore:Math.round(iatroScore*10)/10, betaCellAxis:Math.round(betaCellAxis*10)/10},
     efficacyFactors,
     resistanceFactors,
     ppeEstimate,
@@ -2499,22 +2533,22 @@ function applyBioProfile(profile){
     normal:{
       homaIR:1.8, hba1c:5.2, glyc:4.8, crphs:0.5, tsh:2.0, ldl:2.4, hdl:1.4,
       tg:1.2, adipon:14, asat:25, apob:0.7, ggt:30,
-      tghdl:1.2, urate:300, leptine:12
+      tghdl:1.2, urate:300, leptine:12, cpep:1.8, fgf21:120, glucag:70
     },
     borderline:{
       homaIR:3.2, hba1c:5.9, glyc:5.8, crphs:2.0, tsh:3.5, ldl:3.5, hdl:0.85,
       tg:1.9, adipon:8, asat:48, apob:1.0, ggt:60,
-      tghdl:2.7, urate:385, leptine:28
+      tghdl:2.7, urate:385, leptine:28, cpep:1.0, fgf21:280, glucag:120
     },
     elevated:{
       homaIR:4.5, hba1c:6.8, glyc:7.5, crphs:4.0, tsh:6.0, ldl:4.5, hdl:0.65,
       tg:2.5, adipon:5, asat:65, apob:1.3, ggt:85,
-      tghdl:3.8, urate:440, leptine:45
+      tghdl:3.8, urate:440, leptine:45, cpep:0.6, fgf21:450, glucag:160
     },
     critical:{
       homaIR:6.0, hba1c:8.2, glyc:10, crphs:8.0, tsh:10, ldl:5.5, hdl:0.5,
       tg:3.5, adipon:3, asat:90, apob:1.6, ggt:120,
-      tghdl:5.0, urate:520, leptine:65
+      tghdl:5.0, urate:520, leptine:65, cpep:0.3, fgf21:650, glucag:220
     }
   };
 
@@ -2651,15 +2685,23 @@ function renderFinal(){
         {n:'Chronicite / Resistance',v:ax.chronScore,max:10,good:false,c:'var(--red)'},
         {n:'Inflammation',v:ax.inflamScore,max:10,good:true,c:'var(--orange)'},
         {n:'Psycho-comportemental',v:ax.psychoScore,max:10,good:false,c:'var(--purple)'},
-        {n:'Iatrogene',v:ax.iatroScore,max:5,good:false,c:'var(--red)'}
-      ].map(a=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        {n:'Iatrogene',v:ax.iatroScore,max:5,good:false,c:'var(--red)'},
+        {n:'Beta-cellulaire',v:Math.max(0,ax.betaCellAxis),max:5,good:true,c:'var(--accent)',neg:Math.min(0,ax.betaCellAxis)}
+      ].map(a=>{
+        const isBeta=(a.neg!==undefined);
+        const barPct=Math.round(a.v/a.max*100);
+        const barCol=isBeta?(a.neg<0?'var(--red)':'var(--green)'):a.good?'var(--green)':a.c;
+        const valTxt=isBeta?(a.neg<0?a.neg+'/'+a.max:'+'+a.v+'/'+a.max):a.v+'/'+a.max;
+        const valCol=isBeta?(a.neg<0?'var(--red)':a.v>=2?'var(--green)':'var(--dim3)'):(a.good&&a.v>=4?'var(--green)':!a.good&&a.v>=4?a.c:'var(--dim3)');
+        const arrow=isBeta?(a.neg<0?'↓':a.v>=2?'↑':''):(a.good?(a.v>=4?'↑':''):(a.v>=4?'↓':''));
+        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <div style="min-width:130px;font-size:10px;color:var(--dim)">${a.n}</div>
         <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
-          <div style="width:${Math.round(a.v/a.max*100)}%;height:100%;background:${a.good?'var(--green)':a.c};border-radius:3px"></div>
+          <div style="width:${barPct}%;height:100%;background:${barCol};border-radius:3px"></div>
         </div>
-        <div style="min-width:28px;font-size:10px;font-weight:700;color:${a.good&&a.v>=4?'var(--green)':!a.good&&a.v>=4?a.c:'var(--dim3)'}; text-align:right">${a.v}/${a.max}</div>
-        <div style="min-width:12px;font-size:9px">${a.good?(a.v>=4?'↑':''):(a.v>=4?'↓':'')}</div>
-      </div>`).join('')}
+        <div style="min-width:36px;font-size:10px;font-weight:700;color:${valCol}; text-align:right">${valTxt}</div>
+        <div style="min-width:12px;font-size:9px">${arrow}</div>
+      </div>`;}).join('')}
     </div>
 
     <!-- Perte de poids estimee -->
@@ -2732,7 +2774,7 @@ function renderFinal(){
 
     <!-- Avertissement bio -->
     ${!glp1.hasBio?`<div style="padding:8px 16px;border-top:1px solid var(--orange);background:rgba(245,158,11,.08)">
-      <div style="font-size:10px;color:var(--orange);font-weight:600">⚠ Profil base sur les donnees declaratives uniquement. La biologie (HOMA-IR, adiponectine, leptine) affinera significativement cette prediction.</div>
+      <div style="font-size:10px;color:var(--orange);font-weight:600">⚠ Profil base sur les donnees declaratives uniquement. La biologie (HOMA-IR, adiponectine, leptine, C-peptide, FGF21, glucagon) affinera significativement cette prediction.</div>
     </div>`:''}
 
   </div>`;
