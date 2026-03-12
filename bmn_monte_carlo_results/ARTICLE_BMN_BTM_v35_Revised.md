@@ -2,7 +2,7 @@
 
 **Authors:** Bach S, Manos A, Noel P
 
-**Corresponding author:** [corresponding author email]
+**Corresponding author:** S. Bach (stefbach@protonmail.com)
 
 **Date:** March 2026
 
@@ -274,7 +274,7 @@ The Mayo Clinic approach has been commercialized as the MyPhenome® test (Phenom
 
 The BMN v3.5 and Mayo Clinic/Phenomix approaches differ fundamentally: MyPhenome requires specialized testing (gastric emptying scintigraphy, ad libitum meal studies, or a proprietary polygenic saliva test from 22 genes), while the BMN operates from routinely available clinical and biochemical variables. The BMN captures chronicity trajectory and metabolic entrenchment—dimensions absent from the phenotypic model—while lacking gastric emptying rate, a measurable variable strongly predictive in the "Hungry Gut" phenotype. Integration of gastric emptying as an optional Axis 8 input in future versions deserves evaluation.
 
-A third concurrent development is the CTSGRS (Calories-to-Satiation Gene Risk Score, Cifuentes et al., Cell Metabolism 2025^18^), a machine-learning genetic score derived from 10 gut-brain axis genes (SIM1, PCSK1, SH2B1, LEPR, UCP2, FTO, TCF7L2, GLP1R, TNFRSF11A, ADRA2A). The CTSGRS achieved AUC 0.85 (training) and 0.69 (validation) for predicting satiation threshold, with differential response between phentermine-topiramate (favored by high CTSGRS) and liraglutide (favored by low CTSGRS). In a post-bariatric semaglutide application (N=68), AUC was 0.63 for TBWL ≥10%^19^—virtually identical to the BMN GRS AUC (0.650), suggesting that the binary response prediction ceiling is similar across clinical and genetic approaches. Notably, the two tools operate on fundamentally different inputs: the CTSGRS is a pure genetic score, while the BMN GRS integrates seven clinical and metabolic axes available without genotyping.
+A third concurrent development is the CTSGRS (Calories-to-Satiation Gene Risk Score, Cifuentes et al., Cell Metabolism 2025^18^), a machine-learning genetic score derived from 10 gut-brain axis genes (SIM1, PCSK1, SH2B1, LEPR, UCP2, FTO, TCF7L2, GLP1R, TNFRSF11A, ADRA2A). The CTSGRS achieved AUC 0.85 (training) and 0.69 (validation) for predicting satiation threshold, with differential response between phentermine-topiramate (favored by high CTSGRS) and liraglutide (favored by low CTSGRS). In a post-bariatric semaglutide application (N=68), AUC was 0.63 for TBWL ≥10%^19^—comparable to the BMN GRS AUC (0.571 overall, 0.681 in T2DM subgroup), suggesting that the binary response prediction ceiling is similar across clinical and genetic approaches. Notably, the two tools operate on fundamentally different inputs: the CTSGRS is a pure genetic score, while the BMN GRS integrates seven clinical and metabolic axes available without genotyping.
 
 Finally, a 2024 Nature Medicine study by Coral et al. (Lund University) proposed precision subclassification of obesity using multi-ancestry biobank data, identifying subgroups with markedly divergent cardiometabolic trajectories within the same BMI stratum.^28^ This reinforces the BMN's CLEO architecture principle that BMI-agnostic, biology-driven stratification improves prediction.
 
@@ -333,7 +333,7 @@ The Score BMN v3.5 demonstrates robust metabolic risk prediction (AUC = 0.876 fo
 
 ## DATA AVAILABILITY
 
-NHANES data: CDC NCHS (https://www.cdc.gov/nchs/nhanes/). Algorithm source code: [repository URL upon publication].
+NHANES data: CDC NCHS (https://www.cdc.gov/nchs/nhanes/). Algorithm source code: https://github.com/stefbach/score-bmn-v3.
 
 ## CONFLICT OF INTEREST
 
@@ -406,7 +406,7 @@ SB: Conceptualization, algorithm design, statistical analysis, manuscript writin
 
 **Figure 1.** Schematic overview of the Score BMN v3.5 algorithm architecture. CLEO declarative score (sD) and biological normalization (bioNorm) combine into the final metabolic risk score (sf). The CTI and 7-axis GRS feed into the BTM for therapeutic strategy selection.
 
-**Figure 2.** ROC curves for MetS prediction: BMN v3.5 (AUC=0.875) vs. logistic regression and comparison with published FINDRISC/FRS ranges.
+**Figure 2.** ROC curves for MetS prediction: BMN v3.5 (AUC=0.876) vs. logistic regression and comparison with published FINDRISC/FRS ranges.
 
 **Figure 3.** Calibration plot (observed vs. predicted MetS probability by decile).
 

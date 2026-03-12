@@ -68,21 +68,23 @@ COMORBIDITIES_DEF = {
     "depres": {"pts": 4, "ca": 1.0, "gr": 0},
 }
 
+# BIOMARKERS_DEF — CANONICAL values aligned with app.js / score-bmn-v3.js / nhanes.py
 BIOMARKERS_DEF = {
-    "hba1c":    {"normal": 5.6, "abnormal": 7.0, "inv": False, "w": 3.0},
-    "glucose":  {"normal": 5.6, "abnormal": 7.8, "inv": False, "w": 2.5},
-    "homaIR":   {"normal": 1.5, "abnormal": 4.0, "inv": False, "w": 3.0},
-    "tg":       {"normal": 1.0, "abnormal": 2.3, "inv": False, "w": 2.0},
-    "hdl":      {"normal": 1.55, "abnormal": 0.9, "inv": True, "w": 2.0},
-    "ldl":      {"normal": 2.6, "abnormal": 4.1, "inv": False, "w": 1.5},
-    "crphs":    {"normal": 1.0, "abnormal": 5.0, "inv": False, "w": 2.5},
-    "urate":    {"normal": 350, "abnormal": 480, "inv": False, "w": 1.5},
-    "ggt":      {"normal": 30, "abnormal": 80, "inv": False, "w": 1.5},
-    "adipon":   {"normal": 10, "abnormal": 4, "inv": True, "w": 2.0},
-    "leptine":  {"normal": 15, "abnormal": 40, "inv": False, "w": 2.0},
-    "apoB":     {"normal": 0.8, "abnormal": 1.3, "inv": False, "w": 1.5},
-    "tsh":      {"normal": 2.5, "abnormal": 6.0, "inv": False, "w": 1.0},
-    "tghdl":    {"normal": 1.5, "abnormal": 3.5, "inv": False, "w": 2.0},
+    "homaIR":   {"normal": 2.5, "abnormal": 4.0, "inv": False, "w": 2.5},
+    "hba1c":    {"normal": 5.7, "abnormal": 6.5, "inv": False, "w": 2.0},
+    "glyc":     {"normal": 5.6, "abnormal": 7.0, "inv": False, "w": 1.8},
+    "crphs":    {"normal": 1.0, "abnormal": 3.0, "inv": False, "w": 2.0},
+    "tsh":      {"normal": 4.0, "abnormal": 8.0, "inv": False, "w": 1.3},
+    "ldl":      {"normal": 3.0, "abnormal": 4.1, "inv": False, "w": 1.8},
+    "hdl":      {"normal": 1.0, "abnormal": 0.7, "inv": True, "w": 1.0},
+    "tg":       {"normal": 1.7, "abnormal": 2.3, "inv": False, "w": 1.5},
+    "adipon":   {"normal": 10,  "abnormal": 6.0, "inv": True, "w": 2.5},
+    "asat":     {"normal": 40,  "abnormal": 60,  "inv": False, "w": 1.0},
+    "apob":     {"normal": 0.9, "abnormal": 1.2, "inv": False, "w": 1.5},
+    "ggt":      {"normal": 50,  "abnormal": 80,  "inv": False, "w": 0.8},
+    "tghdl":    {"normal": 2.0, "abnormal": 3.5, "inv": False, "w": 2.0},
+    "urate":    {"normal": 360, "abnormal": 420, "inv": False, "w": 0.8},
+    "leptine":  {"normal": 20,  "abnormal": 40,  "inv": False, "w": 1.5},
     "cpep":     {"normal": 1.1, "abnormal": 0.4, "inv": True, "w": 2.0},
     "fgf21":    {"normal": 200, "abnormal": 500, "inv": False, "w": 1.5},
     "glucag":   {"normal": 100, "abnormal": 180, "inv": False, "w": 1.3},
@@ -1501,37 +1503,41 @@ The BTM v3.4 addresses this gap by integrating:
 NHANES 2011-2018, {cohort_stats['n_total']} adults >= 18 years.
 BMN v3.4 scores pre-computed with validated Monte Carlo imputation.
 
-2.2 GRS Computation (6 Axes)
+2.2 GRS Computation (7 Axes)
 
   Axis 1 — Insulin Resistance (0-10):
     HOMA-IR, adiponectin, TG/HDL ratio, comorbidities (DT2, MetS, NAFLD, PCOS)
-    Weight: 0.35 (positive factor)
+    Weight: 0.30 (positive factor)
 
   Axis 2 — Chronicity-Resistance (0-10):
     CTI, leptin resistance, BMI severity, yo-yo dieting history
-    Weight: 0.20 (negative factor)
+    Weight: 0.18 (negative factor)
 
   Axis 3 — Inflammation (0-10):
     hs-CRP, SII (indirect inflammatory index), GGT
-    Weight: 0.15 (positive factor — GLP-1 anti-inflammatory effect)
+    Weight: 0.12 (positive factor — GLP-1 anti-inflammatory effect)
 
   Axis 4 — Psycho-Behavioral (0-10):
     PHQ-9 depression, PSS-10 stress, BES binge eating
-    Weight: 0.15 (negative factor)
+    Weight: 0.12 (negative factor)
 
   Axis 5 — Iatrogenic (0-5):
     Corticosteroids, obesogenic antidepressants, uncontrolled hypothyroidism
-    Weight: 0.20 (negative factor)
+    Weight: 0.15 (negative factor)
 
   Axis 6 — Demographics:
     Age 30-65 (+0.5), female sex (+0.3), high-IR ethnicity (+0.5)
 
-  GRS = [(IR*0.35 + Inflam*0.15 + Demo) - (Chron*0.20 + Psycho*0.15 + Iatro*0.20) + GRI] / 2
+  Axis 7 — Beta-Cell / Secretory Function (-3 to +5):
+    C-peptide, FGF21 resistance, fasting glucagon dysregulation
+    Weight: 0.08 (positive), 0.05 (negative if depleted)
+
+  GRS = [(IR*0.30 + Inflam*0.12 + Demo + max(0,BetaCell)*0.08) - (Chron*0.18 + Psycho*0.12 + Iatro*0.15 + max(0,-BetaCell)*0.05) + GRI] / 2
 
 2.3 Profile Assignment
   R1 (Excellent): GRS >= 2.5, IR >= 4, Chron <= 4 -> Response >85%
   R2 (Good): GRS >= 1.5, IR >= 2 -> Response 60-85%
-  R3 (Partial): GRS >= 0.3, Chron <= 6 -> Response 30-60%
+  R3 (Partial): GRS >= 0.5, IR >= 1, Chron <= 6 -> Response 30-60%
   R4 (Non-responder): GRS >= -0.5 -> Response <30%
   R5 (Failure): GRS < -0.5 -> Response <10%
   CI: HbA1c >= 10% OR BMI >= 50 + CTI > 70

@@ -67,37 +67,41 @@ The BTM v3.4 addresses this gap by integrating:
 NHANES 2011-2018, 22807 adults >= 18 years.
 BMN v3.4 scores pre-computed with validated Monte Carlo imputation.
 
-2.2 GRS Computation (6 Axes)
+2.2 GRS Computation (7 Axes)
 
   Axis 1 — Insulin Resistance (0-10):
     HOMA-IR, adiponectin, TG/HDL ratio, comorbidities (DT2, MetS, NAFLD, PCOS)
-    Weight: 0.35 (positive factor)
+    Weight: 0.30 (positive factor)
 
   Axis 2 — Chronicity-Resistance (0-10):
     CTI, leptin resistance, BMI severity, yo-yo dieting history
-    Weight: 0.20 (negative factor)
+    Weight: 0.18 (negative factor)
 
   Axis 3 — Inflammation (0-10):
     hs-CRP, SII (indirect inflammatory index), GGT
-    Weight: 0.15 (positive factor — GLP-1 anti-inflammatory effect)
+    Weight: 0.12 (positive factor — GLP-1 anti-inflammatory effect)
 
   Axis 4 — Psycho-Behavioral (0-10):
     PHQ-9 depression, PSS-10 stress, BES binge eating
-    Weight: 0.15 (negative factor)
+    Weight: 0.12 (negative factor)
 
   Axis 5 — Iatrogenic (0-5):
     Corticosteroids, obesogenic antidepressants, uncontrolled hypothyroidism
-    Weight: 0.20 (negative factor)
+    Weight: 0.15 (negative factor)
 
   Axis 6 — Demographics:
     Age 30-65 (+0.5), female sex (+0.3), high-IR ethnicity (+0.5)
 
-  GRS = [(IR*0.35 + Inflam*0.15 + Demo) - (Chron*0.20 + Psycho*0.15 + Iatro*0.20) + GRI] / 2
+  Axis 7 — Beta-Cell / Secretory Function (-3 to +5):
+    C-peptide, FGF21 resistance, fasting glucagon dysregulation
+    Weight: 0.08 (positive), 0.05 (negative if depleted)
+
+  GRS = [(IR*0.30 + Inflam*0.12 + Demo + max(0,BetaCell)*0.08) - (Chron*0.18 + Psycho*0.12 + Iatro*0.15 + max(0,-BetaCell)*0.05) + GRI] / 2
 
 2.3 Profile Assignment
   R1 (Excellent): GRS >= 2.5, IR >= 4, Chron <= 4 -> Response >85%
   R2 (Good): GRS >= 1.5, IR >= 2 -> Response 60-85%
-  R3 (Partial): GRS >= 0.3, Chron <= 6 -> Response 30-60%
+  R3 (Partial): GRS >= 0.5, IR >= 1, Chron <= 6 -> Response 30-60%
   R4 (Non-responder): GRS >= -0.5 -> Response <30%
   R5 (Failure): GRS < -0.5 -> Response <10%
   CI: HbA1c >= 10% OR BMI >= 50 + CTI > 70
