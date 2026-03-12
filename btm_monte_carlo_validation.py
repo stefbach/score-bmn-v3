@@ -83,6 +83,9 @@ BIOMARKERS_DEF = {
     "apoB":     {"normal": 0.8, "abnormal": 1.3, "inv": False, "w": 1.5},
     "tsh":      {"normal": 2.5, "abnormal": 6.0, "inv": False, "w": 1.0},
     "tghdl":    {"normal": 1.5, "abnormal": 3.5, "inv": False, "w": 2.0},
+    "cpep":     {"normal": 1.1, "abnormal": 0.4, "inv": True, "w": 2.0},
+    "fgf21":    {"normal": 200, "abnormal": 500, "inv": False, "w": 1.5},
+    "glucag":   {"normal": 100, "abnormal": 180, "inv": False, "w": 1.3},
 }
 
 print("=" * 78)
@@ -399,7 +402,21 @@ def monte_carlo_impute_indicators(df):
     mu_pred = 8 - 0.1*(bmi - 25)
     df['predimed'] = np.clip(np.random.normal(mu_pred, 2.5), 0, 14)
 
-    print(f'    Done: 8 indicators imputed for {n} subjects')
+    # C-peptide (proxy from insulin and glucose)
+    # C-peptide ≈ insulin/6.0 nmol/L (rough conversion), modulated by beta-cell health
+    insulin_v = df['insulin_uUmL'].fillna(10).values if 'insulin_uUmL' in df.columns else np.full(n, 10.0)
+    mu_cpep = insulin_v / 6.0 * (1.0 - 0.02 * np.clip(df['hba1c'].fillna(5.5).values - 5.5, 0, 5))
+    df['cpep'] = np.maximum(0.1, np.random.normal(mu_cpep, 0.3))
+
+    # FGF21 (correlated with BMI, NAFLD severity, and HOMA-IR)
+    mu_fgf21 = 150 + 5 * bmi + 20 * homa - 50 * sex_f
+    df['fgf21'] = np.maximum(20, np.random.normal(mu_fgf21, 80))
+
+    # Fasting glucagon (correlated with glucose, BMI, insulin resistance)
+    mu_glucag = 80 + 1.5 * bmi + 8 * homa - 0.3 * age
+    df['glucag'] = np.maximum(20, np.random.normal(mu_glucag, 30))
+
+    print(f'    Done: 11 indicators imputed for {n} subjects')
     return df
 
 
@@ -740,9 +757,30 @@ def compute_glp1_profile(row):
     if sex == 'F': demoBonus += 0.3
     if ep.get('dR', 1.0) >= 1.5: demoBonus += 0.5
 
+    # ── AXE 7: Beta-cell / Secretory Function (-3 to +5) ──
+    betaCellAxis = 0
+    cpep_v = sv('cpep', 0)
+    if cpep_v > 0:
+        if cpep_v >= 2.0: betaCellAxis += 2
+        elif cpep_v >= 1.1: betaCellAxis += 1
+        if cpep_v < 0.4: betaCellAxis -= 2
+    else:
+        # Proxy: HOMA-IR + HbA1c as surrogate for beta-cell reserve
+        if homa_v >= 2.5 and (hba1c is not None and not np.isnan(hba1c) and hba1c < 7.0):
+            betaCellAxis += 1
+        if hba1c is not None and not np.isnan(hba1c) and hba1c >= 8.5:
+            betaCellAxis -= 1
+    fgf21_v = sv('fgf21', 0)
+    if fgf21_v >= 500: betaCellAxis -= 1
+    elif fgf21_v > 0 and fgf21_v <= 200: betaCellAxis += 1
+    glucag_v = sv('glucag', 0)
+    if glucag_v >= 180: betaCellAxis -= 1
+    elif glucag_v > 0 and glucag_v <= 100: betaCellAxis += 1
+    betaCellAxis = max(-3, min(5, betaCellAxis))
+
     # ── GRS Composite ──
-    posFactor = irScore * 0.35 + inflamScore * 0.15 + demoBonus
-    negFactor = chronScore * 0.20 + psychoScore * 0.15 + iatroScore * 0.20
+    posFactor = irScore * 0.30 + inflamScore * 0.12 + demoBonus + max(0, betaCellAxis) * 0.08
+    negFactor = chronScore * 0.18 + psychoScore * 0.12 + iatroScore * 0.15 + max(0, -betaCellAxis) * 0.05
     grs = posFactor - negFactor
     grs = (grs + gri) / 2
     grs = max(-3, min(6, grs))
@@ -836,6 +874,7 @@ def compute_glp1_profile(row):
         'psychoScore': round(psychoScore, 1),
         'iatroScore': round(iatroScore, 1),
         'demoBonus': round(demoBonus, 1),
+        'betaCellAxis': round(betaCellAxis, 1),
     })
 
 
@@ -888,17 +927,42 @@ def simulate_treatment_response(df, n_mc=N_MC_TREATMENT):
         bmi = row.get('bmi', 30)
         if pd.isna(bmi): bmi = 30
 
+        # === ANTI-CIRCULARITY DESIGN ===
+        # To avoid tautological validation (GRS predicting what it generated),
+        # we introduce substantial independent noise and latent variables
+        # that are NOT captured by the GRS axes.
+
+        # 1. GRS-independent latent factors (NOT in the scoring model)
+        # These represent real biological variance not captured by the 7 axes:
+        # - Gut microbiome composition (Akkermansia, Firmicutes/Bacteroidetes)
+        # - Gastric emptying rate (Acosta "Hungry Gut" phenotype)
+        # - GLP-1 receptor sensitivity/density
+        # - Epigenetic methylation state
+        # - Pharmacokinetic variability (absorption, metabolism)
+        latent_factor = np.random.normal(1.0, 0.25)  # 25% unexplained variance
+
+        # 2. Partially correlated clinical modifiers (use raw clinical data, NOT GRS axes)
+        # This creates partial but not complete correlation with GRS
         modifier = 1.0
-        modifier *= (1.0 + 0.04 * ir)           # IR high = better response
-        modifier *= (1.0 - 0.06 * chron)         # Chronic = worse (stronger)
-        modifier *= (1.0 - 0.035 * psycho)       # Psycho = worse (stronger)
-        modifier *= (1.0 - 0.08 * iatro)         # Iatrogene = worse (stronger)
-        modifier *= (1.0 + 0.015 * inflam)       # Inflammation = slightly better
-        if sex == 'F': modifier *= 1.05           # Female bonus (STEP data)
-        if 30 <= age <= 55: modifier *= 1.03      # Optimal age
-        if age >= 65: modifier *= 0.90            # Elderly penalty (stronger)
-        if bmi >= 45: modifier *= 0.85            # Super-obesity penalty (stronger)
-        if bmi >= 40: modifier *= 0.93            # Obesity severity
+        raw_homa = row.get('homaIR', 2.0)
+        if pd.isna(raw_homa): raw_homa = 2.0
+        raw_crp = row.get('crphs', 1.0)
+        if pd.isna(raw_crp): raw_crp = 1.0
+        raw_leptine = row.get('leptine', 20)
+        if pd.isna(raw_leptine): raw_leptine = 20
+
+        # Use raw biomarker values (not axis scores) with weaker coefficients
+        modifier *= (1.0 + 0.02 * min(10, raw_homa))     # IR benefit (weaker)
+        modifier *= (1.0 - 0.003 * min(60, raw_leptine))  # Leptin resistance
+        modifier *= (1.0 + 0.01 * min(10, raw_crp))       # Inflammation mild benefit
+        modifier *= latent_factor                           # Independent noise
+
+        # Demographic modifiers (mild)
+        if sex == 'F': modifier *= 1.03
+        if 30 <= age <= 55: modifier *= 1.02
+        if age >= 65: modifier *= 0.93
+        if bmi >= 45: modifier *= 0.88
+        elif bmi >= 40: modifier *= 0.95
 
         adj_mu = base_mu * modifier
         adj_sd = base_sd * (0.8 + 0.04 * chron)  # More variability if chronic
@@ -1105,7 +1169,7 @@ def sensitivity_analysis_axes(df):
     """Which GRS axis contributes most to discrimination?"""
     print('\n  ── Axis Sensitivity Analysis ──')
     eligible = df[df['bmi'] >= 27].copy()
-    axes = ['irScore', 'chronScore', 'inflamScore', 'psychoScore', 'iatroScore', 'demoBonus']
+    axes = ['irScore', 'chronScore', 'inflamScore', 'psychoScore', 'iatroScore', 'demoBonus', 'betaCellAxis']
     results = {}
 
     y = eligible['is_responder'].values

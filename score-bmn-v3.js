@@ -68,6 +68,9 @@ export const BIOMARKERS = {
   asat:    { label: 'Transaminases',      w: 1.0, normal: 40,  abnormal: 60,   inverted: false },
   ggt:     { label: 'GGT',               w: 0.8, normal: 50,  abnormal: 80,   inverted: false },
   urate:   { label: 'Uric acid',         w: 0.8, normal: 360, abnormal: 420,  inverted: false },
+  cpep:    { label: 'C-peptide',         w: 2.0, normal: 1.1, abnormal: 0.4,  inverted: true  },
+  fgf21:   { label: 'FGF21',            w: 1.5, normal: 200, abnormal: 500,  inverted: false },
+  glucag:  { label: 'Fasting glucagon',  w: 1.3, normal: 100, abnormal: 180,  inverted: false },
 };
 
 /** Markov comorbidity multipliers */
@@ -752,7 +755,39 @@ function computeGLP1Axes(patient, activeComorbidities, cti, bioValues) {
   const irProneEthnicities = ['im', 'sa', 'cr'];
   if (irProneEthnicities.includes(patient.ethnicCode)) demoBonus += 0.2;
 
-  return { irAxis, chronAxis, inflamAxis, psychoAxis, iatroAxis, demoBonus, bInflam };
+  // Axe 7: Beta-cell / Secretory Function (0-5, ↑ positive)
+  // Preserved beta-cell function = better GLP-1 response (incrétine effect)
+  let betaCellAxis = 0;
+  const cpep = bioValues?.cpep;
+  if (cpep != null) {
+    if (cpep >= 2.0) betaCellAxis += 2;      // Strong secretory reserve
+    else if (cpep >= 1.1) betaCellAxis += 1;  // Normal function
+    // Low C-peptide = depleted beta cells = poor GLP-1 response
+    if (cpep < 0.4) betaCellAxis -= 2;
+  } else {
+    // Proxy: if no C-peptide available, use HOMA-IR + HbA1c as surrogate
+    // High HOMA + moderate HbA1c = IR-driven (good beta reserve)
+    // High HOMA + high HbA1c = beta-cell failure
+    const homaVal = bioValues?.homaIR ?? 0;
+    const hba1cVal = bioValues?.hba1c ?? 5.5;
+    if (homaVal >= 2.5 && hba1cVal < 7.0) betaCellAxis += 1;  // IR-driven, preserved beta
+    if (hba1cVal >= 8.5) betaCellAxis -= 1;  // Likely beta depletion
+  }
+  // FGF21 resistance (elevated FGF21 = chronic metabolic stress)
+  const fgf21Val = bioValues?.fgf21;
+  if (fgf21Val != null) {
+    if (fgf21Val >= 500) betaCellAxis -= 1;  // FGF21 resistance
+    else if (fgf21Val <= 200) betaCellAxis += 1;  // Healthy FGF21 signaling
+  }
+  // Fasting glucagon (hyperglucagonemia = GLP-1 resistance)
+  const glucagVal = bioValues?.glucag;
+  if (glucagVal != null) {
+    if (glucagVal >= 180) betaCellAxis -= 1;  // Alpha-cell dysregulation
+    else if (glucagVal <= 100) betaCellAxis += 1;  // Normal suppression
+  }
+  betaCellAxis = Math.max(-3, Math.min(5, betaCellAxis));
+
+  return { irAxis, chronAxis, inflamAxis, psychoAxis, iatroAxis, demoBonus, bInflam, betaCellAxis };
 }
 
 /**
@@ -763,8 +798,8 @@ export function computeGLP1Engine(patient, activeComorbidities, cti, bioValues) 
   const { gri } = computeGRI(patient, activeComorbidities, cti, bioValues);
   const axes = computeGLP1Axes(patient, activeComorbidities, cti, bioValues);
 
-  const posFactor = axes.irAxis * 0.35 + axes.inflamAxis * 0.15 + axes.demoBonus;
-  const negFactor = axes.chronAxis * 0.20 + axes.psychoAxis * 0.15 + axes.iatroAxis * 0.20;
+  const posFactor = axes.irAxis * 0.30 + axes.inflamAxis * 0.12 + axes.demoBonus + Math.max(0, axes.betaCellAxis) * 0.08;
+  const negFactor = axes.chronAxis * 0.18 + axes.psychoAxis * 0.12 + axes.iatroAxis * 0.15 + Math.max(0, -axes.betaCellAxis) * 0.05;
 
   let grs = (posFactor - negFactor + gri) / 2;
   grs = Math.max(-3, Math.min(6, grs));
@@ -961,7 +996,7 @@ export function computeMarkov(sf, bmnK, bmi, activeComorbidities, ethnicCode) {
  *                       hoursPerWeek, socialIsolation }
  *   - lifestyle: { physicalActivityMinWeek, predimed, drinksPerWeek, isi, sleepHours }
  *   - bioValues: { homaIR, adipon, hba1c, crphs, tghdl, glyc, ldl, tg, apob,
- *                   leptine, tsh, hdl, asat, ggt, urate } (all optional)
+ *                   leptine, tsh, hdl, asat, ggt, urate, cpep, fgf21, glucag } (all optional)
  *
  * @returns {Object} Résultat complet avec tous les sous-scores
  */
