@@ -1,6 +1,6 @@
 """
 ===============================================================================
-BTM v3.4 - BARIATRIC & THERAPEUTIC MODULE - MONTE CARLO VALIDATION ON NHANES
+BTM v3.5 - BARIATRIC & THERAPEUTIC MODULE - MONTE CARLO VALIDATION ON NHANES
 ===============================================================================
 Second-stage validation: GLP-1 response prediction and therapeutic strategy
 Built on top of validated BMN scores (AUC=0.875 for MetS)
@@ -44,7 +44,7 @@ N_BOOTSTRAP = 2000       # Bootstrap for CI
 RESPONDER_THRESHOLD = 10.0   # TBWL >= 10% = responder
 SUPER_RESP_THRESHOLD = 20.0  # TBWL >= 20% = super-responder
 
-# Ethnic profiles (from BMN v3.4)
+# Ethnic profiles (from BMN v3.5)
 ETHNIC_PROFILES = {
     "eu": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 94, "waistF": 80, "dR": 1.0, "hR": 1.0, "cR": 1.0, "ev": 0},
     "af": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 94, "waistF": 80, "dR": 1.7, "hR": 1.45, "cR": 1.15, "ev": 3},
@@ -91,7 +91,7 @@ BIOMARKERS_DEF = {
 }
 
 print("=" * 78)
-print("  BTM v3.4 — MONTE CARLO THERAPEUTIC VALIDATION PIPELINE")
+print("  BTM v3.5 — MONTE CARLO THERAPEUTIC VALIDATION PIPELINE")
 print("  GLP-1 Response Prediction + Therapeutic Strategy on NHANES")
 print("=" * 78)
 
@@ -427,7 +427,7 @@ def monte_carlo_impute_indicators(df):
 # ======================================================================
 
 def compute_bmn_score(row):
-    """Compute BMN v3.4 score for a single subject."""
+    """Compute BMN v3.5 score for a single subject."""
     eth = row.get('ethnicCode', 'eu')
     ep = ETHNIC_PROFILES.get(eth, ETHNIC_PROFILES['eu'])
     sex = row.get('sex', 'M')
@@ -1229,7 +1229,7 @@ def generate_btm_figures(df, val_results, eligible, subgroup_results, axis_resul
         ax.set_ylabel('Sensibilite', fontsize=11)
         ax.set_title(label, fontsize=12, fontweight='bold')
         ax.legend(loc='lower right', fontsize=10)
-    fig.suptitle('BTM v3.4 — ROC: GRS/GRI vs Reponse GLP-1 Simulee', fontsize=14, fontweight='bold')
+    fig.suptitle('BTM v3.5 — ROC: GRS/GRI vs Reponse GLP-1 Simulee', fontsize=14, fontweight='bold')
     plt.tight_layout()
     fig.savefig(os.path.join(OUTPUT_DIR, 'fig_btm1_roc_glp1.png'), dpi=300, bbox_inches='tight')
     plt.close()
@@ -1435,7 +1435,7 @@ def generate_btm_article(val_results, subgroup_results, axis_results, cohort_sta
     print('\n  ── Generating BTM Article ──')
 
     article = f"""================================================================================
-BTM v3.4 — BARIATRIC & THERAPEUTIC MODULE VALIDATION ON NHANES
+BTM v3.5 — BARIATRIC & THERAPEUTIC MODULE VALIDATION ON NHANES
 Monte Carlo Simulation of GLP-1 Response Prediction
 ================================================================================
 
@@ -1447,11 +1447,11 @@ ABSTRACT
 ================================================================================
 
 OBJECTIVE: To validate the GLP-1 Response Score (GRS) and Bariatric-Therapeutic
-Module (BTM v3.4) for predicting treatment response and guiding therapeutic
+Module (BTM v3.5) for predicting treatment response and guiding therapeutic
 strategy selection in overweight/obese adults, using Monte Carlo simulation
 on the NHANES cohort.
 
-METHODS: Building on validated BMN v3.4 scores (AUC=0.875 for MetS) from
+METHODS: Building on validated BMN v3.5 scores (AUC=0.875 for MetS) from
 {cohort_stats['n_total']} NHANES adults (2011-2018), we computed the GRS using
 6 clinical axes (insulin resistance, chronicity, inflammation, psycho-behavioral,
 iatrogenic, demographic). GLP-1 treatment response (TBWL at 12 months) was
@@ -1486,7 +1486,7 @@ loss (>=10% TBWL), while 20-30% are super-responders (>=20% TBWL).
 
 Current prescribing guidelines use BMI thresholds alone, without accounting for
 metabolic phenotype, chronicity, psychological factors, or iatrogenic interactions.
-The BTM v3.4 addresses this gap by integrating:
+The BTM v3.5 addresses this gap by integrating:
 
   1. GRI (GLP-1 Response Index): Quick screening index (-3 to +6)
   2. GRS (GLP-1 Response Score): Multi-axis composite score
@@ -1501,7 +1501,7 @@ The BTM v3.4 addresses this gap by integrating:
 
 2.1 Study Population
 NHANES 2011-2018, {cohort_stats['n_total']} adults >= 18 years.
-BMN v3.4 scores pre-computed with validated Monte Carlo imputation.
+BMN v3.5 scores pre-computed with validated Monte Carlo imputation.
 
 2.2 GRS Computation (7 Axes)
 
@@ -1632,7 +1632,7 @@ The 6-axis model captures the major determinants of GLP-1 efficacy:
 
 4.2 Clinical Relevance
 
-The BTM v3.4 enables:
+The BTM v3.5 enables:
   1. IDENTIFICATION of optimal GLP-1 candidates (R1-R2) vs surgical candidates (R4-R5)
   2. MOLECULE SELECTION: Tirzepatide for high-IR/DT2, Semaglutide for moderate profiles
   3. REALISTIC EXPECTATIONS: PPE calibrated to individual phenotype
@@ -1658,7 +1658,7 @@ The BTM v3.4 enables:
 5. CONCLUSION
 ================================================================================
 
-The BTM v3.4 GLP-1 Response Score (GRS) provides a validated multi-dimensional
+The BTM v3.5 GLP-1 Response Score (GRS) provides a validated multi-dimensional
 framework for predicting treatment response and guiding therapeutic strategy in
 overweight/obese adults. While based on simulated outcomes, the model demonstrates
 strong internal consistency and clinical face validity, warranting prospective
@@ -1712,7 +1712,7 @@ def main():
     start_time = time.time()
 
     print('\n' + 'X' * 78)
-    print('X  BTM v3.4 — MONTE CARLO THERAPEUTIC VALIDATION PIPELINE')
+    print('X  BTM v3.5 — MONTE CARLO THERAPEUTIC VALIDATION PIPELINE')
     print('X  Phase 2: GLP-1 Response Prediction on Validated BMN Cohort')
     print('X' * 78)
 
@@ -1751,9 +1751,9 @@ def main():
 
     # ── Step 5: BMN scoring ──
     print('\n' + '-' * 78)
-    print('  STEP 5: Computing BMN v3.4 scores')
+    print('  STEP 5: Computing BMN v3.5 scores')
     print('-' * 78)
-    print('  Applying BMN v3.4 algorithm...', end=' ', flush=True)
+    print('  Applying BMN v3.5 algorithm...', end=' ', flush=True)
     scores = df.apply(compute_bmn_score, axis=1)
     df = pd.concat([df, scores], axis=1)
     print(f'done ({len(df)} scored)')

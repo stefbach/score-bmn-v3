@@ -1,12 +1,12 @@
 """
 ===============================================================================
-SCORE BMN v3.4 — MONTE CARLO SIMULATION ON COMPLETE NHANES COHORT
+SCORE BMN v3.5 — MONTE CARLO SIMULATION ON COMPLETE NHANES COHORT
 ===============================================================================
 
 Publication-grade validation pipeline:
   1. Full NHANES cohort retrieval (6 cycles: 2011-2020, Pre-pandemic)
   2. Monte Carlo Multiple Imputation (MCMI) for missing BMN indicators
-  3. Application of SCORE BMN v3.4 algorithm (Python port)
+  3. Application of SCORE BMN v3.5 algorithm (Python port)
   4. Statistical validation:
      - AUC-ROC + 95% CI bootstrap (2000 replicates)
      - Monte Carlo sensitivity analysis (N=1000 simulations)
@@ -98,7 +98,7 @@ NHANES_TABLES = {
 }
 
 print("=" * 78)
-print("  SCORE BMN v3.4 — MONTE CARLO SIMULATION ON COMPLETE NHANES COHORT")
+print("  SCORE BMN v3.5 — MONTE CARLO SIMULATION ON COMPLETE NHANES COHORT")
 print("  Publication-grade validation with missing indicator recovery")
 print("=" * 78)
 print()
@@ -951,7 +951,7 @@ def mice_imputation(df, n_imputations=N_IMPUTATIONS, n_iter=N_IMPUTATION_ITER):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# PART 5: BMN v3.4 ALGORITHM — PYTHON PORT
+# PART 5: BMN v3.5 ALGORITHM — PYTHON PORT
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Ethnic profiles
@@ -1018,7 +1018,7 @@ BIOMARKERS_DEF = {
 
 
 def compute_bmn_score(row):
-    """Compute the full BMN v3.4 score for a single subject (pd.Series)."""
+    """Compute the full BMN v3.5 score for a single subject (pd.Series)."""
     eth = row.get('ethnicCode', 'eu')
     ep = ETHNIC_PROFILES.get(eth, ETHNIC_PROFILES['eu'])
     sex = row.get('sex', 'M')
@@ -1305,7 +1305,7 @@ def compute_bmn_score(row):
 
 def apply_bmn_to_dataset(df):
     """Apply BMN scoring to entire dataset."""
-    print("\n  Applying BMN v3.4 algorithm to dataset...", end=' ', flush=True)
+    print("\n  Applying BMN v3.5 algorithm to dataset...", end=' ', flush=True)
     scores = df.apply(compute_bmn_score, axis=1)
     result = pd.concat([df, scores], axis=1)
     print(f"done ({len(result)} subjects scored)")
@@ -1506,6 +1506,9 @@ def validate_bmn_comprehensive(scored_datasets, target='MetS'):
     all_idis = []
     all_brier = []
     all_hl = []
+    all_ici = []
+    all_eo = []
+    all_cal_slope = []
     all_sf = []
     all_y = []
 
@@ -1544,6 +1547,26 @@ def validate_bmn_comprehensive(scored_datasets, target='MetS'):
 
         hl = hosmer_lemeshow_test(y_true, sf_scores.clip(0.001, 0.999))
         all_hl.append(hl)
+
+        # Integrated Calibration Index (ICI) and E/O ratio
+        try:
+            prob_true_cal, prob_pred_cal = calibration_curve(y_true, sf_scores.clip(0, 1), n_bins=10, strategy='quantile')
+            ici = np.mean(np.abs(prob_true_cal - prob_pred_cal))
+            all_ici.append(ici)
+            # E/O ratio by decile
+            eo = np.mean(sf_scores.clip(0, 1)) / np.mean(y_true) if np.mean(y_true) > 0 else 1.0
+            all_eo.append(eo)
+        except Exception:
+            pass
+
+        # Calibration slope (logistic recalibration)
+        try:
+            X_cal = sm.add_constant(sf_scores)
+            logit_model = sm.GLM(y_true, X_cal, family=sm.families.Binomial())
+            logit_result = logit_model.fit()
+            all_cal_slope.append(logit_result.params[1])
+        except Exception:
+            pass
 
         all_sf.extend(sf_scores.tolist())
         all_y.extend(y_true.tolist())
@@ -1615,6 +1638,17 @@ def validate_bmn_comprehensive(scored_datasets, target='MetS'):
         # Hosmer-Lemeshow
         'hl_chi2_mean': np.mean([h['chi2'] for h in all_hl]),
         'hl_p_value_mean': np.mean([h['p_value'] for h in all_hl]),
+
+        # Integrated Calibration Index (ICI)
+        'ici_mean': np.mean(all_ici) if all_ici else None,
+        'ici_se': np.std(all_ici) / np.sqrt(len(all_ici)) if len(all_ici) > 1 else 0,
+
+        # Expected/Observed ratio
+        'eo_ratio_mean': np.mean(all_eo) if all_eo else None,
+
+        # Calibration slope
+        'cal_slope_mean': np.mean(all_cal_slope) if all_cal_slope else None,
+        'cal_slope_se': np.std(all_cal_slope) / np.sqrt(len(all_cal_slope)) if len(all_cal_slope) > 1 else 0,
     }
 
     # Print results table
@@ -1638,6 +1672,12 @@ def validate_bmn_comprehensive(scored_datasets, target='MetS'):
     print(f"  ╠═══════════════════════════════════════════════════════════════╣")
     print(f"  ║  Hosmer-Lemeshow: χ²={results['hl_chi2_mean']:.1f} "
           f"(p={results['hl_p_value_mean']:.4f})               ║")
+    if results.get('ici_mean') is not None:
+        print(f"  ║  ICI:             {results['ici_mean']:.4f} (±{results['ici_se']:.4f})            ║")
+    if results.get('eo_ratio_mean') is not None:
+        print(f"  ║  E/O Ratio:       {results['eo_ratio_mean']:.3f}                              ║")
+    if results.get('cal_slope_mean') is not None:
+        print(f"  ║  Cal. Slope:      {results['cal_slope_mean']:.3f} (±{results['cal_slope_se']:.4f})            ║")
     print(f"  ╚═══════════════════════════════════════════════════════════════╝")
 
     return results
@@ -1664,7 +1704,7 @@ def comparative_models_analysis(scored_datasets, target='MetS'):
     X_scaled = scaler.fit_transform(X)
 
     models = {
-        'BMN v3.4': df_valid['sf'].values / 100.0,
+        'BMN v3.5': df_valid['sf'].values / 100.0,
         'Logistic Regression': None,
         'Random Forest': None,
         'Gradient Boosting': None,
@@ -1704,10 +1744,10 @@ def comparative_models_analysis(scored_datasets, target='MetS'):
     print(f"  └───────────────────────────────────────────────────────────┘")
 
     # DeLong test: BMN vs each model
-    bmn_probs = models['BMN v3.4']
-    print(f"\n  DeLong tests (BMN v3.4 vs others):")
+    bmn_probs = models['BMN v3.5']
+    print(f"\n  DeLong tests (BMN v3.5 vs others):")
     for name, probs in models.items():
-        if name == 'BMN v3.4' or probs is None:
+        if name == 'BMN v3.5' or probs is None:
             continue
         # Approximate DeLong using bootstrap
         n_boot = 1000
@@ -1918,7 +1958,7 @@ def generate_publication_figures(scored_datasets, validation_results,
     ax = axes[0]
     fpr, tpr, _ = roc_curve(y_mets, sf_scores)
     auc_val = roc_auc_score(y_mets, sf_scores)
-    ax.plot(fpr, tpr, 'b-', lw=2, label=f'BMN v3.4 (AUC={auc_val:.3f})')
+    ax.plot(fpr, tpr, 'b-', lw=2, label=f'BMN v3.5 (AUC={auc_val:.3f})')
     ax.plot([0, 1], [0, 1], 'k--', lw=1, alpha=0.5)
     ax.set_xlabel('1 - Specificity (FPR)', fontsize=12)
     ax.set_ylabel('Sensitivity (TPR)', fontsize=12)
@@ -1933,7 +1973,7 @@ def generate_publication_figures(scored_datasets, validation_results,
     if y_obes is not None and len(np.unique(y_obes)) == 2:
         fpr_o, tpr_o, _ = roc_curve(y_obes, sf_scores)
         auc_o = roc_auc_score(y_obes, sf_scores)
-        ax.plot(fpr_o, tpr_o, 'r-', lw=2, label=f'BMN v3.4 (AUC={auc_o:.3f})')
+        ax.plot(fpr_o, tpr_o, 'r-', lw=2, label=f'BMN v3.5 (AUC={auc_o:.3f})')
     ax.plot([0, 1], [0, 1], 'k--', lw=1, alpha=0.5)
     ax.set_xlabel('1 - Specificity (FPR)', fontsize=12)
     ax.set_ylabel('Sensitivity (TPR)', fontsize=12)
@@ -1951,7 +1991,7 @@ def generate_publication_figures(scored_datasets, validation_results,
     # ── Figure 2: Calibration Plot ──
     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
     prob_true, prob_pred = calibration_curve(y_mets, sf_scores, n_bins=10, strategy='quantile')
-    ax.plot(prob_pred, prob_true, 'bo-', lw=2, markersize=8, label='BMN v3.4')
+    ax.plot(prob_pred, prob_true, 'bo-', lw=2, markersize=8, label='BMN v3.5')
     ax.plot([0, 1], [0, 1], 'k--', lw=1, label='Perfect calibration')
     ax.fill_between(prob_pred,
                     prob_true - 0.05, prob_true + 0.05,
@@ -2090,7 +2130,7 @@ def generate_publication_figures(scored_datasets, validation_results,
         ax.set_xticks(x_pos)
         ax.set_xticklabels(names, rotation=20, fontsize=10)
         ax.set_ylabel('AUC-ROC', fontsize=12)
-        ax.set_title('Model Comparison — MetS Prediction', fontsize=13, fontweight='bold')
+        ax.set_title('Supplementary Figure S4: Model Comparison — MetS Prediction\n(BMN v3.5: interpretable clinical score vs. ML classifiers)', fontsize=11, fontweight='bold')
         ax.set_ylim([0.5, 1.0])
         ax.grid(True, alpha=0.3, axis='y')
         plt.tight_layout()
@@ -2147,7 +2187,7 @@ def generate_publication_article(validation_results_mets, validation_results_obe
 
     article = f"""
 ================================================================================
-VALIDATION OF THE BMN SCORE v3.4: A MULTI-DIMENSIONAL METABOLIC RISK
+VALIDATION OF THE BMN SCORE v3.5: A MULTI-DIMENSIONAL METABOLIC RISK
 ASSESSMENT ALGORITHM ON THE NHANES COHORT WITH MONTE CARLO SIMULATION
 ================================================================================
 
@@ -2159,12 +2199,12 @@ Status: Submitted for peer review
 ABSTRACT
 ────────────────────────────────────────────────────────────────────────────────
 
-BACKGROUND: The Score BMN (Bach-Manos-Noel) v3.4 is an integrated clinical
+BACKGROUND: The Score BMN (Bach-Manos-Noel) v3.5 is an integrated clinical
 risk assessment algorithm combining declarative clinical data (CLEO framework:
 Clinical, Lifestyle, Exposome, Occupational), biological markers (15-marker BSD
 panel), and advanced indices (SII, CTI, GRI) for metabolic disease evaluation.
 
-OBJECTIVE: To validate the BMN v3.4 algorithm on the complete NHANES cohort
+OBJECTIVE: To validate the BMN v3.5 algorithm on the complete NHANES cohort
 (2011-2020) using Monte Carlo Multiple Imputation for missing indicator
 recovery and comprehensive statistical metrics.
 
@@ -2176,7 +2216,7 @@ correlates. Multiple Imputation by Chained Equations (MICE, m={N_IMPUTATIONS})
 handled partially-missing NHANES variables. Primary endpoints: Metabolic Syndrome
 (IDF-harmonized) and Obesity (BMI ≥30 kg/m²).
 
-RESULTS: The BMN v3.4 algorithm achieved:
+RESULTS: The BMN v3.5 algorithm achieved:
   - MetS: AUC-ROC = {vr.get('auc_combined', 0):.3f} (95% CI: {vr.get('auc_ci_lower', 0):.3f}–{vr.get('auc_ci_upper', 0):.3f})
   - Obesity: AUC-ROC = {vr_o.get('auc_combined', 0):.3f} (95% CI: {vr_o.get('auc_ci_lower', 0):.3f}–{vr_o.get('auc_ci_upper', 0):.3f})
   - Brier Score (MetS): {vr.get('brier_mean', 0):.4f}
@@ -2185,7 +2225,7 @@ Monte Carlo indicator recovery validation showed 95% coverage probabilities
 ≥{min([r['coverage_95'] for r in mc_recovery_results.values()] if mc_recovery_results else [0]):.0%}
 for all tested variables.
 
-CONCLUSION: The BMN v3.4 demonstrates robust discriminative performance for
+CONCLUSION: The BMN v3.5 demonstrates robust discriminative performance for
 metabolic syndrome prediction, competitive with standard machine learning
 approaches while providing clinically interpretable multi-dimensional outputs
 including chronicity trajectory (CTI) and GLP-1 response prediction (GRI).
@@ -2204,7 +2244,7 @@ Current risk assessment tools typically focus on individual components (BMI,
 blood glucose, lipid panels) without integrating the complex interplay between
 clinical, behavioral, environmental, and biological dimensions.
 
-The Score BMN (Bach-Manos-Noel) v3.4 addresses this gap through a
+The Score BMN (Bach-Manos-Noel) v3.5 addresses this gap through a
 multi-dimensional framework integrating:
 
   1. CLEO Framework (Declarative Score, sD: 0-100):
@@ -2304,9 +2344,9 @@ using MICE with {N_IMPUTATIONS} imputations × {N_IMPUTATION_ITER} iterations:
   - Biological constraints enforced post-imputation
   - Combined estimates via Rubin's rules (1987)
 
-2.6 BMN v3.4 Algorithm Application
+2.6 BMN v3.5 Algorithm Application
 
-The complete BMN v3.4 algorithm was applied to each imputed dataset,
+The complete BMN v3.5 algorithm was applied to each imputed dataset,
 computing all indices: C, E, O, L, sD, bioNorm, sf, SII, CTI, GRI/GRS.
 
 2.7 Statistical Analysis
@@ -2344,7 +2384,7 @@ The final analytic cohort comprised {cohort_stats['n_total']} adults from
 
 3.2 Primary Validation: Metabolic Syndrome
 
-Table 1. BMN v3.4 Performance for Metabolic Syndrome Prediction
+Table 1. BMN v3.5 Performance for Metabolic Syndrome Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
@@ -2360,7 +2400,7 @@ Table 1. BMN v3.4 Performance for Metabolic Syndrome Prediction
 
 3.3 Secondary Validation: Obesity
 
-Table 2. BMN v3.4 Performance for Obesity Prediction
+Table 2. BMN v3.5 Performance for Obesity Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
@@ -2429,7 +2469,7 @@ from NHANES.
 
 4.1 Principal Findings
 
-The BMN v3.4 algorithm demonstrates robust discriminative performance for
+The BMN v3.5 algorithm demonstrates robust discriminative performance for
 metabolic syndrome prediction on the NHANES cohort, with AUC-ROC = {vr.get('auc_combined', 0):.3f}
 (95% CI: {vr.get('auc_ci_lower', 0):.3f}–{vr.get('auc_ci_upper', 0):.3f}). This is consistent with our
 previous single-cycle validation (AUC 0.849 on NHANES 2017-2018) and compares
@@ -2442,7 +2482,7 @@ favorably with established metabolic risk scores:
 
 4.2 Multi-dimensional Advantage
 
-Unlike single-outcome risk scores, BMN v3.4 provides:
+Unlike single-outcome risk scores, BMN v3.5 provides:
   1. Decomposed risk profile (CLEO dimensions)
   2. Chronicity trajectory (CTI) for treatment selection
   3. GLP-1 response prediction (GRI/GRS) for pharmacological guidance
@@ -2471,7 +2511,7 @@ The Monte Carlo modeling of 8 missing indicators demonstrated:
 
 4.5 Clinical Implications
 
-The BMN v3.4 provides actionable clinical guidance through:
+The BMN v3.5 provides actionable clinical guidance through:
   - Risk stratification (FAIBLE/MODÉRÉ/ÉLEVÉ/TRÈS ÉLEVÉ)
   - GLP-1 candidacy assessment (R1-R5 profiles)
   - Bariatric surgery indication (CTI > 55)
@@ -2481,7 +2521,7 @@ The BMN v3.4 provides actionable clinical guidance through:
 5. CONCLUSION
 ────────────────────────────────────────────────────────────────────────────────
 
-The Score BMN v3.4 demonstrates statistically robust performance for metabolic
+The Score BMN v3.5 demonstrates statistically robust performance for metabolic
 risk assessment on the complete NHANES cohort ({cohort_stats['n_total']} subjects,
 {cohort_stats['n_cycles']} cycles). Monte Carlo simulation successfully models
 missing BMN indicators with validated distributional properties. The algorithm
@@ -2517,7 +2557,7 @@ REFERENCES
 SUPPLEMENTARY MATERIAL
 ────────────────────────────────────────────────────────────────────────────────
 
-Table S1. BMN v3.4 Algorithm Parameters (complete specification)
+Table S1. BMN v3.5 Algorithm Parameters (complete specification)
   → See DOSSIER_ALGORITHME_BMN.md (29 sections, 93+ references)
 
 Table S2. NHANES Variable Mapping
@@ -2571,7 +2611,7 @@ def main():
     start_time = time.time()
 
     print("\n" + "█" * 78)
-    print("█  SCORE BMN v3.4 — COMPLETE MONTE CARLO VALIDATION PIPELINE")
+    print("█  SCORE BMN v3.5 — COMPLETE MONTE CARLO VALIDATION PIPELINE")
     print("█  CDC NHANES Cohort × Monte Carlo Imputation × Statistical Validation")
     print("█" * 78)
 
@@ -2595,7 +2635,7 @@ def main():
 
     # ── Step 7: Apply BMN algorithm to all imputed datasets ──
     print("\n" + "━" * 78)
-    print("  PART 5: APPLYING BMN v3.4 ALGORITHM")
+    print("  PART 5: APPLYING BMN v3.5 ALGORITHM")
     print("━" * 78)
 
     scored_datasets = []
