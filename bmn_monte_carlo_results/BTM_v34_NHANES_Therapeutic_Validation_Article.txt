@@ -25,13 +25,13 @@ Subjects were classified into 5 response profiles (R1-R5) plus contra-indication
 Primary endpoint: AUC-ROC of GRS for predicting responders (TBWL>=10%).
 
 RESULTS:
-  - GRS -> Responder AUC: 0.6503
-    (95% CI: 0.6402-0.6604)
-  - GRS -> Super-Responder AUC: 0.9963
-  - GRI simple -> Responder AUC: 0.5576
-  - NRI vs Logistic Regression: -0.4919
-  - Profile concordance: R1 responder rate 100.0%,
-    R5 responder rate 0.0%
+  - GRS -> Responder AUC: 0.5612
+    (95% CI: 0.5503-0.5707)
+  - GRS -> Super-Responder AUC: 0.9108
+  - GRI simple -> Responder AUC: 0.5401
+  - NRI vs Logistic Regression: +0.9463
+  - Profile concordance: R1 responder rate 87.6%,
+    R5 responder rate N/A%
 
 CONCLUSION: The GRS demonstrates strong discriminative performance for predicting
 simulated GLP-1 response, with clear dose-response relationship across profiles
@@ -132,50 +132,51 @@ BMN v3.4 scores pre-computed with validated Monte Carlo imputation.
   Total eligible: 12733 subjects
 
 3.2 Profile Distribution
-  R1: n=386, Responder rate=100.0%, Super-resp=3.1%, Mean TBWL=15.8%
-  R2: n=2761, Responder rate=87.3%, Super-resp=0.0%, Mean TBWL=12.9%
-  R3: n=7658, Responder rate=68.3%, Super-resp=0.0%, Mean TBWL=10.6%
-  R4: n=1644, Responder rate=48.2%, Super-resp=0.0%, Mean TBWL=9.9%
-  R5: n=6, Responder rate=0.0%, Super-resp=0.0%, Mean TBWL=3.1%
-  CI: n=278, Responder rate=0.0%, Super-resp=0.0%, Mean TBWL=4.9%
+  R1: n=314, Responder rate=87.6%, Super-resp=22.0%, Mean TBWL=16.1%
+  R2: n=2714, Responder rate=74.8%, Super-resp=5.8%, Mean TBWL=13.0%
+  R3: n=8023, Responder rate=58.8%, Super-resp=0.1%, Mean TBWL=10.9%
+  R4: n=1404, Responder rate=56.8%, Super-resp=0.0%, Mean TBWL=10.7%
+  R5: n=0, Responder rate=0%, Super-resp=0%, Mean TBWL=0%
+  CI: n=278, Responder rate=0.0%, Super-resp=0.0%, Mean TBWL=5.1%
 
 3.3 Discriminative Performance
 
-  GRS -> Responder:       AUC = 0.6503 (0.6402-0.6604)
-  GRS -> Super-Responder: AUC = 0.9963 (0.9941-0.9982)
-  GRI -> Responder:       AUC = 0.5576
-  Baseline LR:            AUC = 0.7902
+  GRS -> Responder:       AUC = 0.5612 (0.5503-0.5707)
+  GRS -> Super-Responder: AUC = 0.9108 (0.8959-0.9231)
+  GRI -> Responder:       AUC = 0.5401
+  Baseline LR:            AUC = 0.5724
 
 3.4 Reclassification
-  NRI = -0.4919 (events: -0.7192, non-events: +0.2273)
-  IDI = -0.0996
-  Brier Score: 0.1866
+  NRI = +0.9463 (events: -0.0321, non-events: +0.9784)
+  IDI = +0.2106
+  Brier Score: 0.1568
 
 3.5 Subgroup Analysis
-  Age_18-39           : AUC=0.629 (0.609-0.649), n=4086, Resp=74.5%
-  Age_40-59           : AUC=0.614 (0.595-0.634), n=4410, Resp=76.0%
-  Age_60+             : AUC=0.760 (0.748-0.774), n=4237, Resp=57.1%
-  BMI_27-30           : AUC=0.690 (0.667-0.710), n=4169, Resp=81.1%
-  BMI_30-35           : AUC=0.680 (0.663-0.698), n=4647, Resp=78.6%
-  BMI_35-40           : AUC=0.709 (0.689-0.731), n=2183, Resp=67.4%
-  BMI_40+             : AUC=0.845 (0.822-0.866), n=1734, Resp=18.1%
-  DT2_No              : AUC=0.652 (0.640-0.663), n=9981, Resp=70.4%
-  DT2_Yes             : AUC=0.781 (0.761-0.800), n=2752, Resp=65.0%
-  Eth_African         : AUC=0.673 (0.653-0.690), n=3250, Resp=65.5%
-  Eth_EastAsian       : AUC=0.680 (0.627-0.727), n=840, Resp=85.7%
-  Eth_European        : AUC=0.643 (0.630-0.656), n=8643, Resp=69.1%
-  Female              : AUC=0.653 (0.641-0.667), n=6727, Resp=61.0%
-  Male                : AUC=0.635 (0.619-0.653), n=6006, Resp=78.4%
-  MetS_No             : AUC=0.675 (0.662-0.689), n=7956, Resp=70.5%
-  MetS_Yes            : AUC=0.728 (0.714-0.742), n=4777, Resp=67.2%
+  Age_18-39           : AUC=0.542 (0.523-0.559), n=4086, Resp=62.4%
+  Age_40-59           : AUC=0.538 (0.521-0.556), n=4410, Resp=63.7%
+  Age_60+             : AUC=0.620 (0.604-0.637), n=4237, Resp=58.2%
+  BMI_27-30           : AUC=0.538 (0.520-0.556), n=4169, Resp=62.2%
+  BMI_30-35           : AUC=0.554 (0.535-0.571), n=4647, Resp=63.5%
+  BMI_35-40           : AUC=0.575 (0.548-0.601), n=2183, Resp=62.9%
+  BMI_40+             : AUC=0.617 (0.588-0.639), n=1734, Resp=52.1%
+  DT2_No              : AUC=0.536 (0.526-0.547), n=9981, Resp=60.9%
+  DT2_Yes             : AUC=0.684 (0.664-0.702), n=2752, Resp=63.3%
+  Eth_African         : AUC=0.566 (0.546-0.585), n=3250, Resp=61.7%
+  Eth_EastAsian       : AUC=0.583 (0.538-0.620), n=840, Resp=66.4%
+  Eth_European        : AUC=0.555 (0.543-0.568), n=8643, Resp=60.8%
+  Female              : AUC=0.564 (0.549-0.578), n=6727, Resp=60.1%
+  Male                : AUC=0.556 (0.540-0.572), n=6006, Resp=62.9%
+  MetS_No             : AUC=0.530 (0.517-0.543), n=7956, Resp=60.3%
+  MetS_Yes            : AUC=0.623 (0.608-0.639), n=4777, Resp=63.3%
 
 3.6 Axis Contribution to Discrimination
-  chronScore     : AUC = 0.8129
-  psychoScore    : AUC = 0.6980
-  demoBonus      : AUC = 0.5330
-  irScore        : AUC = 0.5104
-  iatroScore     : AUC = 0.5009
-  inflamScore    : AUC = 0.4664
+  chronScore     : AUC = 0.5518
+  inflamScore    : AUC = 0.5279
+  demoBonus      : AUC = 0.5233
+  irScore        : AUC = 0.5222
+  psychoScore    : AUC = 0.5142
+  betaCellAxis   : AUC = 0.5086
+  iatroScore     : AUC = 0.4995
 
 ================================================================================
 4. DISCUSSION
