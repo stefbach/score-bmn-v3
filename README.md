@@ -143,9 +143,11 @@
 - **Calibration**: ICI=0.032, E/O=1.04, slope=0.91
 - **Profils GLP-1**: R1 Excellent (2.5%, 92% resp), R2 Good (21.3%, 80.9%), R3 Partial (49%, 64%), R4 Non-resp (25%, 63.1%), CI (2.2%, 0%)
 - **Super-responder**: AUC 0.911 (metric interne, anti-circularite)
-- **16 figures** (8 principales + 9 supplementaires)
+- **16 figures** (8 principales + 9 supplementaires), toutes reassignees et verifiees
 - **52 references scientifiques**
-- **Peer-reviewed**: 23 corrections Lancet Digital Health appliquees (mars 2026)
+- **Peer-reviewed**: 23 corrections R1 + 10 corrections R2 + 7 corrections R3 (mars 2026)
+- **R3 corrections**: Realignement complet figures/legendes (17 reassignations), regeneration 4 PNG v3.5, Figure 3 calibration ajoutee
 - **Supplementary Methods S1**: Equations FNC completes, reponderation dynamique, bioNorm, safety floors
+- **Table S5**: 18 biomarqueurs avec seuils normal/critique, poids wi, panels P5/P10/P15, sources
 - **COI/Funding/CRediT**: Sections ICMJE completes avec declaration IA
 - **Cibles**: BMC Medicine (principal), Lancet Digital Health (avec validation externe)
