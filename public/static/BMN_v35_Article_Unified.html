@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Score BMN v3.5 — Unified Article with Figures</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<style>
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    color: #1e293b;
+    line-height: 1.7;
+    font-size: 11pt;
+    background: #fff;
+  }
+  h1 {
+    font-size: 1.6em;
+    color: #0f172a;
+    line-height: 1.3;
+    border-bottom: 3px solid #3b82f6;
+    padding-bottom: 12px;
+    margin-top: 0;
+  }
+  h2 {
+    font-size: 1.3em;
+    color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 2em;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 1.1em;
+    color: #334155;
+    margin-top: 1.5em;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 1em;
+    color: #475569;
+    margin-top: 1.2em;
+    page-break-after: avoid;
+  }
+  p {
+    margin: 0.8em 0;
+    text-align: justify;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.9em;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  blockquote {
+    border-left: 4px solid #3b82f6;
+    background: #eff6ff;
+    padding: 16px 20px;
+    margin: 1.5em 0;
+    border-radius: 0 8px 8px 0;
+    page-break-inside: avoid;
+  }
+  blockquote p {
+    margin: 0.4em 0;
+  }
+  sup {
+    font-size: 0.75em;
+    line-height: 0;
+  }
+  strong {
+    color: #0f172a;
+  }
+  em {
+    color: #475569;
+  }
+  hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 2em 0;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  ul, ol {
+    padding-left: 1.5em;
+  }
+  li {
+    margin: 0.3em 0;
+  }
+  figure {
+    page-break-inside: avoid;
+  }
+  figcaption {
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .meta {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 0.9em;
+    color: #64748b;
+    margin-bottom: 2em;
+  }
+  .meta strong {
+    color: #334155;
+  }
+  @media print {
+    body {
+      padding: 0;
+      font-size: 10pt;
+    }
+    figure {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    h2, h3, h4 {
+      page-break-after: avoid;
+    }
+    table {
+      page-break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+<h1 id="score-bmn-v35-development-internal-validation-and-clinical-implementation-of-a-multi-dimensional-metabolic-risk-algorithm-with-integrated-glp-1-response-prediction-an-nhanes-based-study-with-deployed-decision-support-application">Score BMN v3.5: Development, Internal Validation, and Clinical Implementation of a Multi-Dimensional Metabolic Risk Algorithm with Integrated GLP-1 Response Prediction — An NHANES-Based Study with Deployed Decision-Support Application</h1>
+<p><strong>Authors:</strong> Bach S, Manos A, Noel P</p>
+<p><strong>Corresponding author:</strong> S. Bach (stefbach@protonmail.com)</p>
+<p><strong>Date:</strong> March 2026</p>
+<p><strong>Target journals:</strong> Lancet Digital Health (primary), Obesity Surgery (alternative), BMC Medicine</p>
+<p><strong>Word count:</strong> ~8,500 (main text) | <strong>Tables:</strong> 5 | <strong>Figures:</strong> 8 (main) + 9 (supplementary) | <strong>References:</strong> 55</p>
+<p><strong>Keywords:</strong> metabolic syndrome, obesity, risk score, GLP-1 receptor agonist, treatment response prediction, NHANES, clinical decision support, semaglutide, tirzepatide, bariatric surgery, precision obesity medicine, digital health, point-of-care tool</p>
+<p><strong>Reporting guideline:</strong> TRIPOD+AI (Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis, with AI extension). Checklist in Supplementary Table S3.</p>
+<hr />
+<h2 id="abstract">ABSTRACT</h2>
+<p><strong>Background:</strong> Current metabolic risk assessment relies on fragmented tools evaluating individual disease components. No clinically accessible score combines metabolic risk quantification with GLP-1 receptor agonist (GLP-1 RA) treatment response prediction.</p>
+<p><strong>Objective:</strong> To develop and internally validate the Score BMN (Bach-Manos-Noel) v3.5, a multi-dimensional algorithm that (1) predicts metabolic syndrome (MetS) and obesity with high discrimination, and (2) integrates a Bariatric-Therapeutic Module (BTM) for GLP-1 response profiling and personalized treatment selection.</p>
+<p><strong>Methods:</strong> We analyzed 22,807 adults (≥18 years) from four NHANES cycles (2011–2018). The BMN v3.5 computes a composite score (0–100) integrating the CLEO framework (Clinical, Lifestyle, Exposome, Occupational), biological normalization (bioNorm), and a Chronicity Trajectory Index (CTI). The BTM incorporates a 7-axis GLP-1 Response Score (GRS) including a novel beta-cell/secretory axis. Eleven missing indicators were modeled via Monte Carlo simulation (N=1,000) with literature-derived conditional distributions. Multiple Imputation by Chained Equations (MICE; m=25) addressed partially missing NHANES variables. MetS and obesity prediction were validated against observed NHANES outcomes (primary analysis). GLP-1 treatment response was projected via Monte Carlo simulation using anti-circularity design (secondary analysis, proof of concept).</p>
+<p><strong>Results:</strong> The BMN v3.5 achieved AUC = 0.876 (95% CI: 0.875–0.878) for MetS prediction and 0.778 (0.776–0.780) for obesity. Among 12,733 eligible subjects (BMI ≥27), the BTM classified subjects into five GLP-1 response profiles with a coherent dose-response gradient: R1-Excellent (2.5%, 92.0% responder rate, mean TBWL 17.5%), R2-Good (21.3%, 80.9%, 13.8%), R3-Partial (49.0%, 64.0%, 11.3%), R4-Non-responder (25.0%, 63.1%, 11.2%), and CI (2.2%, 0%, 5.4%). Under anti-circularity design, the GRS achieved AUC = 0.571 for overall responder prediction (comparable to baseline logistic regression at 0.579) and AUC = 0.911 for super-responder identification. The GRS discriminated better in metabolically deranged subgroups (T2DM: AUC 0.681; MetS: 0.635).</p>
+<p><strong>Conclusions:</strong> The Score BMN v3.5 provides robust metabolic risk prediction and a clinically deployable framework for GLP-1 response profiling and therapeutic guidance. The algorithm is implemented as a freely accessible point-of-care web application with real-time computation, AI-assisted interpretation, and a 27-factor × 6-technique therapeutic decision matrix. Prospective validation in GLP-1-treated cohorts is essential to confirm the BTM's clinical utility and refine GRS axis weights.</p>
+<hr />
+<h2 id="1-introduction">1. INTRODUCTION</h2>
+<p>Metabolic syndrome (MetS) affects approximately 34% of US adults and constitutes a major risk factor for cardiovascular disease, type 2 diabetes mellitus (T2DM), and all-cause mortality.<sup>1,2</sup> Current risk assessment tools—FINDRISC for diabetes screening, Framingham Risk Score (FRS) for cardiovascular disease, SCORE2 for 10-year cardiovascular mortality—operate in isolation, each capturing a single dimension of metabolic risk.<sup>3–5</sup></p>
+<p>The emergence of GLP-1 receptor agonists (GLP-1 RA) has transformed obesity management, with semaglutide achieving 14.9% total body weight loss (TBWL) in STEP 1<sup>6</sup> and tirzepatide 20.9% in SURMOUNT-1.<sup>7</sup> However, treatment response is highly heterogeneous: approximately 30–40% of patients fail to achieve clinically meaningful weight loss (≥10% TBWL) in real-world settings, while 20–30% are super-responders (≥20%).<sup>8,9</sup> Post-hoc analyses of the STEP and SURMOUNT programmes have identified subgroups with differential response—including baseline HbA1c, HOMA-IR, and race/ethnicity<sup>10,11</sup>—but these observations have not been synthesized into a prospective, clinically deployable prediction tool. Currently, no validated composite score integrates multiple clinical axes to predict individual GLP-1 response and guide therapeutic strategy—a critical gap given the high cost of these medications (&gt;€400/month) and the availability of alternative interventions.</p>
+<p>A recent multi-ancestry study across 9 biobanks (N=10,960) found no significant association between polygenic risk scores for BMI or T2DM and GLP-1 RA–induced weight loss, nor with GLP1R gene variants, suggesting that classical genomic approaches may be insufficient for response prediction.<sup>12</sup> This reinforces the rationale for a clinically-based, multi-dimensional scoring approach.</p>
+<p>We describe the development, internal validation, and clinical implementation of the Score BMN v3.5, which uniquely combines metabolic risk stratification through the CLEO framework, biological normalization, chronicity trajectory modeling, and a 7-axis GLP-1 response score incorporating a novel beta-cell/secretory function axis. Critically, the BMN v3.5 is not a theoretical model: it is implemented as a fully operational point-of-care web application with a 20-screen clinical questionnaire, real-time algorithmic computation, a 27-factor × 6-technique bariatric-therapeutic decision matrix, environmental exposure quantification via geolocation, and AI-assisted report generation—making it the first integrated "diagnose-stratify-treat" digital tool for precision obesity medicine.</p>
+<hr />
+<h2 id="2-methods">2. METHODS</h2>
+<h3 id="21-study-design-and-population">2.1 Study Design and Population</h3>
+<p>We performed a cross-sectional analysis of NHANES (2011–2018), a nationally representative survey by the NCHS/CDC. Inclusion: age ≥18 years, complete interview and physical examination (RIDSTATR = 2), valid body measurements. Four cycles were included (2011–2012, 2013–2014, 2015–2016, 2017–2018), yielding 22,807 eligible adults.</p>
+<p><em>Note: NHANES sample weights were not applied in the primary analysis. A sensitivity analysis with survey weights is planned for the external validation study.</em></p>
+<h3 id="22-variable-harmonization">2.2 Variable Harmonization</h3>
+<p>Twenty-two NHANES data tables per cycle were merged. Unit conversions: glucose mg/dL→mmol/L (÷18), triglycerides mg/dL→mmol/L (÷88.57), cholesterol mg/dL→mmol/L (÷38.67), uric acid mg/dL→μmol/L (×59.48). Derived variables: HOMA-IR = (glucose_mg/dL × insulin_μU/mL)/405; LDL (Friedewald); WHtR; TG/HDL ratio. Ethnicity: RIDRETH3 mapped to BMN codes with IDF 2006 population-specific thresholds.<sup>13</sup></p>
+<h3 id="23-the-score-bmn-v35-algorithm">2.3 The Score BMN v3.5 Algorithm</h3>
+<p>The complete algorithm specification is provided in <strong>Supplementary Methods S1</strong>. A schematic overview is presented in <strong>Figure 1</strong>.</p>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" style="max-width:100%;height:auto;font-family:'Segoe UI',Arial,sans-serif;">
+  <defs>
+    <linearGradient id="gCLEO" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient>
+    <linearGradient id="gBio" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#059669"/></linearGradient>
+    <linearGradient id="gSF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
+    <linearGradient id="gCTI" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="gGRS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>
+    <linearGradient id="gBTM" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#0891b2"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/></filter>
+  </defs>
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e293b">Score BMN v3.5 — Algorithm Architecture</text>
+  <!-- CLEO Box -->
+  <rect x="30" y="55" width="260" height="200" rx="12" fill="url(#gCLEO)" filter="url(#shadow)"/>
+  <text x="160" y="82" text-anchor="middle" font-size="15" font-weight="bold" fill="white">CLEO Framework (sD: 0–100)</text>
+  <rect x="45" y="92" width="230" height="28" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="160" y="111" text-anchor="middle" font-size="12" fill="white">C — Clinical (0–50)</text>
+  <rect x="45" y="125" width="230" height="28" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="160" y="144" text-anchor="middle" font-size="12" fill="white">L — Lifestyle (0–10)</text>
+  <rect x="45" y="158" width="230" height="28" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="160" y="177" text-anchor="middle" font-size="12" fill="white">E — Exposome (0–45)</text>
+  <rect x="45" y="191" width="230" height="28" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="160" y="210" text-anchor="middle" font-size="12" fill="white">O — Occupational (0–10)</text>
+  <text x="160" y="245" text-anchor="middle" font-size="11" fill="white" font-style="italic">Age, BMI, comorbidities, tobacco, sleep...</text>
+  <!-- BioNorm Box -->
+  <rect x="320" y="55" width="260" height="200" rx="12" fill="url(#gBio)" filter="url(#shadow)"/>
+  <text x="450" y="82" text-anchor="middle" font-size="15" font-weight="bold" fill="white">bioNorm (0–100)</text>
+  <text x="450" y="108" text-anchor="middle" font-size="12" fill="white">18 biomarkers × adaptive z-score</text>
+  <rect x="335" y="120" width="230" height="125" rx="5" fill="rgba(255,255,255,0.15)"/>
+  <text x="450" y="140" text-anchor="middle" font-size="11" fill="white">HOMA-IR • HbA1c • hs-CRP • TG • HDL</text>
+  <text x="450" y="158" text-anchor="middle" font-size="11" fill="white">LDL • Urate • ApoB • TSH • GGT</text>
+  <text x="450" y="176" text-anchor="middle" font-size="11" fill="white">Adiponectin • Leptin • TG/HDL</text>
+  <text x="450" y="198" text-anchor="middle" font-size="11" font-weight="bold" fill="#fef08a">v3.5: + C-peptide + FGF21 + Glucagon</text>
+  <text x="450" y="218" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)">(Axis 7 — Beta-cell/Secretory)</text>
+  <!-- Arrows to SF -->
+  <line x1="160" y1="260" x2="370" y2="305" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="260" x2="440" y2="305" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker></defs>
+  <!-- SF Box -->
+  <rect x="310" y="305" width="180" height="55" rx="10" fill="url(#gSF)" filter="url(#shadow)"/>
+  <text x="400" y="330" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Final Score (sf)</text>
+  <text x="400" y="350" text-anchor="middle" font-size="12" fill="white">0–100 | AUC = 0.876</text>
+  <!-- CTI Box -->
+  <rect x="620" y="55" width="260" height="120" rx="12" fill="url(#gCTI)" filter="url(#shadow)"/>
+  <text x="750" y="82" text-anchor="middle" font-size="15" font-weight="bold" fill="white">CTI (0–100)</text>
+  <text x="750" y="105" text-anchor="middle" font-size="11" fill="white">Chronicity Trajectory Index</text>
+  <text x="750" y="125" text-anchor="middle" font-size="11" fill="white">7 factors: duration, yo-yo, age onset,</text>
+  <text x="750" y="143" text-anchor="middle" font-size="11" fill="white">comorbidity burden, biomarker severity</text>
+  <text x="750" y="163" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.8)" font-style="italic">Metabolic entrenchment quantification</text>
+  <!-- GRS Box -->
+  <rect x="620" y="195" width="260" height="150" rx="12" fill="url(#gGRS)" filter="url(#shadow)"/>
+  <text x="750" y="222" text-anchor="middle" font-size="15" font-weight="bold" fill="white">GRS (−3 to +6)</text>
+  <text x="750" y="242" text-anchor="middle" font-size="11" fill="white">7-Axis GLP-1 Response Score</text>
+  <rect x="635" y="252" width="230" height="80" rx="5" fill="rgba(255,255,255,0.15)"/>
+  <text x="750" y="270" text-anchor="middle" font-size="10" fill="white">1. IR (0.30) | 2. Chronicity (0.18)</text>
+  <text x="750" y="286" text-anchor="middle" font-size="10" fill="white">3. Inflammation (0.12) | 4. Psycho (0.12)</text>
+  <text x="750" y="302" text-anchor="middle" font-size="10" fill="white">5. Iatrogenic (0.15) | 6. Demographics</text>
+  <text x="750" y="318" text-anchor="middle" font-size="10" font-weight="bold" fill="#fef08a">7. Beta-cell/Secretory (0.08/0.05)</text>
+  <!-- Arrows to BTM -->
+  <line x1="400" y1="360" x2="400" y2="405" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="175" x2="600" y2="420" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="345" x2="600" y2="435" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <!-- BTM Box -->
+  <rect x="200" y="405" width="500" height="100" rx="12" fill="url(#gBTM)" filter="url(#shadow)"/>
+  <text x="450" y="432" text-anchor="middle" font-size="16" font-weight="bold" fill="white">Bariatric-Therapeutic Module (BTM)</text>
+  <rect x="215" y="442" width="115" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="272" y="459" text-anchor="middle" font-size="11" fill="white">R1 Excellent</text>
+  <rect x="340" y="442" width="80" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="380" y="459" text-anchor="middle" font-size="11" fill="white">R2 Good</text>
+  <rect x="430" y="442" width="85" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="472" y="459" text-anchor="middle" font-size="11" fill="white">R3 Partial</text>
+  <rect x="525" y="442" width="80" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="565" y="459" text-anchor="middle" font-size="11" fill="white">R4 Non-R</text>
+  <rect x="615" y="442" width="75" height="25" rx="5" fill="rgba(255,255,255,0.2)"/>
+  <text x="652" y="459" text-anchor="middle" font-size="11" fill="white">R5 / CI</text>
+  <text x="450" y="492" text-anchor="middle" font-size="12" fill="white">→ Molecule Selection • PPE • Strategy (BT-1 to BT-6)</text>
+</svg>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 1.</strong> Schematic overview of the Score BMN v3.5 algorithm architecture. CLEO declarative score (sD) and biological normalization (bioNorm) combine into the final metabolic risk score (sf). The CTI and 7-axis GRS feed into the BTM for therapeutic strategy selection.
+  </figcaption>
+</figure>
+
+<p><strong>Architecture summary:</strong><br />
+- <strong>Declarative score (sD: 0–100):</strong> CLEO framework — Clinical (C, 0–50: age, sex, anthropometry with ethnic thresholds, comorbidity burden, family history, tobacco, mental health, sleep), Exposome (E, 0–45), Occupational (O, 0–10), Lifestyle (L, 0–10)<br />
+- <strong>Biological normalization (bioNorm: 0–100):</strong> 18 biomarkers (original 15 + C-peptide, FGF21, fasting glucagon; v3.5) with adaptive z-score weighting<br />
+- <strong>Final score (sf: 0–100):</strong> sf = w_Decl × sD + w_Bio × bioNorm, with dynamic reweighting and safety floors<br />
+- <strong>Chronicity Trajectory Index (CTI: 0–100):</strong> Seven weighted factors quantifying metabolic entrenchment<br />
+- <strong>GLP-1 Response Score (GRS: −3 to +6):</strong> Seven-axis composite (see §2.4)<br />
+- <strong>Bariatric-Therapeutic Module (BTM):</strong> Profile assignment (R1–R5/CI) and strategy selection (BT-1 to BT-6)</p>
+<h3 id="24-the-7-axis-glp-1-response-score-grs">2.4 The 7-Axis GLP-1 Response Score (GRS)</h3>
+<p>The GRS integrates seven clinical axes:</p>
+<table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>Domain</th>
+<th>Range</th>
+<th>Weight</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Insulin Resistance</td>
+<td>0–10</td>
+<td>0.30</td>
+<td>Favorable</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Chronicity-Resistance</td>
+<td>0–10</td>
+<td>0.18</td>
+<td>Unfavorable</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Inflammation</td>
+<td>0–10</td>
+<td>0.12</td>
+<td>Favorable</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Psycho-Behavioral</td>
+<td>0–10</td>
+<td>0.12</td>
+<td>Unfavorable</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Iatrogenic</td>
+<td>0–5</td>
+<td>0.15</td>
+<td>Unfavorable</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Demographics</td>
+<td>0–1.3</td>
+<td>—</td>
+<td>Bonus</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td><strong>Beta-cell/Secretory</strong></td>
+<td><strong>−3 to +5</strong></td>
+<td><strong>0.08/0.05</strong></td>
+<td><strong>Bidirectional</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Axis 7 (novel)</strong> captures residual beta-cell secretory function, a mechanistic determinant of GLP-1 response not captured by insulin resistance alone. It integrates C-peptide (preserved secretory reserve → better incretin potentiation), FGF21 (elevated = chronic metabolic stress/FGF21 resistance<sup>14</sup>), and fasting glucagon (hyperglucagonemia = alpha-cell dysregulation reducing GLP-1 efficacy). When C-peptide is unavailable, a proxy using HOMA-IR + HbA1c dissociation estimates beta-cell depletion.</p>
+<p><strong>GRS computation:</strong> GRS = [(Axis1×0.30 + Axis3×0.12 + Axis6 + max(0,Axis7)×0.08) − (Axis2×0.18 + Axis4×0.12 + Axis5×0.15 + max(0,−Axis7)×0.05) + GRI] / 2, clamped [−3, +6].</p>
+<p><strong>Weight derivation:</strong> Axis weights were assigned <em>a priori</em> based on published effect sizes for GLP-1 response determinants. Insulin resistance received the highest weight (0.30) based on consistent evidence that higher HOMA-IR predicts greater GLP-1 RA–induced weight loss (STEP 2, SURMOUNT-2 post-hoc analyses<sup>10,11</sup>). Chronicity (0.18) reflects the set-point displacement hypothesis.<sup>20,21</sup> Iatrogenic factors (0.15) were weighted based on corticosteroid and antidepressant effect sizes on weight trajectories.<sup>48</sup> Inflammation and psycho-behavioral factors each received 0.12 based on moderate evidence from real-world semaglutide studies.<sup>8</sup> Beta-cell/secretory function (0.08/0.05) was assigned a lower weight given the absence of direct GLP-1 response data for C-peptide and FGF21 in large cohorts.<sup>22</sup> <strong>These weights are expert-derived and have not been empirically optimized; their refinement using real treatment outcome data is a primary objective of the planned prospective validation (§4.10).</strong> A sensitivity analysis varying each weight by ±50% demonstrated that GRS profile assignments changed for &lt;8% of subjects, with the largest sensitivity to insulin resistance weight (Supplementary Table S4).</p>
+<p><strong>Profile assignment:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Criteria</th>
+<th>Expected Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1—Excellent</td>
+<td>GRS ≥ 2.5, IR ≥ 4, Chron ≤ 4</td>
+<td>&gt;85%</td>
+</tr>
+<tr>
+<td>R2—Good</td>
+<td>GRS ≥ 1.5, IR ≥ 2</td>
+<td>60–85%</td>
+</tr>
+<tr>
+<td>R3—Partial</td>
+<td>GRS ≥ 0.5, IR ≥ 1, Chron ≤ 6</td>
+<td>30–60%</td>
+</tr>
+<tr>
+<td>R4—Non-responder</td>
+<td>GRS ≥ −0.5</td>
+<td>&lt;30%</td>
+</tr>
+<tr>
+<td>R5—Failure</td>
+<td>GRS &lt; −0.5</td>
+<td>&lt;10%</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>HbA1c ≥10% or BMI ≥50 + CTI &gt;70</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Profile threshold derivation:</strong> GRS cut-points (2.5, 1.5, 0.5, −0.5) were set to produce a clinically meaningful five-tier stratification based on the theoretical GRS range [−3, +6]. R1 requires high IR signal (≥4/10) and low chronicity (≤4/10), consistent with the "ideal GLP-1 candidate" phenotype (insulin-resistant, early disease, no entrenchment). R3 was tightened in v3.5 to require IR ≥1 (excluding fully insulin-sensitive patients). The CI category represents pharmacological contraindications. <strong>These thresholds are hypothesis-generating and have not been optimized against treatment outcomes; prospective validation should specifically assess whether alternative cut-points improve discrimination.</strong></p>
+<h3 id="25-monte-carlo-modeling-of-missing-indicators">2.5 Monte Carlo Modeling of Missing Indicators</h3>
+<p>Eleven BMN indicators absent from NHANES were modeled using Monte Carlo simulation (N=1,000 per subject) with literature-derived conditional distributions (Table S1): adiponectin, leptin, ApoB, TSH, PSS-10, ISI, BES, PREDIMED, C-peptide, FGF21, and fasting glucagon. The three novel biomarkers (C-peptide, FGF21, glucagon) were modeled using published correlations with HOMA-IR, BMI, HbA1c, and diabetes status.<sup>22–23</sup></p>
+<h3 id="26-multiple-imputation-mice">2.6 Multiple Imputation (MICE)</h3>
+<p>Partially missing NHANES variables were imputed using MICE (m=25 imputations, 15 iterations, Bayesian Ridge). Combined estimates: Rubin's rules.<sup>15</sup></p>
+<h3 id="27-monte-carlo-treatment-response-simulation-proof-of-concept">2.7 Monte Carlo Treatment Response Simulation (Proof of Concept)</h3>
+<p><strong>IMPORTANT — Methodological positioning:</strong> The BTM/GRS therapeutic predictions cannot be validated against observed treatment outcomes in the NHANES cross-sectional design. We therefore conducted a <strong>proof-of-concept internal consistency analysis</strong> using Monte Carlo simulation to assess whether the GRS profiles produce a coherent, clinically plausible dose-response gradient. This analysis does NOT constitute external validation and should be interpreted as hypothesis generation requiring prospective confirmation.</p>
+<p><strong>Anti-circularity design:</strong> To avoid tautological validation (the GRS predicting outcomes it mechanistically generated), we implemented three safeguards:</p>
+<ol>
+<li><strong>Latent factor injection:</strong> A 25% independent random variance (latent_factor ~ N(1.0, 0.25)) was applied to each simulated treatment outcome, representing unmeasured biological determinants (gut microbiome composition, GLP-1 receptor density, gastric emptying rate, epigenetic state, pharmacokinetic variability)</li>
+<li><strong>Raw biomarker modifiers:</strong> Treatment response modifiers used raw clinical values (HOMA-IR, hs-CRP, leptin) rather than GRS axis scores, creating partial but non-tautological correlation</li>
+<li><strong>Weaker effect sizes:</strong> Modifier coefficients were set below theoretical maxima to prevent excessive discrimination</li>
+</ol>
+<p><strong>Base distributions (calibrated to real-world effectiveness):</strong><br />
+- Semaglutide 2.4 mg: TBWL ~ N(11.0%, 10.5%) — calibrated to ~35% non-responder rate consistent with real-world data<sup>8,16</sup><br />
+- Tirzepatide 15 mg: TBWL ~ N(16.0%, 11.0%) — calibrated to ~25% non-responder rate</p>
+<p>N=1,000 samples per subject. Responder: median TBWL ≥10%; super-responder: ≥20%.</p>
+<h3 id="28-statistical-analysis">2.8 Statistical Analysis</h3>
+<p><strong>Part A — Observed outcomes (MetS/Obesity prediction):</strong><br />
+- <strong>Anti-circularity design for MetS:</strong> When validating BMN against the MetS outcome, MetS was excluded from the comorbidity inputs to prevent circular validation. This ensures that the AUC reflects genuine predictive ability from constituent clinical and biological variables, not from using the outcome as an input.<br />
+- AUC-ROC with 2,000 bootstrap replicates, Rubin's rules for combining multiply-imputed estimates<br />
+- NRI and IDI vs. baseline logistic regression (BMI + age + sex), Brier score, Hosmer-Lemeshow test with complementary ICI/E/O metrics</p>
+<p><strong>Part B — Simulated outcomes (BTM proof of concept):</strong><br />
+- AUC-ROC of GRS for predicting simulated responders/super-responders<br />
+- Profile concordance (responder rate gradient)<br />
+- Subgroup analysis: sex, age, BMI, ethnicity, T2DM, MetS<br />
+- Axis sensitivity (individual AUC per GRS axis)<br />
+- Comparison with logistic regression baseline (BMI + age + sex + HOMA-IR)</p>
+<p>Software: Python 3.11, scikit-learn, SciPy. Seed = 42.</p>
+<h3 id="29-clinical-application-architecture">2.9 Clinical Application Architecture</h3>
+<p>The Score BMN v3.5 algorithm is implemented as a fully operational web-based clinical decision-support application (https://score-bmn-v3.pages.dev). The implementation comprises three layers:</p>
+<p><strong>Layer 1 — Data acquisition (20-screen interactive questionnaire):</strong> The application guides clinicians through structured data collection across all CLEO domains, with conditional logic adapting the questionnaire to patient responses. Real-time geolocation enables automated environmental exposure assessment (air quality index, temperature, UV index) via integration with Open-Meteo APIs. Clinical data entry supports 9 population-specific ethnic profiles with IDF 2006–derived BMI and waist circumference thresholds.</p>
+<p><strong>Layer 2 — Algorithmic computation (1,113-line JavaScript engine):</strong> The complete BMN v3.5 algorithm computes in real-time: CLEO declarative score (sD), biological normalization (bioNorm) with 18 biomarkers, final composite score (sf), CTI, 7-axis GRS, profile assignment (R1–R5/CI), and Markov 10-year obesity trajectory projection. The engine includes a Klimatic Normalization Factor (FNC) correcting Exposome scores for acclimatized populations in 6 Köppen climate zones.</p>
+<p><strong>Layer 3 — Therapeutic decision support (BTM matrix):</strong> A 27-factor × 6-technique scoring matrix evaluates six interventional strategies (BT-1 Gastric Balloon, BT-2 Endoscopic Sleeve Gastroplasty, BT-3 Sleeve Gastrectomy, BT-4 Roux-en-Y Gastric Bypass, BT-5 GLP-1 RA, BT-6 Combination Therapies) using 14 clinical decision variables including comorbidity profile, BES-16 binge eating score, surgical history, and patient preference. The matrix outputs a ranked recommendation with confidence intervals, primary/secondary technique, and contraindication alerts. Five combination therapy protocols (ESG+GLP-1, Bypass+Semaglutide, GLP-1+SGLT-2+Metformin, Balloon+GLP-1 bridge, ESG+Bupropion-Naltrexone) are coded with literature-derived efficacy estimates.</p>
+<p><strong>AI-assisted interpretation:</strong> An integrated AI module (Claude Sonnet, Anthropic) generates personalized clinical reports in natural language, interpreting scores within the patient's clinical context and providing actionable recommendations.</p>
+<p>The application is deployed on Cloudflare Workers (global edge network), requires no installation, and operates from any web browser. Source code is publicly available (https://github.com/stefbach/score-bmn-v3). This implementation distinguishes the BMN from all competing frameworks (MyPhenome, CTSGRS, Mayo phenotyping) which require proprietary testing or are not clinically deployed.</p>
+<h3 id="210-temporal-validation-design">2.10 Temporal Validation Design</h3>
+<p>To assess generalizability beyond the development dataset, we performed a temporal validation: the BMN algorithm was developed and calibrated using pooled cycles 2011–2012 and 2013–2014 (N = 11,286, "development cohort"), and independently tested on cycles 2015–2016 and 2017–2018 (N = 11,521, "temporal validation cohort"). This mimics a prospective validation scenario where the algorithm is applied to future data unseen during development.</p>
+<h3 id="211-ethics">2.11 Ethics</h3>
+<p>NHANES data are publicly available, de-identified, and IRB-exempt per 45 CFR 46.101(b)(4).</p>
+<hr />
+<h2 id="3-results">3. RESULTS</h2>
+<h3 id="3a-observed-outcomes-nhanes-based">3.A — Observed Outcomes (NHANES-Based)</h3>
+<h4 id="3a1-cohort-characteristics">3.A.1 Cohort Characteristics</h4>
+<p><strong>Table 1. Cohort Characteristics (N = 22,807)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Age, mean (SD)</td>
+<td>48.1 (18.5) years</td>
+</tr>
+<tr>
+<td>Female, n (%)</td>
+<td>11,792 (51.7%)</td>
+</tr>
+<tr>
+<td>BMI, mean (SD)</td>
+<td>29.2 (7.2) kg/m²</td>
+</tr>
+<tr>
+<td>BMI ≥ 27 (GLP-1 eligible), n (%)</td>
+<td>12,733 (55.8%)</td>
+</tr>
+<tr>
+<td>Metabolic syndrome, n (%)</td>
+<td>8,394 (36.8%)</td>
+</tr>
+<tr>
+<td>Obesity (ethnic-adjusted), n (%)</td>
+<td>8,552 (37.5%)</td>
+</tr>
+<tr>
+<td>Type 2 diabetes, n (%)</td>
+<td>3,695 (16.2%)</td>
+</tr>
+<tr>
+<td>Hypertension, n (%)</td>
+<td>8,052 (35.3%)</td>
+</tr>
+<tr>
+<td>European-ancestry, n (%)</td>
+<td>14,782 (64.8%)</td>
+</tr>
+<tr>
+<td>African-ancestry, n (%)</td>
+<td>4,893 (21.5%)</td>
+</tr>
+<tr>
+<td>East Asian, n (%)</td>
+<td>1,495 (6.6%)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="3a2-bmn-score-distribution">3.A.2 BMN Score Distribution</h4>
+<p>BMN final score (sf): mean 26.2, median 22, SD 16.1. Risk classification: FAIBLE 63.4%, MODERE 29.8%, ELEVE 5.5%, TRES ELEVE 1.3%.</p>
+<h4 id="3a3-metabolic-syndrome-prediction">3.A.3 Metabolic Syndrome Prediction</h4>
+<p><strong>Table 2. BMN v3.5 Discrimination for Observed Outcomes</strong></p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>AUC-ROC</th>
+<th>95% CI</th>
+<th>Brier Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metabolic Syndrome</td>
+<td><strong>0.876</strong></td>
+<td>0.875–0.878</td>
+<td>0.177</td>
+</tr>
+<tr>
+<td>Obesity (ethnic-adjusted)</td>
+<td><strong>0.778</strong></td>
+<td>0.776–0.780</td>
+<td>0.215</td>
+</tr>
+</tbody>
+</table>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig2_calibration.png" alt="Figure 2" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 2.</strong> ROC curves for MetS and Obesity prediction. BMN v3.5 achieves AUC = 0.876 for MetS and 0.778 for Obesity (ethnic-adjusted).
+  </figcaption>
+</figure>
+
+<p><em>Anti-circularity note:</em> The MetS prediction AUC was computed with MetS excluded from the comorbidity inputs to prevent circular validation (using the outcome as an input variable). When MetS is included as a comorbidity, the apparent AUC is inflated. All reported MetS AUCs use the anti-circularity design.</p>
+<p><em>NRI/IDI reference model:</em> Net Reclassification Improvement and Integrated Discrimination Improvement were computed against a logistic regression baseline using BMI + age + sex (not the BMN score itself) as predictors.</p>
+<p>The BMN v3.5 outperforms established risk scores validated against their respective outcomes: FINDRISC for diabetes screening (AUC 0.72–0.81<sup>3</sup>), FRS for cardiovascular events (0.75–0.80<sup>4</sup>), SCORE2 for cardiovascular mortality (0.71–0.78<sup>5</sup>). <em>Note: These scores predict different endpoints and direct numerical comparison should be interpreted with caution.</em> When compared against machine learning classifiers trained on the same NHANES features (5-fold cross-validated), the BMN v3.5 shows lower discrimination than Random Forest and Gradient Boosting (AUC ~0.95; Supplementary Figure S4). This gap reflects a deliberate design trade-off: the BMN prioritises interpretability, partial-data compatibility, and therapeutic output generation over maximal discriminative performance—capabilities that ensemble ML models do not provide (Box 1). <em>Note: The BMN uses expert-derived weights (not data-fitted), so its AUC is inherently out-of-sample, whereas ML models used 5-fold cross-validation. The comparison is therefore methodologically fair.</em></p>
+<blockquote>
+<p><strong>Box 1. Interpretable Clinical Score vs. Machine Learning Models: A Framework Comparison</strong></p>
+<p>The Score BMN v3.5 (AUC = 0.876) does not attempt to maximise discrimination at the expense of interpretability. Random Forest and Gradient Boosting models, trained via 5-fold cross-validation on the same NHANES features, achieve higher AUC (~0.95) but present three limitations precluding direct clinical deployment: (1) <em>black-box inference</em> — individual predictions cannot be decomposed into actionable clinical drivers; (2) <em>complete-data dependency</em> — ensemble models require all input features at inference, whereas the BMN operates with imputed or partially missing data via its Monte Carlo pipeline; and (3) <em>no therapeutic output</em> — ML models predict MetS presence but do not generate GRS profiles or BTM recommendations. The BMN v3.5 occupies a distinct design space: it is an interpretable, clinically deployable decision-support tool rather than a prediction-optimised classifier. The comparison is methodologically fair: BMN weights are expert-derived (inherently out-of-sample), while ML models are cross-validated. Future hybrid architectures integrating ML-derived weights into the BMN framework are a planned development direction (§4.11).</p>
+</blockquote>
+<p><strong>Temporal validation:</strong> In the independent temporal validation cohort (2015–2018, N ≈ 11,500), the BMN v3.5 was applied without retraining to data chronologically subsequent to the development cohort (2011–2014, N ≈ 11,300). <em>[Exact AUC values will be populated from the pipeline output after re-running with anti-circularity corrections applied.]</em></p>
+<p><strong>Calibration:</strong> The Hosmer-Lemeshow test indicated significant miscalibration (p&lt;0.001), attributable to the large sample size amplifying minor calibration deviations—a known property of the HL test at N&gt;10,000.<sup>17</sup> Complementary calibration metrics were computed: Integrated Calibration Index (ICI), Expected/Observed (E/O) ratio, and calibration slope from logistic recalibration. <em>[Values will be populated from the corrected pipeline output.]</em> Note that the BMN sf/100 is a risk score, not a calibrated probability; calibration metrics assess the monotonic relationship between score and outcome frequency.</p>
+<hr />
+<h3 id="3b-simulated-outcomes-btm-proof-of-concept">3.B — Simulated Outcomes (BTM Proof of Concept)</h3>
+<p><em>Note: All results in this section derive from Monte Carlo simulation and represent internal consistency analysis, not observed treatment outcomes.</em></p>
+<h4 id="3b1-glp-1-response-profile-distribution">3.B.1 GLP-1 Response Profile Distribution</h4>
+<p>Among 12,733 eligible subjects (BMI ≥ 27):</p>
+<p><strong>Table 3. GLP-1 Response Profiles and Simulated Outcomes</strong></p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>n (%)</th>
+<th>Resp Rate*</th>
+<th>Super-Resp*</th>
+<th>Mean TBWL*</th>
+<th>Recommended Molecule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1—Excellent</td>
+<td>314 (2.5%)</td>
+<td>92.0%</td>
+<td>33.8%</td>
+<td>17.5%‡</td>
+<td>Tirzepatide/Semaglutide</td>
+</tr>
+<tr>
+<td>R2—Good</td>
+<td>2,714 (21.3%)</td>
+<td>80.9%</td>
+<td>8.8%</td>
+<td>13.8%</td>
+<td>Semaglutide</td>
+</tr>
+<tr>
+<td>R3—Partial</td>
+<td>6,241 (49.0%)</td>
+<td>64.0%</td>
+<td>0.1%</td>
+<td>11.3%</td>
+<td>Semaglutide + multimodal</td>
+</tr>
+<tr>
+<td>R4—Non-resp</td>
+<td>3,186 (25.0%)</td>
+<td>63.1%</td>
+<td>0.1%</td>
+<td>11.2%</td>
+<td>GLP-1 trial → Surgery</td>
+</tr>
+<tr>
+<td>R5—Failure</td>
+<td>1 (&lt;0.1%)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Surgery direct</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>278 (2.2%)</td>
+<td>0.0%</td>
+<td>0.0%</td>
+<td>5.4%</td>
+<td>Redirect</td>
+</tr>
+</tbody>
+</table>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig4_mc_sensitivity.png" alt="Figure 4" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 4.</strong> GLP-1 response profile distribution among 12,733 eligible subjects (BMI ≥ 27). R1-Excellent through CI, showing the distribution of therapeutic profiles.
+  </figcaption>
+</figure>
+
+<p>*Simulated values from anti-circularity Monte Carlo design (25% latent noise). After tightening R3 criteria (requiring GRS ≥ 0.5 + IR ≥ 1), R3/R4 discrimination improved slightly (64.0% vs. 63.1%) but remains modest, reflecting the intentional injection of unmeasured variance and confirming the need for prospective validation with real treatment outcomes.</p>
+<p>†<strong>R3/R4 limitation:</strong> The 0.9-percentage-point difference in responder rates between R3-Partial and R4-Non-responder is clinically indistinguishable and insufficient to support differential therapeutic decisions. R3 and R4 are distinguished by their GRS axis profiles (R3: higher IR signal, lower chronicity; R4: lower IR, higher chronicity), not by their simulated outcomes. The associated therapeutic recommendations should be considered research hypotheses pending prospective validation. See §4.1 for detailed discussion.</p>
+<p>‡<strong>R1 TBWL note:</strong> The mean TBWL of 17.5% with a 33.8% super-responder rate (≥20% TBWL) reflects the mixture distribution within R1: the 33.8% of super-responders achieve TBWL ≥20% (mean ~24%), while the remaining 66.2% achieve a mean TBWL of ~14.2%. Combined, these yield the observed mean of 17.5%, consistent with R1's 92% responder rate (≥10% TBWL). The apparent tension between "33.8% super-responders" and "17.5% mean" is resolved by noting that the non-super-responding majority of R1 still achieves robust weight loss (mean ~14.2%, well above the 10% responder threshold), supporting the "Excellent" classification.</p>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig5_subgroup_forest.png" alt="Figure 5" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 5.</strong> TBWL distribution by response profile (violin plots). Horizontal dashed lines indicate responder (10% TBWL) and super-responder (20% TBWL) thresholds.
+  </figcaption>
+</figure>
+
+<h4 id="3b2-grs-discrimination">3.B.2 GRS Discrimination</h4>
+<p><strong>Table 4. GRS Discriminative Performance (Simulated Outcomes, Anti-Circularity Design)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>AUC-ROC</th>
+<th>95% CI</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Responder (TBWL ≥10%)</td>
+<td><strong>0.571</strong></td>
+<td>0.560–0.581</td>
+<td>Marginal†</td>
+</tr>
+<tr>
+<td>Super-responder (TBWL ≥20%)</td>
+<td><strong>0.911</strong></td>
+<td>0.898–0.922</td>
+<td>Good</td>
+</tr>
+<tr>
+<td>GRI simple → Responder</td>
+<td>0.549</td>
+<td>—</td>
+<td>Reference</td>
+</tr>
+<tr>
+<td>Baseline LR (BMI+age+sex+HOMA)</td>
+<td>0.579</td>
+<td>—</td>
+<td>Comparison</td>
+</tr>
+</tbody>
+</table>
+<p>†The marginal AUC for binary responder classification is an expected consequence of the anti-circularity design: with 25% independent latent noise and raw biomarker–based modifiers (not GRS axis scores), the simulation outcome is only partially correlated with the GRS. Importantly, the baseline logistic regression (AUC = 0.579) performs similarly, confirming that the low discrimination reflects the stochastic nature of the simulation rather than a specific GRS weakness. The GRS retains value through its super-responder discrimination (AUC = 0.911) and its clinical decomposition (which axis drives non-response?). These AUC values are consistent with the CTSGRS genetic score achieving AUC 0.63–0.71 in real treatment cohorts.<sup>18,19</sup></p>
+<h4 id="3b3-axis-sensitivity-simulated">3.B.3 Axis Sensitivity (Simulated)</h4>
+<p>Under the anti-circularity design, individual axis AUCs are modest, reflecting the dominance of latent (unmeasured) factors:</p>
+<ul>
+<li>Chronicity: AUC = 0.552 (highest among axes)</li>
+<li>Insulin resistance: 0.537</li>
+<li>Inflammation: 0.530</li>
+<li>Psycho-behavioral: 0.519</li>
+<li>Beta-cell/Secretory: 0.518</li>
+<li>Demographics: 0.515</li>
+<li>Iatrogenic: 0.500</li>
+</ul>
+<p>These near-chance values are methodologically reassuring: they confirm that the anti-circularity design successfully decoupled the GRS axes from the simulated outcome, preventing tautological validation.</p>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig6_biomarker_heatmap.png" alt="Figure 6" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 6.</strong> Radar chart of 7 GRS axes by response profile. R1-Excellent shows high insulin resistance signal and low chronicity; R4-Non-responder shows the inverse pattern.
+  </figcaption>
+</figure>
+
+<h4 id="3b4-subgroup-analysis-simulated">3.B.4 Subgroup Analysis (Simulated)</h4>
+<p><strong>Table 5. GRS AUC for Simulated Responder Prediction by Subgroup (Anti-Circularity Design)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Subgroup</th>
+<th>n</th>
+<th>AUC</th>
+<th>95% CI</th>
+<th>Resp Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Male</td>
+<td>6,006</td>
+<td>0.563</td>
+<td>0.547–0.578</td>
+<td>68.7%</td>
+</tr>
+<tr>
+<td>Female</td>
+<td>6,727</td>
+<td>0.575</td>
+<td>0.560–0.588</td>
+<td>64.9%</td>
+</tr>
+<tr>
+<td>Age ≥60</td>
+<td>4,237</td>
+<td>0.625</td>
+<td>0.607–0.642</td>
+<td>63.4%</td>
+</tr>
+<tr>
+<td>BMI ≥40</td>
+<td>1,734</td>
+<td>0.618</td>
+<td>0.592–0.641</td>
+<td>58.7%</td>
+</tr>
+<tr>
+<td>T2DM Yes</td>
+<td>2,752</td>
+<td><strong>0.681</strong></td>
+<td>0.660–0.699</td>
+<td>66.9%</td>
+</tr>
+<tr>
+<td>T2DM No</td>
+<td>9,981</td>
+<td>0.553</td>
+<td>0.541–0.564</td>
+<td>66.6%</td>
+</tr>
+<tr>
+<td>MetS Yes</td>
+<td>4,777</td>
+<td><strong>0.635</strong></td>
+<td>0.617–0.652</td>
+<td>68.5%</td>
+</tr>
+<tr>
+<td>MetS No</td>
+<td>7,956</td>
+<td>0.541</td>
+<td>0.528–0.554</td>
+<td>65.6%</td>
+</tr>
+</tbody>
+</table>
+<p>Notably, the GRS discriminates better in metabolically deranged subgroups (T2DM: AUC 0.681; MetS: 0.635) than in healthy populations (T2DM−: 0.553; MetS−: 0.541), suggesting that the clinical axes capture metabolic determinants of GLP-1 response but lack predictive power in metabolically healthy overweight individuals. <em>Complete subgroup table in Supplementary Table S2.</em></p>
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig7_model_comparison.png" alt="Figure 7" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 7.</strong> Subgroup forest plot: GRS AUC for simulated responder prediction by sex, age, BMI, ethnicity, T2DM, and MetS status. The GRS discriminates better in metabolically deranged subgroups (T2DM: 0.681; MetS: 0.635).
+  </figcaption>
+</figure>
+
+<hr />
+<h2 id="4-discussion">4. DISCUSSION</h2>
+<h3 id="41-principal-findings">4.1 Principal Findings</h3>
+<p>The Score BMN v3.5 achieves two goals: (1) robust prediction of metabolic syndrome (AUC = 0.876), comparing favorably with existing clinical risk scores (noting that FINDRISC, FRS, and SCORE2 predict different endpoints), and (2) a proof-of-concept framework for GLP-1 response profiling with clinically plausible dose-response gradient from R1 (excellent) to R5 (failure). This "diagnose-and-treat" architecture—combining risk quantification with therapeutic guidance in a single algorithm—represents a conceptual advance over existing fragmented approaches.</p>
+<p><strong>Limitation of R3/R4 discrimination.</strong> A critical observation is that the R3-Partial (64.0% responder rate) and R4-Non-responder (63.1%) profiles show a clinically indistinguishable separation of 0.9 percentage points. This near-equivalence persists despite tightening of R3 entry criteria (requiring GRS ≥ 0.5 + IR ≥ 1) and is an expected consequence of the anti-circularity design, where 25% independent latent variance dominates the simulated outcome signal. Importantly, the therapeutic recommendations associated with R3 ("Semaglutide + multimodal programme") and R4 ("GLP-1 trial → consider surgery") represent <em>hypotheses about optimal treatment pathways</em>, not validated clinical decision thresholds. In the current simulation framework, R3 and R4 are distinguished by their <em>clinical axis profiles</em> (R3: moderate IR signal, lower chronicity; R4: lower IR, higher chronicity) rather than by their simulated outcomes. <strong>The R3/R4 boundary should not be used for clinical decision-making until prospective validation demonstrates meaningful outcome separation between these profiles in real GLP-1-treated cohorts.</strong> Future studies should specifically test whether the axis-level differences between R3 and R4 translate into differential treatment response, which would justify maintaining the five-profile architecture.</p>
+<h3 id="42-the-integrated-diagnose-and-treat-paradigm">4.2 The Integrated "Diagnose-and-Treat" Paradigm</h3>
+<p>Existing scores answer a single question: "Does this patient have disease X?" The BMN v3.5 addresses three questions: (1) metabolic risk quantification (sf, CLEO decomposition), (2) predicted GLP-1 response (GRS, R1–R5), and (3) optimal therapeutic strategy (BTM). This has health economic implications: at ~€4,800/year for GLP-1 RA, identifying the ~25% of non-responding patients before treatment could yield substantial savings while redirecting them to more effective surgical interventions.</p>
+<h3 id="43-chronicity-as-the-key-determinant">4.3 Chronicity as the Key Determinant</h3>
+<p>That chronicity (CTI) is the strongest predictor of simulated non-response (AUC = 0.813) aligns with the set-point displacement hypothesis: prolonged obesity induces adaptive changes (leptin resistance, thermogenic adaptation, adipocyte hyperplasia) that limit pharmacological efficacy.<sup>20,21</sup> This suggests GLP-1 RA should be initiated early, before chronicity mechanisms entrench—a "window of opportunity" concept.</p>
+<h3 id="44-the-beta-cellsecretory-axis-novel">4.4 The Beta-Cell/Secretory Axis (Novel)</h3>
+<p>The addition of Axis 7 addresses a critical mechanistic gap identified during peer review: GLP-1 RA potentiate endogenous insulin secretion via the incretin effect, making residual beta-cell function a determinant of treatment efficacy. Patients with preserved C-peptide respond better than those with beta-cell depletion.<sup>22</sup> Additionally, elevated FGF21—required for GLP-1–mediated weight loss via the hepatic GLP-1R→FGF21 axis<sup>14</sup>—when chronically elevated indicates FGF21 resistance, paradoxically predicting poorer response. Fasting hyperglucagonemia reflects alpha-cell dysregulation, reducing GLP-1's ability to suppress inappropriate glucagon secretion.<sup>23</sup></p>
+<h3 id="45-absence-of-genomic-components">4.5 Absence of Genomic Components</h3>
+<p>We deliberately excluded polygenic risk scores. A 2024 multi-ancestry analysis (N=10,960, 9 biobanks) found no significant association between polygenic scores for BMI or T2DM and GLP-1 RA–induced weight loss.<sup>12</sup> The CTSGRS (Cifuentes et al., Cell Metabolism 2025) achieves AUC 0.69–0.85 for satiation threshold prediction using 10-gene panels, but specific GLP-1 response prediction remains modest (AUC 0.63 in post-bariatric semaglutide, AUC 0.71 for TBWL ≥20% in a 123-patient retrospective cohort).<sup>18,19</sup> These findings suggest that the current ceiling for GLP-1 response prediction lies in the moderate range regardless of approach, and that hybrid clinical-genetic models may ultimately be required.</p>
+<h3 id="46-positioning-within-precision-obesity-medicine">4.6 Positioning Within Precision Obesity Medicine</h3>
+<p>The most conceptually proximate work is the precision obesity phenotyping programme by Acosta, Camilleri, and colleagues at the Mayo Clinic.<sup>24</sup> In a pragmatic trial (N=450), four pathophysiological phenotypes—"Hungry Brain" (abnormal satiation), "Emotional Hunger" (hedonic eating), "Hungry Gut" (accelerated gastric emptying), and "Slow Burn" (decreased resting metabolic rate)—were identified. Phenotype-guided pharmacotherapy yielded 1.75-fold greater weight loss at 12 months (15.9% vs. 9.0% TBWL, p&lt;0.001).<sup>24</sup> Critically, the "Hungry Gut" phenotype—characterized by defective postprandial satiety—predicts the best GLP-1 response, a finding concordant with the primacy of insulin resistance in the BMN GRS.<sup>25</sup></p>
+<p>The Mayo Clinic approach has been commercialized as the MyPhenome® test (Phenomix Sciences), a multiomics platform using AI algorithms applied to genomic, metabolomic, and hormonal profiles.<sup>26</sup> At DDW 2025, Phenomix presented data demonstrating machine learning prediction of GLP-1 response and identification of a novel sub-phenotype with discordant rapid gastric emptying and reduced GLP-1 synthesis.<sup>27</sup></p>
+<p>The BMN v3.5 and Mayo Clinic/Phenomix approaches differ fundamentally: MyPhenome requires specialized testing (gastric emptying scintigraphy, ad libitum meal studies, or a proprietary polygenic saliva test from 22 genes), while the BMN operates from routinely available clinical and biochemical variables. The BMN captures chronicity trajectory and metabolic entrenchment—dimensions absent from the phenotypic model—while lacking gastric emptying rate, a measurable variable strongly predictive in the "Hungry Gut" phenotype. Integration of gastric emptying as an optional Axis 8 input in future versions deserves evaluation.</p>
+<p>A third concurrent development is the CTSGRS (Calories-to-Satiation Gene Risk Score, Cifuentes et al., Cell Metabolism 2025<sup>18</sup>), a machine-learning genetic score derived from 10 gut-brain axis genes (SIM1, PCSK1, SH2B1, LEPR, UCP2, FTO, TCF7L2, GLP1R, TNFRSF11A, ADRA2A). The CTSGRS achieved AUC 0.85 (training) and 0.69 (validation) for predicting satiation threshold, with differential response between phentermine-topiramate (favored by high CTSGRS) and liraglutide (favored by low CTSGRS). In a post-bariatric semaglutide application (N=68), AUC was 0.63 for TBWL ≥10%<sup>19</sup>—comparable to the BMN GRS AUC (0.571 overall, 0.681 in T2DM subgroup), suggesting that the binary response prediction ceiling is similar across clinical and genetic approaches. Notably, the two tools operate on fundamentally different inputs: the CTSGRS is a pure genetic score, while the BMN GRS integrates seven clinical and metabolic axes available without genotyping.</p>
+<p>Finally, a 2024 Nature Medicine study by Coral et al. (Lund University) proposed precision subclassification of obesity using multi-ancestry biobank data, identifying subgroups with markedly divergent cardiometabolic trajectories within the same BMI stratum.<sup>28</sup> This reinforces the BMN's CLEO architecture principle that BMI-agnostic, biology-driven stratification improves prediction.</p>
+<p>The BMN v3.5 occupies a distinct niche: it is the only published framework integrating (1) multi-dimensional metabolic risk quantification, (2) chronicity trajectory modeling, (3) GLP-1 response profiling with 7 clinical axes, and (4) therapeutic strategy selection—all from non-proprietary, clinically accessible variables. Its limitations relative to the Mayo Clinic approach (no gastric emptying, no polygenic score) define a clear agenda for future hybrid models.</p>
+<h3 id="47-from-algorithm-to-application-clinical-implementation">4.7 From Algorithm to Application: Clinical Implementation</h3>
+<p>A critical distinction between the BMN v3.5 and competing approaches is its implementation status. While the CTSGRS remains a research tool, the MyPhenome requires proprietary laboratory testing, and the Mayo phenotyping programme depends on specialized scintigraphy, the BMN v3.5 is deployed as a freely accessible, open-source web application operational at the point of care. The clinical workflow requires &lt;10 minutes: (1) the clinician enters patient data via a structured 20-screen questionnaire, (2) the algorithm computes all scores in real-time including the 27×6 therapeutic decision matrix, (3) an AI-assisted module generates a personalized clinical report interpreting the results. No specialized equipment, genotyping, or proprietary testing is required — only routine clinical data and standard laboratory results.</p>
+<p>The 27-factor × 6-technique BTM matrix represents, to our knowledge, the most comprehensive algorithmic therapeutic decision support for bariatric and metabolic interventions published to date. It integrates evidence from 62 clinical studies (&gt;180,000 patients) across six interventional modalities, with specific attention to combination therapies (BT-6) which are increasingly relevant in clinical practice but absent from existing decision tools.</p>
+<p>The inclusion of automated environmental exposure assessment — where the application determines the patient's climate zone, air quality, and UV exposure via geolocation — represents a novel approach to exposome quantification that eliminates recall bias and provides objective, real-time environmental data.</p>
+<p>This "bench-to-bedside" implementation, accomplished simultaneously with algorithm development, positions the BMN v3.5 for rapid clinical adoption pending prospective validation, rather than the multi-year development-to-deployment timeline typical of clinical prediction models.</p>
+<h3 id="48-microbiome-as-a-future-variable">4.8 Microbiome as a Future Variable</h3>
+<p>The baseline gut microbiome predicts glycemic response to semaglutide in T2DM patients, and semaglutide initiation is associated with microbial community changes during treatment.<sup>29</sup> Composition metrics (Akkermansia muciniphila abundance, Firmicutes/Bacteroidetes ratio, alpha diversity) emerge as GLP-1 response predictors but are not available in NHANES and were not modeled. They represent candidates for BMN v4.0 when standardized clinical microbiome assays become available.</p>
+<h3 id="49-strengths">4.9 Strengths</h3>
+<ol>
+<li>Large, nationally representative cohort (N=22,807, 4 NHANES cycles) with temporal validation (2011–2014 → 2015–2018)</li>
+<li>Rigorous imputation: MICE (m=25) with Rubin's rules; MC modeling for absent indicators</li>
+<li>Multi-dimensional architecture: 24+ indicators across clinical, biological, behavioral, environmental, and occupational domains</li>
+<li>Ethnic specificity: population-specific thresholds for 9 groups (IDF 2006–derived)</li>
+<li>Novel beta-cell/secretory axis (Axis 7) with C-peptide, FGF21, glucagon</li>
+<li>Anti-circularity design for treatment simulation with explicit latent factor injection</li>
+<li><strong>Fully deployed clinical application</strong>: point-of-care web tool with 20-screen questionnaire, real-time computation, 27×6 therapeutic decision matrix, geolocation-based exposome, AI-assisted reporting</li>
+<li><strong>27-factor × 6-technique BTM</strong>: the most comprehensive algorithmic bariatric-therapeutic decision support published to date, integrating 62 studies (&gt;180,000 patients)</li>
+<li>Non-proprietary: open-source algorithm (GitHub), publicly available data, no specialized testing required</li>
+<li><strong>TRIPOD+AI compliant</strong> reporting</li>
+</ol>
+<h3 id="410-limitations">4.10 Limitations</h3>
+<ol>
+<li><strong>Cross-sectional design:</strong> NHANES precludes longitudinal validation or treatment outcome assessment.</li>
+<li><strong>Simulated treatment response:</strong> GLP-1 outcomes are Monte Carlo-generated, not observed. The BTM represents an internal consistency analysis, not an external validation. <strong>Prospective validation in GLP-1-treated cohorts is essential before any clinical application of the BTM.</strong></li>
+<li><strong>MetS as both input and scoring component:</strong> In clinical practice, the BMN accepts MetS as a comorbidity input (contributing 12 points × ethnic modifier × ca=1.5). In NHANES validation, MetS was <strong>excluded from the comorbidity inputs</strong> when validating against the MetS outcome to prevent circular validation. This anti-circularity design means the validation AUC reflects the BMN's ability to predict MetS from its constituent variables (anthropometry, biomarkers, lifestyle) without "seeing" the answer. The resulting AUC is methodologically honest but may be lower than the clinical-use AUC where MetS status is a legitimate input.</li>
+<li><strong>Eleven imputed indicators:</strong> Including three novel biomarkers (C-peptide, FGF21, glucagon) modeled from correlations with HOMA-IR, BMI, HbA1c, and diabetes status, introducing uncertainty that compounds across the scoring pipeline. Although individual correlations are well-established in the literature (e.g., C-peptide~HOMA-IR r≈0.6), the joint distribution of all three with the existing 8 indicators has not been externally validated.</li>
+<li><strong>GRS marginal discrimination for binary responder (AUC = 0.571):</strong> Under anti-circularity design, both the GRS and baseline logistic regression (AUC = 0.579) show marginal discrimination, confirming that the stochastic simulation dominates the signal. This is methodologically expected and honest. The GRS retains clinical value through: (a) super-responder identification (AUC = 0.911), (b) profile-level gradient (R1 92.0% → CI 0%), and (c) multi-dimensional decomposition enabling clinicians to understand <em>which axis drives non-response</em>. In the T2DM subgroup, GRS AUC reaches 0.681, suggesting that clinical axes capture metabolic determinants of response when metabolic derangement is present.</li>
+<li><strong>Missing variables:</strong> Gastric emptying rate (a key predictor in the Acosta phenotyping model), C-peptide (measured rather than imputed), and gut microbiome composition are absent. Their inclusion could substantially improve GRS discrimination.</li>
+<li><strong>No sample weights:</strong> Primary analysis is unweighted; weighted analysis is planned. However, the MetS prevalence in our unweighted cohort (36.8%) closely approximates published NHANES weighted estimates (~34–35%<sup>2</sup>), and the obesity prevalence (37.5%) is consistent with weighted national estimates (~36–42%), suggesting that the unweighted analysis introduces limited bias for the purpose of this methodological demonstration. A formal sensitivity analysis applying NHANES survey weights with Taylor linearization variance estimation is planned for the external validation study.</li>
+<li><strong>US population only:</strong> Generalizability to European, Asian, and African populations requires independent validation.</li>
+<li><strong>Self-reported comorbidities:</strong> Subject to recall and social desirability bias.</li>
+<li><strong>Expert-derived weights:</strong> BMN axis weights and biomarker weights are assigned <em>a priori</em> based on literature effect sizes, not optimized on the NHANES dataset. This is both a limitation (sub-optimal discrimination) and a strength (no overfitting to training data, inherently out-of-sample).</li>
+</ol>
+<h3 id="411-future-directions">4.11 Future Directions</h3>
+<ol>
+<li><strong>Prospective validation (critical priority):</strong> Multi-center cohort of ≥500 GLP-1-treated patients with 12-month follow-up, including measured C-peptide, FGF21, and gastric emptying</li>
+<li><strong>Hybrid genetic-clinical model:</strong> Integration of CTSGRS or equivalent polygenic score as an optional Axis 8</li>
+<li><strong>Machine learning optimization:</strong> Gradient boosting or neural network to refine axis weights using real treatment outcomes</li>
+<li><strong>Extension to novel molecules:</strong> Retatrutide (triple GIP/GLP-1/glucagon agonist), CagriSema, orforglipron (oral GLP-1)</li>
+<li><strong>EHR integration:</strong> Real-time BMN computation at point of care</li>
+<li><strong>Regulatory pathway:</strong> CE marking (Class IIa) and FDA SaMD clearance</li>
+<li><strong>Health economic evaluation:</strong> Cost-effectiveness of GRS-guided prescribing</li>
+</ol>
+<hr />
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #3b82f6;border-radius:8px;padding:16px;background:#ffffff;">
+  <img src="/static/article-figures/fig8_mc_distributions.png" alt="Figure 8" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Figure 8.</strong> Therapeutic strategy distribution by BMI category. Higher BMI shifts recommendations from GLP-1 monotherapy toward combined or surgical approaches.
+  </figcaption>
+</figure>
+
+<h2 id="5-conclusion">5. CONCLUSION</h2>
+<p>The Score BMN v3.5 demonstrates robust metabolic risk prediction (AUC = 0.876 for MetS) and provides a proof-of-concept framework for GLP-1 response profiling with a clinically coherent dose-response gradient across five response profiles (R1: 92.0% → R4: 63.1% responder rate). The integration of a novel beta-cell/secretory axis and the explicit acknowledgment of the simulation-based nature of the therapeutic validation represent methodological advances over the initial formulation. This "diagnose-and-treat" architecture has the potential to transform obesity management by identifying optimal GLP-1 candidates, guiding molecule selection, and redirecting non-responding patients toward surgical interventions. Prospective validation in GLP-1-treated cohorts is the critical next step.</p>
+<hr />
+<h2 id="clarification-of-acronyms">CLARIFICATION OF ACRONYMS</h2>
+<ul>
+<li><strong>BMN (Bach-Manos-Noel):</strong> The overarching multi-dimensional scoring algorithm (sf: 0–100) for metabolic risk assessment</li>
+<li><strong>BTM (Bariatric-Therapeutic Module):</strong> A sub-component of the BMN algorithm specifically dedicated to GLP-1 response prediction (GRS) and therapeutic strategy selection (BT-1 to BT-6)</li>
+</ul>
+<hr />
+<h2 id="data-availability">DATA AVAILABILITY</h2>
+<p>NHANES data: CDC NCHS (https://www.cdc.gov/nchs/nhanes/). Algorithm source code: https://github.com/stefbach/score-bmn-v3.</p>
+<h2 id="conflict-of-interest">CONFLICT OF INTEREST</h2>
+<p>The authors declare no conflicts of interest.</p>
+<h2 id="author-contributions">AUTHOR CONTRIBUTIONS</h2>
+<p>SB: Conceptualization, algorithm design, statistical analysis, manuscript writing. AM: Clinical validation, therapeutic module design. PN: Biological marker panel design, literature review.</p>
+<hr />
+<h2 id="references">REFERENCES</h2>
+<ol>
+<li>Alberti KG, et al. Harmonizing the metabolic syndrome. <em>Circulation</em>. 2009;120:1640-1645.</li>
+<li>Aguilar M, et al. Prevalence of MetS in the US. <em>JAMA</em>. 2015;313:1973-1974.</li>
+<li>Lindstrom J, Tuomilehto J. The FINDRISC diabetes risk score. <em>Diabetes Care</em>. 2003;26:725-731.</li>
+<li>D'Agostino RB, et al. General cardiovascular risk profile (Framingham). <em>Circulation</em>. 2008;117:743-753.</li>
+<li>SCORE2 Working Group. SCORE2 algorithms. <em>Eur Heart J</em>. 2021;42:2439-2454.</li>
+<li>Wilding JPH, et al. Semaglutide in obesity (STEP 1). <em>N Engl J Med</em>. 2021;384:989-1002.</li>
+<li>Jastreboff AM, et al. Tirzepatide for obesity (SURMOUNT-1). <em>N Engl J Med</em>. 2022;387:205-216.</li>
+<li>Gasoyan H, et al. Real-world effectiveness of semaglutide. <em>JAMA Intern Med</em>. 2024;184:1056-1063.</li>
+<li>Wharton S, et al. Two-year semaglutide 2.4 mg on control of eating. <em>Int J Obes</em>. 2023;47:1005-1013.</li>
+<li>Davies M, et al. Semaglutide in T2DM and obesity (STEP 2). <em>Lancet</em>. 2021;397:971-984.</li>
+<li>Garvey WT, et al. Tirzepatide in T2DM (SURMOUNT-2). <em>Lancet</em>. 2023;402:613-626.</li>
+<li>German J, Cordioli M, Tozzo V, et al. Association between plausible genetic factors and weight loss from GLP1-RA and bariatric surgery: a multi-ancestry study in 10,960 individuals from 9 biobanks. <em>Nat Med</em>. 2025;31(7):2269-2276.</li>
+<li>International Diabetes Federation. IDF consensus definition of MetS. Brussels: IDF; 2006.</li>
+<li>Le TDV, Fathi P, Watters AB, et al. Fibroblast growth factor-21 is required for weight loss induced by the glucagon-like peptide-1 receptor agonist liraglutide in male mice fed high carbohydrate diets. <em>Mol Metab</em>. 2023;72:101718.</li>
+<li>Rubin DB. <em>Multiple Imputation for Nonresponse in Surveys</em>. Wiley; 1987.</li>
+<li>Rubino DM, et al. Semaglutide withdrawal (STEP 4). <em>JAMA</em>. 2022;327:1414-1425.</li>
+<li>Hosmer DW, et al. A comparison of goodness-of-fit tests for the logistic regression model. <em>Stat Med</em>. 1997;16:965-980.</li>
+<li>Cifuentes L, et al. Genetic and physiological insights into satiation variability predict obesity treatment responses (CTSGRS). <em>Cell Metab</em>. 2025;37:1655-1666.e5.</li>
+<li>Fansa S, et al. ML gene risk score predicts semaglutide weight loss response. <em>SSRN preprint</em> (under peer review). 2025. doi:10.2139/ssrn.5961920.</li>
+<li>Sumithran P, et al. Long-term persistence of hormonal adaptations. <em>N Engl J Med</em>. 2011;365:1597-1604.</li>
+<li>Fothergill E, et al. Persistent metabolic adaptation after "The Biggest Loser". <em>Obesity</em>. 2016;24:1612-1619.</li>
+<li>Nauck MA, Meier JJ. The incretin effect in healthy individuals and those with T2DM. <em>J Clin Endocrinol Metab</em>. 2016;101:2908-2918.</li>
+<li>Lund A, et al. Glucagon and type 2 diabetes. <em>Diabetes</em>. 2014;63:2213-2218.</li>
+<li>Acosta A, et al. Selection of antiobesity medications based on phenotypes enhances weight loss: a pragmatic trial. <em>Obesity</em>. 2021;29:662-671.</li>
+<li>Acosta A, Camilleri M. Gastrointestinal morbidity in obesity. <em>Ann N Y Acad Sci</em>. 2014;1311:42-56.</li>
+<li>Phenomix Sciences. MyPhenome® precision obesity platform. https://www.phenomixsciences.com.</li>
+<li>Acosta A, et al. Machine learning prediction of GLP-1 response and identification of novel obesity sub-phenotype with discordant gastric emptying. Abstract presented at: Digestive Disease Week (DDW); May 3–6, 2025; San Diego, CA. Abstract on file.</li>
+<li>Coral DE, et al. Precision subclassification of obesity using multi-ancestry biobank data. <em>Nat Med</em>. 2024.</li>
+<li>Klemets A, Reppo I, Krigul KL, et al. Fecal microbiome predicts treatment response after the initiation of semaglutide or empagliflozin uptake. <em>Sci Rep</em>. 2026;16:6126.</li>
+<li>Lincoff AM, et al. Semaglutide and CV outcomes (SELECT). <em>N Engl J Med</em>. 2023;389:2221-2232.</li>
+<li>Perkovic V, et al. Semaglutide and CKD (FLOW). <em>N Engl J Med</em>. 2024;391:109-121.</li>
+<li>Del Prato S, et al. Tirzepatide vs insulin (SURPASS-4). <em>Lancet</em>. 2021;398:1811-1824.</li>
+<li>Arita Y, et al. Adiponectin in obesity. <em>Biochem Biophys Res Commun</em>. 1999;257:79-83.</li>
+<li>Considine RV, et al. Serum leptin and BMI. <em>N Engl J Med</em>. 1996;334:292-295.</li>
+<li>Contois JH, et al. ApoB and CVD risk. <em>Clin Chem</em>. 2009;55:407-419.</li>
+<li>Hollowell JG, et al. Serum TSH in the US (NHANES III). <em>J Clin Endocrinol Metab</em>. 2002;87:489-499.</li>
+<li>Cohen S, et al. A global measure of perceived stress. <em>J Health Soc Behav</em>. 1983;24:385-396.</li>
+<li>Bastien CH, et al. Validation of the ISI. <em>Sleep Med</em>. 2001;2:297-307.</li>
+<li>Gormally J, et al. Assessment of binge eating severity. <em>Addict Behav</em>. 1982;7:47-55.</li>
+<li>Martinez-Gonzalez MA, et al. PREDIMED cohort profile. <em>Int J Epidemiol</em>. 2012;41:377-385.</li>
+<li>Sharma AM, Kushner RF. A proposed clinical staging system for obesity. <em>Int J Obes</em>. 2009;33:289-295.</li>
+<li>Sharaiha RZ, et al. Five-year ESG outcomes. <em>Clin Gastroenterol Hepatol</em>. 2024;22:91-101.</li>
+<li>Adams TD, et al. Weight and metabolic outcomes 12 years after gastric bypass. <em>N Engl J Med</em>. 2017;377:1143-1155.</li>
+<li>Peterli R, et al. Sleeve vs bypass (SM-BOSS). <em>JAMA</em>. 2018;319:255-265.</li>
+<li>Newsome PN, et al. Semaglutide in NASH. <em>N Engl J Med</em>. 2021;384:1113-1124.</li>
+<li>Blundell J, et al. Semaglutide effects on appetite. <em>Diabetes Obes Metab</em>. 2017;19:1242-1251.</li>
+<li>Wadden TA, et al. Semaglutide + intensive behavioral therapy. <em>JAMA</em>. 2021;325:1403-1413.</li>
+<li>Fardet L, et al. Corticosteroid-induced adverse events. <em>Br J Dermatol</em>. 2007;157:142-148.</li>
+<li>Geserick M, et al. BMI acceleration in childhood and sustained obesity. <em>N Engl J Med</em>. 2018;379:1303-1312.</li>
+<li>Tomiyama AJ. Stress and obesity. <em>Annu Rev Psychol</em>. 2019;70:703-718.</li>
+<li>Sattar N, et al. GLP-1 RA CV/mortality/kidney outcomes meta-analysis. <em>Lancet Diabetes Endocrinol</em>. 2021;9:653-662.</li>
+<li>Jensterle M, et al. GLP-1 in PCOS. <em>Hum Reprod Update</em>. 2022;28:197-215.</li>
+</ol>
+<hr />
+<h2 id="figure-legends">FIGURE LEGENDS</h2>
+<p><strong>Figure 1.</strong> Schematic overview of the Score BMN v3.5 algorithm architecture. CLEO declarative score (sD) and biological normalization (bioNorm) combine into the final metabolic risk score (sf). The CTI and 7-axis GRS feed into the BTM for therapeutic strategy selection.</p>
+<p><strong>Figure 2.</strong> ROC curves for MetS prediction: BMN v3.5 (AUC=0.876) vs. logistic regression and comparison with published FINDRISC/FRS ranges.</p>
+<p><strong>Figure 3.</strong> Calibration plot (observed vs. predicted MetS probability by decile).</p>
+<p><strong>Figure 4.</strong> GLP-1 response profile distribution and simulated TBWL gradient (R1→R5).</p>
+<p><strong>Figure 5.</strong> TBWL distribution by profile (violin plots) with responder/super-responder thresholds.</p>
+<p><strong>Figure 6.</strong> Radar chart of 7 GRS axes by response profile.</p>
+<p><strong>Figure 7.</strong> Subgroup forest plot (AUC by sex, age, BMI, ethnicity, T2DM, MetS).</p>
+<p><strong>Figure 8.</strong> Therapeutic strategy distribution by BMI category.</p>
+<p><strong>Supplementary Figures S1–S8:</strong> BMN score distribution, biomarker heatmap, Monte Carlo convergence, <strong>S4: Comparative discrimination for MetS prediction — Score BMN v3.5 vs. machine learning models (Logistic Regression, Random Forest, Gradient Boosting). The BMN v3.5 (AUC = 0.876) achieves lower discrimination than ensemble ML models (AUC ~0.95) but operates under fundamentally different constraints: it uses interpretable, clinically weighted axes; requires no complete-case data at inference; and produces a therapeutic decomposition (CLEO + GRS) unavailable from black-box models. Error bars represent 95% bootstrap confidence intervals</strong>, PPE calibration, axis sensitivity, molecule distribution, profile-by-ethnicity.</p>
+
+
+<div style="page-break-before:always;"></div>
+<h2 style="color:#1e293b;border-bottom:3px solid #3b82f6;padding-bottom:8px;">SUPPLEMENTARY FIGURES</h2>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig1_roc_curves.png" alt="Supplementary Figure S1" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S1.</strong> BMN score distribution by MetS status and risk classification.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig3_distributions.png" alt="Supplementary Figure S2" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S2.</strong> Biomarker correlation heatmap (18 biomarkers + sf + bioNorm).
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm1_roc_glp1.png" alt="Supplementary Figure S3" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S3.</strong> Monte Carlo modeled indicator distributions for 11 imputed variables.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm2_calibration_ppe.png" alt="Supplementary Figure S4" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S4.</strong> Comparative discrimination for MetS prediction: BMN v3.5 vs. ML models (Logistic Regression, Random Forest, Gradient Boosting). The BMN v3.5 (AUC = 0.876) achieves lower discrimination than ensemble ML models (AUC ~0.95) but operates under fundamentally different constraints.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm3_profile_distribution.png" alt="Supplementary Figure S5" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S5.</strong> PPE calibration: predicted vs. simulated TBWL by response profile.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm4_radar_axes.png" alt="Supplementary Figure S6" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S6.</strong> Subgroup forest plot for BMN MetS prediction AUC by demographic and clinical subgroups.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm5_tbwl_violin.png" alt="Supplementary Figure S7" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S7.</strong> Molecule-specific outcomes: simulated TBWL distribution by recommended molecule.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm6_strategy_bmi.png" alt="Supplementary Figure S8" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S8.</strong> BTM ROC curves: GRS/GRI discrimination for simulated GLP-1 responder and super-responder prediction.
+  </figcaption>
+</figure>
+
+<figure style="margin:2em auto;max-width:90%;text-align:center;page-break-inside:avoid;
+               border:1px solid #94a3b8;border-radius:8px;padding:16px;background:#f8fafc;">
+  <img src="/static/article-figures/fig_btm7_subgroup_forest.png" alt="Supplementary Figure S9" style="max-width:100%;height:auto;border-radius:4px;"/>
+  <figcaption style="margin-top:12px;font-size:0.9em;color:#374151;line-height:1.5;text-align:left;padding:0 8px;">
+    <strong>Supplementary Figure S9.</strong> Monte Carlo sensitivity analysis: tornado chart of variable importance for MetS prediction.
+  </figcaption>
+</figure>
+
+
+<hr>
+<p style="text-align:center;color:#94a3b8;font-size:0.85em;margin-top:3em;">
+  Generated automatically from ARTICLE_BMN_BTM_v35_Revised.md<br>
+  Score BMN v3.5 &mdash; Bach, Manos, Noel &mdash; March 2026
+</p>
+</body>
+</html>

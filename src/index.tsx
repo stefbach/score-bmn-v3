@@ -2635,4 +2635,9 @@ app.get('/', (c) => {
 </html>`)
 })
 
+// ─── ARTICLE SCIENTIFIQUE UNIFIÉ ───
+app.get('/article', (c) => {
+  return c.redirect('/static/BMN_v35_Article_Unified')
+})
+
 export default app
