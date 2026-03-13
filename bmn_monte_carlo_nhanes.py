@@ -2669,7 +2669,7 @@ Code availability:
 """
 
     # Save article
-    article_path = os.path.join(OUTPUT_DIR, 'BMN_v34_NHANES_Validation_Article.txt')
+    article_path = os.path.join(OUTPUT_DIR, 'BMN_v35_NHANES_Validation_Article.txt')
     with open(article_path, 'w', encoding='utf-8') as f:
         f.write(article)
     print(f"  Article saved to: {article_path}")
@@ -2817,7 +2817,7 @@ def main():
     print(f"  MetS AUC: {validation_mets.get('auc_combined', 0):.3f}")
     print(f"  Obesity AUC: {validation_obes.get('auc_combined', 0):.3f}")
     print(f"  Output: {OUTPUT_DIR}/")
-    print(f"  Article: {OUTPUT_DIR}/BMN_v34_NHANES_Validation_Article.txt")
+    print(f"  Article: {OUTPUT_DIR}/BMN_v35_NHANES_Validation_Article.txt")
     print(f"  Figures: fig1-fig8 (PNG, 300 DPI)")
     print("█" * 78)
 

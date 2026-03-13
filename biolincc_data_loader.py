@@ -1,10 +1,10 @@
 """
 ═══════════════════════════════════════════════════════════════════════════
-SCORE BMN v3.0 — CHARGEUR DE DONNÉES BioLINCC + VALIDATION COMPLÈTE
+SCORE BMN v3.5 — CHARGEUR DE DONNÉES BioLINCC + VALIDATION COMPLÈTE
 ═══════════════════════════════════════════════════════════════════════════
 
 Charge et harmonise les données issues des études BioLINCC (NHLBI)
-pour validation du SCORE BMN v3.0.
+pour validation du SCORE BMN v3.5.
 
 Études supportées :
   - MESA (Multi-Ethnic Study of Atherosclerosis) — imagerie + biomarqueurs
@@ -17,11 +17,11 @@ Pipeline complet :
   1. Découverte automatique des fichiers dans le répertoire de l'étude
   2. Chargement multi-format (SAS7BDAT, XPT, CSV)
   3. Fusion sur identifiant unique (configurable par étude)
-  4. Harmonisation des variables vers le schéma BMN v3.0
+  4. Harmonisation des variables vers le schéma BMN v3.5
   5. Conversions d'unités (mg/dL → mmol/L, etc.)
   6. Dérivation des variables composites (HOMA-IR, WHtR, TG/HDL, LDL Friedewald)
   7. Imputation Monte Carlo (MICE — Multiple Imputation by Chained Equations)
-  8. Application du SCORE BMN v3.0 (porté en Python)
+  8. Application du SCORE BMN v3.5 (porté en Python)
   9. Validation statistique complète :
      - AUC-ROC + IC95% bootstrap
      - NRI (Net Reclassification Improvement)
@@ -393,12 +393,12 @@ def _match_files_to_categories(files, config):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# HARMONISATION VERS LE SCHÉMA BMN v3.0
+# HARMONISATION VERS LE SCHÉMA BMN v3.5
 # ═══════════════════════════════════════════════════════════════════════
 
 def harmonize_to_bmn(df, study_name):
     """
-    Harmonise un DataFrame BioLINCC vers le schéma de variables BMN v3.0.
+    Harmonise un DataFrame BioLINCC vers le schéma de variables BMN v3.5.
 
     Applique :
       - Renommage des variables selon le mapping de l'étude
@@ -423,7 +423,7 @@ def harmonize_to_bmn(df, study_name):
     eth_map = config.get("eth_map", {})
     default_eth = config.get("default_eth", "eu")
 
-    print(f"\n[HARMONISATION] Application du mapping BMN v3.0 pour {study_name.upper()}...")
+    print(f"\n[HARMONISATION] Application du mapping BMN v3.5 pour {study_name.upper()}...")
 
     df_h = df.copy()
 
@@ -552,7 +552,7 @@ def harmonize_to_bmn(df, study_name):
 
 def compute_outcomes(df):
     """
-    Dérive les variables cibles pour la validation BMN v3.0.
+    Dérive les variables cibles pour la validation BMN v3.5.
 
     Critères MetS (IDF simplifiés) :
       1. Tour de taille élevé (>88 F / >102 M pour EU)
@@ -747,7 +747,7 @@ def run_mice_imputation(df, n_imputations=20, n_iterations=10, random_state=42):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# ALGORITHME SCORE BMN v3.0 (PORTÉ EN PYTHON)
+# ALGORITHME SCORE BMN v3.5 (PORTÉ EN PYTHON)
 # ═══════════════════════════════════════════════════════════════════════
 
 # --- Données de référence identiques au module JS ---
@@ -779,7 +779,7 @@ BIOMARKERS = {
 
 
 def compute_bmn_row(row):
-    """Calcule le SCORE BMN v3.0 pour une ligne du DataFrame."""
+    """Calcule le SCORE BMN v3.5 pour une ligne du DataFrame."""
     eth = row.get('ethnicCode', 'eu')
     ep = ETHNIC_PROFILES.get(eth, ETHNIC_PROFILES['eu'])
     age = row.get('age', 40)
@@ -951,7 +951,7 @@ def compute_bmn_row(row):
 
 def apply_bmn_score(df, imputed_datasets):
     """
-    Applique le SCORE BMN v3.0 sur chaque jeu imputé et combine par la règle de Rubin.
+    Applique le SCORE BMN v3.5 sur chaque jeu imputé et combine par la règle de Rubin.
 
     Paramètres
     ----------
@@ -966,7 +966,7 @@ def apply_bmn_score(df, imputed_datasets):
     imputed_datasets : list[pd.DataFrame] avec scores ajoutés
     """
     print(f"\n{'=' * 70}")
-    print(f"  APPLICATION DU SCORE BMN v3.0")
+    print(f"  APPLICATION DU SCORE BMN v3.5")
     print(f"  Sur {len(imputed_datasets)} jeux imputés")
     print(f"{'=' * 70}")
 
@@ -1012,7 +1012,7 @@ def apply_bmn_score(df, imputed_datasets):
 
 def run_validation(df, imputed_datasets, study_name, output_dir=None):
     """
-    Pipeline de validation statistique complet du SCORE BMN v3.0.
+    Pipeline de validation statistique complet du SCORE BMN v3.5.
 
     Inclut :
       - AUC-ROC + IC95% bootstrap (2000 itérations)
@@ -1127,8 +1127,8 @@ def run_validation(df, imputed_datasets, study_name, output_dir=None):
             model_probs[model_name] = probs
             print(f"    {model_name}: AUC = {auc_val:.4f}")
 
-        model_aucs['SCORE BMN v3.0'] = auc_main
-        model_probs['SCORE BMN v3.0'] = sf_prob
+        model_aucs['SCORE BMN v3.5'] = auc_main
+        model_probs['SCORE BMN v3.5'] = sf_prob
 
         # ─── NRI (Net Reclassification Improvement) ───
         print("    [NRI — Net Reclassification Improvement]")
@@ -1320,11 +1320,11 @@ def run_validation(df, imputed_datasets, study_name, output_dir=None):
         # ── FIGURE 1 : ROC Curves comparatives ──
         fig, ax = plt.subplots(1, 1, figsize=(8, 7))
         ax.plot(res['fpr'], res['tpr'], 'b-', linewidth=2.5,
-                label=f"SCORE BMN v3.0 (AUC={res['AUC_BMN']:.3f})")
+                label=f"SCORE BMN v3.5 (AUC={res['AUC_BMN']:.3f})")
 
         colors = {'Logistic Regression': '#e74c3c', 'Random Forest': '#2ecc71', 'Gradient Boosting': '#f39c12'}
         for model_name, auc_val in res['AUC_models'].items():
-            if model_name == 'SCORE BMN v3.0':
+            if model_name == 'SCORE BMN v3.5':
                 continue
             probs = np.array(res['model_probs'][model_name])
             fpr_m, tpr_m, _ = roc_curve(y_out, probs)
@@ -1345,7 +1345,7 @@ def run_validation(df, imputed_datasets, study_name, output_dir=None):
         # ── FIGURE 2 : Calibration Plot ──
         fig, ax = plt.subplots(1, 1, figsize=(7, 7))
         frac_pos, mean_pred = calibration_curve(y_out, sf_out, n_bins=10, strategy='quantile')
-        ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.0')
+        ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.5')
         ax.plot([0, 1], [0, 1], 'k--', alpha=0.4, label='Perfect calibration')
 
         probs_lr = np.array(res['model_probs']['Logistic Regression'])
@@ -1371,7 +1371,7 @@ def run_validation(df, imputed_datasets, study_name, output_dir=None):
 
         ax.axvline(30, color='orange', linestyle='--', alpha=0.7, label='Threshold: 30 (Moderate)')
         ax.axvline(60, color='red', linestyle='--', alpha=0.7, label='Threshold: 60 (High)')
-        ax.set_xlabel('SCORE BMN v3.0 (sf)')
+        ax.set_xlabel('SCORE BMN v3.5 (sf)')
         ax.set_ylabel('Density')
         ax.set_title(f'Score Distribution by {outcome_name} Status')
         ax.legend(fontsize=9)
@@ -1605,7 +1605,7 @@ if __name__ == "__main__":
     DATA_PATHS = ["./mesa_data/", "./biolincc_data/MESA/", "./biolincc_data/"]
 
     print("=" * 70)
-    print("  SCORE BMN v3.0 — VALIDATION SUR COHORTE BioLINCC")
+    print("  SCORE BMN v3.5 — VALIDATION SUR COHORTE BioLINCC")
     print("=" * 70)
 
     # ── ÉTAPE 1 : Chargement des données ──
@@ -1635,7 +1635,7 @@ if __name__ == "__main__":
         exit(0)
 
     # ── ÉTAPE 2 : Harmonisation ──
-    print(f"\n[2/5] Harmonisation vers le schema BMN v3.0...")
+    print(f"\n[2/5] Harmonisation vers le schema BMN v3.5...")
     df = harmonize_to_bmn(df, STUDY)
 
     # ── ÉTAPE 3 : Outcomes ──
@@ -1647,7 +1647,7 @@ if __name__ == "__main__":
     imputed_datasets = run_mice_imputation(df, n_imputations=20, n_iterations=10)
 
     # ── ÉTAPE 5 : Score BMN + Validation ──
-    print(f"\n[5/5] Score BMN v3.0 + Validation statistique...")
+    print(f"\n[5/5] Score BMN v3.5 + Validation statistique...")
     df, imputed_datasets = apply_bmn_score(df, imputed_datasets)
     results = run_validation(df, imputed_datasets, STUDY)
 

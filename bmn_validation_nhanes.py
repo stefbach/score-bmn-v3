@@ -1,12 +1,12 @@
 """
 ═══════════════════════════════════════════════════════════════════════════
-SCORE BMN v3.0 — VALIDATION SCIENTIFIQUE SUR COHORTE NHANES
+SCORE BMN v3.5 — VALIDATION SCIENTIFIQUE SUR COHORTE NHANES
 ═══════════════════════════════════════════════════════════════════════════
 
 Pipeline complet :
   1. Récupération multi-tables NHANES (2017-2018)
   2. Imputation Monte Carlo (MICE — Multiple Imputation by Chained Equations)
-  3. Application du SCORE BMN v3.0 (porté en Python)
+  3. Application du SCORE BMN v3.5 (porté en Python)
   4. Validation statistique :
      - AUC-ROC + IC95% bootstrap
      - NRI (Net Reclassification Improvement)
@@ -42,7 +42,7 @@ OUTPUT_DIR = '/home/user/bmn_validation'
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 print("=" * 70)
-print("  SCORE BMN v3.0 — VALIDATION SCIENTIFIQUE SUR COHORTE NHANES")
+print("  SCORE BMN v3.5 — VALIDATION SCIENTIFIQUE SUR COHORTE NHANES")
 print("=" * 70)
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -405,10 +405,10 @@ for i, ds in enumerate(imputed_datasets[:3]):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# PARTIE 4 : ALGORITHME SCORE BMN v3.0 (PORTÉ EN PYTHON)
+# PARTIE 4 : ALGORITHME SCORE BMN v3.5 (PORTÉ EN PYTHON)
 # ═══════════════════════════════════════════════════════════════════════
 
-print("\n[4/6] Application du SCORE BMN v3.0 sur les données NHANES...")
+print("\n[4/6] Application du SCORE BMN v3.5 sur les données NHANES...")
 
 # --- Données de référence identiques au module JS ---
 ETHNIC_PROFILES = {
@@ -439,7 +439,7 @@ BIOMARKERS = {
 
 
 def compute_bmn_row(row):
-    """Calcule le SCORE BMN v3.0 pour une ligne du DataFrame."""
+    """Calcule le SCORE BMN v3.5 pour une ligne du DataFrame."""
     eth = row.get('ethnicCode', 'eu')
     ep = ETHNIC_PROFILES.get(eth, ETHNIC_PROFILES['eu'])
     age = row.get('age', 40)
@@ -719,8 +719,8 @@ for outcome_name, outcome_col in outcomes.items():
         model_probs[model_name] = probs
         print(f"    {model_name}: AUC = {auc_val:.4f}")
 
-    model_aucs['SCORE BMN v3.0'] = auc_main
-    model_probs['SCORE BMN v3.0'] = sf_prob
+    model_aucs['SCORE BMN v3.5'] = auc_main
+    model_probs['SCORE BMN v3.5'] = sf_prob
 
     # ─── 5c. NRI (Net Reclassification Improvement) ───
     print("    [NRI — Net Reclassification Improvement]")
@@ -926,12 +926,12 @@ for outcome_name, res in results.items():
 
     # BMN ROC
     ax.plot(res['fpr'], res['tpr'], 'b-', linewidth=2.5,
-            label=f"SCORE BMN v3.0 (AUC={res['AUC_BMN']:.3f})")
+            label=f"SCORE BMN v3.5 (AUC={res['AUC_BMN']:.3f})")
 
     # Modèles comparatifs
     colors = {'Logistic Regression': '#e74c3c', 'Random Forest': '#2ecc71', 'Gradient Boosting': '#f39c12'}
     for model_name, auc_val in res['AUC_models'].items():
-        if model_name == 'SCORE BMN v3.0':
+        if model_name == 'SCORE BMN v3.5':
             continue
         probs = np.array(res['model_probs'][model_name])
         fpr_m, tpr_m, _ = roc_curve(y_out, probs)
@@ -953,7 +953,7 @@ for outcome_name, res in results.items():
     fig, ax = plt.subplots(1, 1, figsize=(7, 7))
 
     frac_pos, mean_pred = calibration_curve(y_out, sf_out, n_bins=10, strategy='quantile')
-    ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.0')
+    ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.5')
     ax.plot([0, 1], [0, 1], 'k--', alpha=0.4, label='Perfect calibration')
 
     # Ajouter la courbe de calibration LR
@@ -980,7 +980,7 @@ for outcome_name, res in results.items():
 
     ax.axvline(30, color='orange', linestyle='--', alpha=0.7, label='Threshold: 30 (Moderate)')
     ax.axvline(60, color='red', linestyle='--', alpha=0.7, label='Threshold: 60 (High)')
-    ax.set_xlabel('SCORE BMN v3.0 (sf)')
+    ax.set_xlabel('SCORE BMN v3.5 (sf)')
     ax.set_ylabel('Density')
     ax.set_title(f'Score Distribution by {outcome_name} Status')
     ax.legend(fontsize=9)

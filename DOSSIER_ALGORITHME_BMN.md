@@ -1,4 +1,4 @@
-# DOSSIER COMPLET — ALGORITHME SCORE BMN v3.0
+# DOSSIER COMPLET — ALGORITHME SCORE BMN v3.5
 
 ## Architecture CLEO (C + E + O + L) + Integration Biologique BSD v4.9
 
@@ -42,7 +42,7 @@
 
 ## 1. Vue d'ensemble
 
-Le **Score BMN v3.0** est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :
+Le **Score BMN v3.5** est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :
 
 - **Donnees declaratives** du patient (cliniques, mode de vie, psychometriques)
 - **Donnees biologiques** (15 biomarqueurs avec z-scores ponderes)
@@ -1164,7 +1164,7 @@ distance = R * 2 * asin(sqrt(a))
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    SCORE BMN v3.0 — FORMULES                   │
+│                    SCORE BMN v3.5 — FORMULES                   │
 ├────────────────────────────────────────────────────────────────┤
 │                                                                │
 │  sD = min(100, C + E + O + L)                                 │
@@ -1199,6 +1199,6 @@ distance = R * 2 * asin(sqrt(a))
 
 ---
 
-**FIN DU DOSSIER — ALGORITHME SCORE BMN v3.0**
+**FIN DU DOSSIER — ALGORITHME SCORE BMN v3.5**
 **Architecture CLEO + BSD v4.9 + Bio v4.7.1**
 **Bach | Manos | Noel — Fevrier 2026**

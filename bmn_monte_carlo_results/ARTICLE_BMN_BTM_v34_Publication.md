@@ -1,4 +1,4 @@
-# Development and Internal Validation of the Score BMN v3.4: A Multi-Dimensional Risk Assessment Algorithm with Integrated GLP-1 Response Prediction for Metabolic Syndrome and Obesity Management
+# Development and Internal Validation of the Score BMN v3.5: A Multi-Dimensional Risk Assessment Algorithm with Integrated GLP-1 Response Prediction for Metabolic Syndrome and Obesity Management
 
 ## A Monte Carlo Simulation Study on the NHANES Cohort (2011–2018)
 
@@ -18,13 +18,13 @@
 
 **Background:** Current metabolic risk assessment relies on fragmented tools that evaluate individual components without integrating clinical, biological, behavioral, and environmental dimensions. No existing score predicts GLP-1 receptor agonist (GLP-1 RA) treatment response to guide therapeutic strategy selection.
 
-**Objective:** To develop and internally validate the Score BMN (Bach-Manos-Noel) v3.4, a multi-dimensional algorithm that (1) predicts metabolic syndrome and obesity with high discrimination, and (2) integrates a Bariatric-Therapeutic Module (BTM) for GLP-1 response profiling and personalized treatment selection.
+**Objective:** To develop and internally validate the Score BMN (Bach-Manos-Noel) v3.5, a multi-dimensional algorithm that (1) predicts metabolic syndrome and obesity with high discrimination, and (2) integrates a Bariatric-Therapeutic Module (BTM) for GLP-1 response profiling and personalized treatment selection.
 
-**Methods:** We analyzed 22,807 adults (age ≥18) from four NHANES cycles (2011–2018). The BMN v3.4 algorithm computes a composite score (0–100) integrating the CLEO framework (Clinical, Lifestyle, Exposome, Occupational; 0–100), a biological normalization score (bioNorm; 0–100), a Chronicity Trajectory Index (CTI; 0–100), and a GLP-1 Response Score (GRS; −3 to +6). Eight missing BMN indicators were modeled via Monte Carlo simulation (N=1,000) with literature-derived distributions. Multiple Imputation by Chained Equations (MICE; m=25) addressed partially missing NHANES variables. Primary endpoints: AUC-ROC for metabolic syndrome (MetS) and obesity prediction. Secondary endpoints: GRS discrimination for simulated GLP-1 treatment response (N=1,000 Monte Carlo samples per subject), therapeutic strategy concordance, and subgroup performance.
+**Methods:** We analyzed 22,807 adults (age ≥18) from four NHANES cycles (2011–2018). The BMN v3.5 algorithm computes a composite score (0–100) integrating the CLEO framework (Clinical, Lifestyle, Exposome, Occupational; 0–100), a biological normalization score (bioNorm; 0–100), a Chronicity Trajectory Index (CTI; 0–100), and a GLP-1 Response Score (GRS; −3 to +6). Eight missing BMN indicators were modeled via Monte Carlo simulation (N=1,000) with literature-derived distributions. Multiple Imputation by Chained Equations (MICE; m=25) addressed partially missing NHANES variables. Primary endpoints: AUC-ROC for metabolic syndrome (MetS) and obesity prediction. Secondary endpoints: GRS discrimination for simulated GLP-1 treatment response (N=1,000 Monte Carlo samples per subject), therapeutic strategy concordance, and subgroup performance.
 
-**Results:** The BMN v3.4 achieved AUC-ROC = 0.875 (95% CI: 0.873–0.877) for MetS prediction and 0.776 (0.774–0.779) for obesity, outperforming FINDRISC (0.72–0.81) and Framingham Risk Score (0.75–0.80). The integrated BTM classified 12,733 eligible subjects (BMI ≥27) into five GLP-1 response profiles: R1-Excellent (3.0%, 100% responder rate, mean TBWL 15.8%), R2-Good (21.7%, 87.3%, 12.9%), R3-Partial (60.1%, 68.3%, 10.6%), R4-Non-responder (12.9%, 48.2%, 9.9%), and R5-Failure/CI (2.2%, 0%, 4.9%). The GRS discriminated super-responders (TBWL ≥20%) with AUC = 0.996 (0.994–0.998). Chronicity (CTI) was the strongest axis predicting non-response (AUC = 0.813). The algorithm recommended semaglutide for 69.7%, tirzepatide for 6.7%, and redirected 22.0% toward surgical evaluation.
+**Results:** The BMN v3.5 achieved AUC-ROC = 0.875 (95% CI: 0.873–0.877) for MetS prediction and 0.776 (0.774–0.779) for obesity, outperforming FINDRISC (0.72–0.81) and Framingham Risk Score (0.75–0.80). The integrated BTM classified 12,733 eligible subjects (BMI ≥27) into five GLP-1 response profiles: R1-Excellent (3.0%, 100% responder rate, mean TBWL 15.8%), R2-Good (21.7%, 87.3%, 12.9%), R3-Partial (60.1%, 68.3%, 10.6%), R4-Non-responder (12.9%, 48.2%, 9.9%), and R5-Failure/CI (2.2%, 0%, 4.9%). The GRS discriminated super-responders (TBWL ≥20%) with AUC = 0.996 (0.994–0.998). Chronicity (CTI) was the strongest axis predicting non-response (AUC = 0.813). The algorithm recommended semaglutide for 69.7%, tirzepatide for 6.7%, and redirected 22.0% toward surgical evaluation.
 
-**Conclusions:** The Score BMN v3.4 provides, in a single integrated framework, robust metabolic risk prediction (AUC = 0.875) with actionable GLP-1 response profiling and personalized therapeutic guidance. This "diagnose-and-treat" architecture represents a paradigm shift from fragmented risk assessment to integrated clinical decision support. Prospective validation in GLP-1-treated cohorts is warranted.
+**Conclusions:** The Score BMN v3.5 provides, in a single integrated framework, robust metabolic risk prediction (AUC = 0.875) with actionable GLP-1 response profiling and personalized therapeutic guidance. This "diagnose-and-treat" architecture represents a paradigm shift from fragmented risk assessment to integrated clinical decision support. Prospective validation in GLP-1-treated cohorts is warranted.
 
 ---
 
@@ -34,7 +34,7 @@ Metabolic syndrome (MetS) affects approximately 34% of adults in the United Stat
 
 The emergence of GLP-1 receptor agonists (GLP-1 RA) has transformed obesity management, with semaglutide achieving 14.9% total body weight loss (TBWL) in STEP 1^6^ and tirzepatide 20.9% in SURMOUNT-1.^7^ However, treatment response is highly heterogeneous: approximately 30–40% of patients fail to achieve clinically meaningful weight loss (≥10% TBWL), while 20–30% are super-responders (≥20%).^8^ Currently, no validated tool predicts individual GLP-1 response to guide therapeutic strategy—a critical gap given the high cost of these medications (>€400/month) and the availability of alternative interventions (bariatric surgery, endoscopic procedures).
 
-We hypothesized that a multi-dimensional scoring system integrating metabolic risk assessment with treatment response prediction could provide superior clinical decision support compared to existing fragmented approaches. Here, we describe the development and internal validation of the Score BMN v3.4, which uniquely combines:
+We hypothesized that a multi-dimensional scoring system integrating metabolic risk assessment with treatment response prediction could provide superior clinical decision support compared to existing fragmented approaches. Here, we describe the development and internal validation of the Score BMN v3.5, which uniquely combines:
 
 1. **Metabolic risk stratification** through the CLEO framework (Clinical, Lifestyle, Exposome, Occupational)
 2. **Biological normalization** with adaptive z-score weighting across 15 biomarkers
@@ -64,7 +64,7 @@ NHANES variables were mapped to BMN-compatible format with the following convers
 - **Ethnicity mapping:** RIDRETH3 → BMN ethnic codes with population-specific thresholds (European [eu], African [af], East Asian [ea], South Asian [sa]) per IDF 2006 recommendations^9^
 - **Comorbidity extraction:** T2DM (DIQ010 = 1 or HbA1c ≥6.5%), prediabetes (DIQ160 = 1 or HbA1c 5.7–6.5%), hypertension (BPQ020 = 1), hypothyroidism (MCQ160F = 1)
 
-### 2.3 The Score BMN v3.4 Algorithm
+### 2.3 The Score BMN v3.5 Algorithm
 
 #### 2.3.1 CLEO Framework (Declarative Score sD: 0–100)
 
@@ -227,7 +227,7 @@ BMN final score (sf): mean 26.2, median 22, SD 16.1, range [0–100]. Classifica
 
 ### 3.3 Part I: Metabolic Syndrome Prediction
 
-**Table 2. BMN v3.4 Performance for Metabolic Syndrome Prediction (N = 22,807 × 25 imputations = 570,175 observations)**
+**Table 2. BMN v3.5 Performance for Metabolic Syndrome Prediction (N = 22,807 × 25 imputations = 570,175 observations)**
 
 | Metric | Estimate | 95% CI |
 |--------|----------|--------|
@@ -238,7 +238,7 @@ BMN final score (sf): mean 26.2, median 22, SD 16.1, range [0–100]. Classifica
 
 **Obesity prediction:** AUC-ROC = 0.776 (95% CI: 0.774–0.779), Brier = 0.211.
 
-The BMN v3.4 outperforms established metabolic risk scores in comparable populations (Figure 1):
+The BMN v3.5 outperforms established metabolic risk scores in comparable populations (Figure 1):
 - FINDRISC (diabetes screening): AUC 0.72–0.81^3^
 - Framingham Risk Score (CVD): AUC 0.75–0.80^4^
 - SCORE2 (10-year CVD): AUC 0.71–0.78^5^
@@ -309,11 +309,11 @@ Among eligible subjects: BT-5 GLP-1 pharmacotherapy 67.6%, Surveillance 29.1%, B
 
 ### 4.1 Principal Findings
 
-The Score BMN v3.4 achieves two goals in a single integrated framework: (1) robust prediction of metabolic syndrome with AUC = 0.875, exceeding established risk scores, and (2) actionable GLP-1 response profiling with clear dose-response gradient from R1 (100% responder rate, 15.8% TBWL) to R5/CI (0% responder rate). To our knowledge, this is the first score to combine metabolic risk prediction with pharmacological treatment response prediction in a unified algorithm.
+The Score BMN v3.5 achieves two goals in a single integrated framework: (1) robust prediction of metabolic syndrome with AUC = 0.875, exceeding established risk scores, and (2) actionable GLP-1 response profiling with clear dose-response gradient from R1 (100% responder rate, 15.8% TBWL) to R5/CI (0% responder rate). To our knowledge, this is the first score to combine metabolic risk prediction with pharmacological treatment response prediction in a unified algorithm.
 
 ### 4.2 The "Diagnose-and-Treat" Paradigm
 
-Existing scores answer a single question: "Does this patient have (or will develop) disease X?" The BMN v3.4 answers three questions simultaneously:
+Existing scores answer a single question: "Does this patient have (or will develop) disease X?" The BMN v3.5 answers three questions simultaneously:
 
 1. **"What is this patient's metabolic risk?"** → sf score, CLEO decomposition
 2. **"Will this patient respond to GLP-1 therapy?"** → GRS, R1–R5 profile
@@ -351,7 +351,7 @@ No directly comparable tool exists. The closest analogs:
 - **ABCD staging^31^:** Anthropometric, Biomarker, Clinical, Disability—descriptive staging without predictive modeling
 - **STEP trial post-hoc analyses:** Identify subgroup effects but do not synthesize them into a prospective decision tool
 
-The BMN v3.4 integrates more dimensions (24 indicators vs. 3–5), provides quantitative risk scores (not just stages), and uniquely includes treatment response prediction.
+The BMN v3.5 integrates more dimensions (24 indicators vs. 3–5), provides quantitative risk scores (not just stages), and uniquely includes treatment response prediction.
 
 ### 4.7 Strengths
 
@@ -387,13 +387,13 @@ The BMN v3.4 integrates more dimensions (24 indicators vs. 3–5), provides quan
 
 ## 5. CONCLUSION
 
-The Score BMN v3.4 demonstrates that a multi-dimensional algorithm integrating metabolic risk assessment (AUC = 0.875 for MetS) with GLP-1 response prediction (GRS profiles R1–R5 with coherent dose-response gradient) and therapeutic strategy selection is both feasible and clinically relevant. This "diagnose-and-treat" paradigm—moving from fragmented risk scores to integrated clinical decision support—has the potential to transform obesity management by identifying optimal GLP-1 candidates, guiding molecule selection, and recognizing patients who should be redirected toward surgical interventions. Prospective validation in GLP-1-treated cohorts is the critical next step to translate this proof of concept into clinical practice.
+The Score BMN v3.5 demonstrates that a multi-dimensional algorithm integrating metabolic risk assessment (AUC = 0.875 for MetS) with GLP-1 response prediction (GRS profiles R1–R5 with coherent dose-response gradient) and therapeutic strategy selection is both feasible and clinically relevant. This "diagnose-and-treat" paradigm—moving from fragmented risk scores to integrated clinical decision support—has the potential to transform obesity management by identifying optimal GLP-1 candidates, guiding molecule selection, and recognizing patients who should be redirected toward surgical interventions. Prospective validation in GLP-1-treated cohorts is the critical next step to translate this proof of concept into clinical practice.
 
 ---
 
 ## DATA AVAILABILITY
 
-All NHANES data used in this study are publicly available from the CDC National Center for Health Statistics (https://www.cdc.gov/nchs/nhanes/). The BMN v3.4 algorithm source code and analysis scripts are available at [repository URL upon publication].
+All NHANES data used in this study are publicly available from the CDC National Center for Health Statistics (https://www.cdc.gov/nchs/nhanes/). The BMN v3.5 algorithm source code and analysis scripts are available at [repository URL upon publication].
 
 ## CONFLICT OF INTEREST
 

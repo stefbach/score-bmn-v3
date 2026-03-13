@@ -12,7 +12,7 @@
       "Logistic Regression": 0.8716239354351877,
       "Random Forest": 0.918958367706099,
       "Gradient Boosting": 0.9263828553846701,
-      "SCORE BMN v3.0": 0.8492974429635047
+      "SCORE BMN v3.5": 0.8492974429635047
     },
     "NRI": -0.1329509347658168,
     "NRI_CI": [
@@ -74,7 +74,7 @@
       "Logistic Regression": 0.9832568301435146,
       "Random Forest": 0.992065875653708,
       "Gradient Boosting": 0.9940993320611825,
-      "SCORE BMN v3.0": 0.7387059168598107
+      "SCORE BMN v3.5": 0.7387059168598107
     },
     "NRI": -0.8767860907887637,
     "NRI_CI": [

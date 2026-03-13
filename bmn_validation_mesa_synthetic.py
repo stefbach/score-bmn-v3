@@ -1,11 +1,11 @@
 """
 ═══════════════════════════════════════════════════════════════════════════
-SCORE BMN v3.0 — VALIDATION SUR COHORTE SYNTHÉTIQUE MESA
+SCORE BMN v3.5 — VALIDATION SUR COHORTE SYNTHÉTIQUE MESA
 ═══════════════════════════════════════════════════════════════════════════
 
 Génère une cohorte synthétique de 6 814 participants fidèle aux
 caractéristiques publiées de MESA (Multi-Ethnic Study of Atherosclerosis)
-et exécute la validation complète du SCORE BMN v3.0.
+et exécute la validation complète du SCORE BMN v3.5.
 
 Sources des distributions :
   - Malik S et al. (2009) Atherosclerosis 205:599–605 (PMC2677914)
@@ -290,7 +290,7 @@ def generate_mesa_synthetic(n_total=MESA_N, seed=42):
 
     Returns
     -------
-    pd.DataFrame : cohorte synthétique harmonisée au schéma BMN v3.0
+    pd.DataFrame : cohorte synthétique harmonisée au schéma BMN v3.5
     """
     rng = np.random.RandomState(seed)
 
@@ -398,9 +398,9 @@ def generate_mesa_synthetic(n_total=MESA_N, seed=42):
 
     df = pd.DataFrame(all_subjects)
 
-    # ── Harmonisation vers le schéma BMN v3.0 ──
+    # ── Harmonisation vers le schéma BMN v3.5 ──
     print(f"\n{'=' * 70}")
-    print(f"  HARMONISATION VERS LE SCHÉMA BMN v3.0")
+    print(f"  HARMONISATION VERS LE SCHÉMA BMN v3.5")
     print(f"{'=' * 70}")
 
     # Conversions d'unités
@@ -531,7 +531,7 @@ if __name__ == "__main__":
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     print("=" * 70)
-    print("  SCORE BMN v3.0 — VALIDATION COHORTE SYNTHÉTIQUE MESA")
+    print("  SCORE BMN v3.5 — VALIDATION COHORTE SYNTHÉTIQUE MESA")
     print("  (basée sur les publications MESA 2002-2023)")
     print("=" * 70)
 
@@ -552,7 +552,7 @@ if __name__ == "__main__":
     imputed_datasets = run_mice_imputation(df, n_imputations=20, n_iterations=10)
 
     # ── ÉTAPE 5 : Score BMN + Validation ──
-    print(f"\n[5/5] Score BMN v3.0 + Validation statistique...")
+    print(f"\n[5/5] Score BMN v3.5 + Validation statistique...")
     df, imputed_datasets = apply_bmn_score(df, imputed_datasets)
     results = run_validation(df, imputed_datasets, "MESA_Synthetic", output_dir=OUTPUT_DIR)
 

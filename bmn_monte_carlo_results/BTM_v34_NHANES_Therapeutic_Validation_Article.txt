@@ -1,5 +1,5 @@
 ================================================================================
-BTM v3.4 — BARIATRIC & THERAPEUTIC MODULE VALIDATION ON NHANES
+BTM v3.5 — BARIATRIC & THERAPEUTIC MODULE VALIDATION ON NHANES
 Monte Carlo Simulation of GLP-1 Response Prediction
 ================================================================================
 
@@ -11,11 +11,11 @@ ABSTRACT
 ================================================================================
 
 OBJECTIVE: To validate the GLP-1 Response Score (GRS) and Bariatric-Therapeutic
-Module (BTM v3.4) for predicting treatment response and guiding therapeutic
+Module (BTM v3.5) for predicting treatment response and guiding therapeutic
 strategy selection in overweight/obese adults, using Monte Carlo simulation
 on the NHANES cohort.
 
-METHODS: Building on validated BMN v3.4 scores (AUC=0.875 for MetS) from
+METHODS: Building on validated BMN v3.5 scores (AUC=0.875 for MetS) from
 22807 NHANES adults (2011-2018), we computed the GRS using
 6 clinical axes (insulin resistance, chronicity, inflammation, psycho-behavioral,
 iatrogenic, demographic). GLP-1 treatment response (TBWL at 12 months) was
@@ -50,7 +50,7 @@ loss (>=10% TBWL), while 20-30% are super-responders (>=20% TBWL).
 
 Current prescribing guidelines use BMI thresholds alone, without accounting for
 metabolic phenotype, chronicity, psychological factors, or iatrogenic interactions.
-The BTM v3.4 addresses this gap by integrating:
+The BTM v3.5 addresses this gap by integrating:
 
   1. GRI (GLP-1 Response Index): Quick screening index (-3 to +6)
   2. GRS (GLP-1 Response Score): Multi-axis composite score
@@ -65,7 +65,7 @@ The BTM v3.4 addresses this gap by integrating:
 
 2.1 Study Population
 NHANES 2011-2018, 22807 adults >= 18 years.
-BMN v3.4 scores pre-computed with validated Monte Carlo imputation.
+BMN v3.5 scores pre-computed with validated Monte Carlo imputation.
 
 2.2 GRS Computation (7 Axes)
 
@@ -202,7 +202,7 @@ The 6-axis model captures the major determinants of GLP-1 efficacy:
 
 4.2 Clinical Relevance
 
-The BTM v3.4 enables:
+The BTM v3.5 enables:
   1. IDENTIFICATION of optimal GLP-1 candidates (R1-R2) vs surgical candidates (R4-R5)
   2. MOLECULE SELECTION: Tirzepatide for high-IR/DT2, Semaglutide for moderate profiles
   3. REALISTIC EXPECTATIONS: PPE calibrated to individual phenotype
@@ -228,7 +228,7 @@ The BTM v3.4 enables:
 5. CONCLUSION
 ================================================================================
 
-The BTM v3.4 GLP-1 Response Score (GRS) provides a validated multi-dimensional
+The BTM v3.5 GLP-1 Response Score (GRS) provides a validated multi-dimensional
 framework for predicting treatment response and guiding therapeutic strategy in
 overweight/obese adults. While based on simulated outcomes, the model demonstrates
 strong internal consistency and clinical face validity, warranting prospective

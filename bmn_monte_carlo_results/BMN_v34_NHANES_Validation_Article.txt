@@ -1,6 +1,6 @@
 
 ================================================================================
-VALIDATION OF THE BMN SCORE v3.4: A MULTI-DIMENSIONAL METABOLIC RISK
+VALIDATION OF THE BMN SCORE v3.5: A MULTI-DIMENSIONAL METABOLIC RISK
 ASSESSMENT ALGORITHM ON THE NHANES COHORT WITH MONTE CARLO SIMULATION
 ================================================================================
 
@@ -12,12 +12,12 @@ Status: Submitted for peer review
 ABSTRACT
 ────────────────────────────────────────────────────────────────────────────────
 
-BACKGROUND: The Score BMN (Bach-Manos-Noel) v3.4 is an integrated clinical
+BACKGROUND: The Score BMN (Bach-Manos-Noel) v3.5 is an integrated clinical
 risk assessment algorithm combining declarative clinical data (CLEO framework:
 Clinical, Lifestyle, Exposome, Occupational), biological markers (15-marker BSD
 panel), and advanced indices (SII, CTI, GRI) for metabolic disease evaluation.
 
-OBJECTIVE: To validate the BMN v3.4 algorithm on the complete NHANES cohort
+OBJECTIVE: To validate the BMN v3.5 algorithm on the complete NHANES cohort
 (2011-2020) using Monte Carlo Multiple Imputation for missing indicator
 recovery and comprehensive statistical metrics.
 
@@ -29,7 +29,7 @@ correlates. Multiple Imputation by Chained Equations (MICE, m=25)
 handled partially-missing NHANES variables. Primary endpoints: Metabolic Syndrome
 (IDF-harmonized) and Obesity (BMI ≥30 kg/m²).
 
-RESULTS: The BMN v3.4 algorithm achieved:
+RESULTS: The BMN v3.5 algorithm achieved:
   - MetS: AUC-ROC = 0.876 (95% CI: 0.875–0.878)
   - Obesity: AUC-ROC = 0.778 (95% CI: 0.776–0.780)
   - Brier Score (MetS): 0.1771
@@ -38,7 +38,7 @@ Monte Carlo indicator recovery validation showed 95% coverage probabilities
 ≥56%
 for all tested variables.
 
-CONCLUSION: The BMN v3.4 demonstrates robust discriminative performance for
+CONCLUSION: The BMN v3.5 demonstrates robust discriminative performance for
 metabolic syndrome prediction, competitive with standard machine learning
 approaches while providing clinically interpretable multi-dimensional outputs
 including chronicity trajectory (CTI) and GLP-1 response prediction (GRI).
@@ -57,7 +57,7 @@ Current risk assessment tools typically focus on individual components (BMI,
 blood glucose, lipid panels) without integrating the complex interplay between
 clinical, behavioral, environmental, and biological dimensions.
 
-The Score BMN (Bach-Manos-Noel) v3.4 addresses this gap through a
+The Score BMN (Bach-Manos-Noel) v3.5 addresses this gap through a
 multi-dimensional framework integrating:
 
   1. CLEO Framework (Declarative Score, sD: 0-100):
@@ -157,9 +157,9 @@ using MICE with 25 imputations × 15 iterations:
   - Biological constraints enforced post-imputation
   - Combined estimates via Rubin's rules (1987)
 
-2.6 BMN v3.4 Algorithm Application
+2.6 BMN v3.5 Algorithm Application
 
-The complete BMN v3.4 algorithm was applied to each imputed dataset,
+The complete BMN v3.5 algorithm was applied to each imputed dataset,
 computing all indices: C, E, O, L, sD, bioNorm, sf, SII, CTI, GRI/GRS.
 
 2.7 Statistical Analysis
@@ -197,7 +197,7 @@ The final analytic cohort comprised 22807 adults from
 
 3.2 Primary Validation: Metabolic Syndrome
 
-Table 1. BMN v3.4 Performance for Metabolic Syndrome Prediction
+Table 1. BMN v3.5 Performance for Metabolic Syndrome Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
@@ -213,7 +213,7 @@ Table 1. BMN v3.4 Performance for Metabolic Syndrome Prediction
 
 3.3 Secondary Validation: Obesity
 
-Table 2. BMN v3.4 Performance for Obesity Prediction
+Table 2. BMN v3.5 Performance for Obesity Prediction
 ╔══════════════════════════════════════════════════════════════════╗
 ║ Metric                    │ Estimate        │ 95% CI           ║
 ╠══════════════════════════════════════════════════════════════════╣
@@ -226,7 +226,7 @@ Table 2. BMN v3.4 Performance for Obesity Prediction
 
 Table 3. Comparison with Machine Learning Models (MetS)
 ╔════════════════════════════════════════════════════════════════╗
-║ BMN v3.4                  │ 0.876 (0.871–0.880) │
+║ BMN v3.5                  │ 0.876 (0.871–0.880) │
 ║ Logistic Regression       │ 0.907 (0.903–0.911) │
 ║ Random Forest             │ 0.946 (0.944–0.949) │
 ║ Gradient Boosting         │ 0.949 (0.947–0.952) │
@@ -284,7 +284,7 @@ from NHANES.
 
 4.1 Principal Findings
 
-The BMN v3.4 algorithm demonstrates robust discriminative performance for
+The BMN v3.5 algorithm demonstrates robust discriminative performance for
 metabolic syndrome prediction on the NHANES cohort, with AUC-ROC = 0.876
 (95% CI: 0.875–0.878). This is consistent with our
 previous single-cycle validation (AUC 0.849 on NHANES 2017-2018) and compares
@@ -297,7 +297,7 @@ favorably with established metabolic risk scores:
 
 4.2 Multi-dimensional Advantage
 
-Unlike single-outcome risk scores, BMN v3.4 provides:
+Unlike single-outcome risk scores, BMN v3.5 provides:
   1. Decomposed risk profile (CLEO dimensions)
   2. Chronicity trajectory (CTI) for treatment selection
   3. GLP-1 response prediction (GRI/GRS) for pharmacological guidance
@@ -326,7 +326,7 @@ The Monte Carlo modeling of 8 missing indicators demonstrated:
 
 4.5 Clinical Implications
 
-The BMN v3.4 provides actionable clinical guidance through:
+The BMN v3.5 provides actionable clinical guidance through:
   - Risk stratification (FAIBLE/MODÉRÉ/ÉLEVÉ/TRÈS ÉLEVÉ)
   - GLP-1 candidacy assessment (R1-R5 profiles)
   - Bariatric surgery indication (CTI > 55)
@@ -336,7 +336,7 @@ The BMN v3.4 provides actionable clinical guidance through:
 5. CONCLUSION
 ────────────────────────────────────────────────────────────────────────────────
 
-The Score BMN v3.4 demonstrates statistically robust performance for metabolic
+The Score BMN v3.5 demonstrates statistically robust performance for metabolic
 risk assessment on the complete NHANES cohort (22807 subjects,
 4 cycles). Monte Carlo simulation successfully models
 missing BMN indicators with validated distributional properties. The algorithm
@@ -372,7 +372,7 @@ REFERENCES
 SUPPLEMENTARY MATERIAL
 ────────────────────────────────────────────────────────────────────────────────
 
-Table S1. BMN v3.4 Algorithm Parameters (complete specification)
+Table S1. BMN v3.5 Algorithm Parameters (complete specification)
   → See DOSSIER_ALGORITHME_BMN.md (29 sections, 93+ references)
 
 Table S2. NHANES Variable Mapping

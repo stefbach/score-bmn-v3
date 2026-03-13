@@ -1,5 +1,5 @@
 /**
- * SCORE BMN v3.0 — Algorithme complet
+ * SCORE BMN v3.5 — Algorithme complet
  * Dossier scientifique : https://score-bmn-v3.pages.dev/dossier-scientifique
  *
  * Modules :
@@ -970,7 +970,7 @@ export function computeMarkov(sf, bmnK, bmi, activeComorbidities, ethnicCode) {
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Calcul complet SCORE BMN v3.0
+ * Calcul complet SCORE BMN v3.5
  *
  * @param {Object} patient — Données complètes du patient :
  *   - age: number

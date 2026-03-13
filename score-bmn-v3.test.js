@@ -1,5 +1,5 @@
 /**
- * Test de validation — SCORE BMN v3.0
+ * Test de validation — SCORE BMN v3.5
  * Exécuter avec : node score-bmn-v3.test.js
  */
 

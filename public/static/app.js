@@ -1,13 +1,13 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.4 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
+// SCORE BMN v3.5 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
-// BTM v3.4: 10 MOD (exclusivite IMC, colinearite DT2/CTI, BT-6, delta normalise)
+// BTM v3.5: 10 MOD (exclusivite IMC, colinearite DT2/CTI, BT-6, delta normalise)
 // FNC v1.0: Normalisation climatique Koppen (6 zones, acclimatation progressive)
 // ════════════════════════════════════════════════════════════════
 
-// ─── ETHNICITY v3.4 (WHO Asia-Pacific + IDF 2006 + Lancet 2016 + MultCV §9) ───
+// ─── ETHNICITY v3.5 (WHO Asia-Pacific + IDF 2006 + Lancet 2016 + MultCV §9) ───
 // dR=MultDT2, cvR=MultCV, ow=IMC seuil surpoids (ethnique)
 const ETH={
   eu:{n:'Europeen / Caucasien',ow:25,ob:30,tf:88,tm:102,dR:1,cvR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1},
@@ -24,7 +24,7 @@ const ETH={
   oth:{n:'Autre / Non specifie',ow:25,ob:30,tf:88,tm:102,dR:1,cvR:1,hR:1,cR:1,iM:1,ldl:1,ev:0,p:1}
 };
 
-// ─── FNC v1.0 — Normalisation Climatique Koppen (§5 Dossier v3.4) ───
+// ─── FNC v1.0 — Normalisation Climatique Koppen (§5 Dossier v3.5) ───
 // Zone => {FNC_temp, FNC_uv, label}
 // AQI n'est PAS normalise (pollution = meme impact partout)
 // FNC_eff = 1 - (1 - FNC) * min(1, mois_residence / 12)
@@ -37,7 +37,7 @@ const FNC_ZONES={
   Z6:{ft:0.60,fu:0.55,l:'Tropical sec / savane'}
 };
 
-// ─── BTM MATRIX v3.4 — 27 facteurs × 6 techniques (§4 Dossier v3.4) ───
+// ─── BTM MATRIX v3.5 — 27 facteurs × 6 techniques (§4 Dossier v3.5) ───
 // MOD-01: IMC exclusif (PREMIER_VRAI du plus haut)
 // MOD-03: colonne BT6 ajoutee
 // MOD-04: ASA>=4 ESG = +2 (corrige de -2)
@@ -76,7 +76,7 @@ const BTM_MATRIX={
 };
 const BT_NAMES={BT1:'Ballon Gastrique',BT2:'Endosleeve (ESG)',BT3:'Sleeve Gastrectomie',BT4:'Bypass (RYGB)',BT5:'GLP-1 RA',BT6:'Association'};
 
-// ─── BT-6 Sous-categories efficacite (§4b Dossier v3.4) ───
+// ─── BT-6 Sous-categories efficacite (§4b Dossier v3.5) ───
 const BT6_ASSOC=[
   {id:'6a',n:'ESG + GLP-1 RA',tbwl6:'16-20%',tbwl12:'20-25%',tbwl24:'22-27%',dt2r:'65-70%',grade:'1B'},
   {id:'6b',n:'Bypass RYGB + Semaglutide 2.4mg',tbwl6:'25-30%',tbwl12:'32-38%',tbwl24:'35-42%',dt2r:'85-92%',grade:'1B'},
@@ -162,7 +162,7 @@ const MK_B=[[.82,.14,.03,.01,0,0],[.08,.68,.18,.05,.01,0],[.02,.11,.61,.21,.04,.
 const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5,dyslipi:1.15};
 const CTI_G={dur:.185,yoyo:.249,lep:.21,micro:.18,cort:.195,meta:.2,enf:.24};
 
-// ─── BTM v3.4 — Bariatric & Therapeutic Module ───
+// ─── BTM v3.5 — Bariatric & Therapeutic Module ───
 // 6 techniques évaluées, 62 études méta-analysées, >180K patients
 // Bach | Manos | Noel — 2026
 const BTM_TECH={
@@ -225,9 +225,9 @@ let S={
   phq: [0,0,0,0,0,0,0,0,0],
   // BES simplifié (ancien) conservé pour compat
   bes:0,
-  // BES-16 complet (v3.4)
+  // BES-16 complet (v3.5)
   bes16:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  // BTM v3.4 — Bariatric & Therapeutic Module (MOD-01 a MOD-10)
+  // BTM v3.5 — Bariatric & Therapeutic Module (MOD-01 a MOD-10)
   btm:{gerd:0,asa:1,atcdChir:'aucun',atcdBallon:0,atcdBallonType:'',refusChir:0,prefPatient:'neutre',nash:0,comorbCV:0},
   btmResult:null,
   // FNC v1.0 — Normalisation climatique
@@ -615,7 +615,7 @@ const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
     <div class="welc-logo">B</div>
-    <h1>Score <b>BMN</b> v3.4</h1>
+    <h1>Score <b>BMN</b> v3.5</h1>
     <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
     <div class="welc-features">
       <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
@@ -653,7 +653,7 @@ const SCR=[
       <div class="opt-chk">${S.sexe===x.v?'OK':''}</div></div>`).join('')}</div>`;
   },
 
-  // 3: Ethnicity v3.4 (+ MultCV, Metis, Arabe, Autre)
+  // 3: Ethnicity v3.5 (+ MultCV, Metis, Arabe, Autre)
   ()=>{const list=Object.entries(ETH).map(([k,v])=>({k,...v}));
     return `<div class="s-emoji">Origine</div>
     <div class="s-title">Origine ethnique</div>
@@ -917,7 +917,7 @@ const SCR=[
       </div>`;
     }
     return `<div class="s-emoji">Sante</div>
-    <div class="s-title">Comorbidites (v3.4 — 13 declaratives + IR auto)</div>
+    <div class="s-title">Comorbidites (v3.5 — 13 declaratives + IR auto)</div>
     <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
     <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
     ${dyslipiHtml}
@@ -1173,14 +1173,14 @@ const SCR=[
     return html;
   },
 
-  // 17: BTM v3.4 — Questionnaire Bariatrique & Therapeutique
+  // 17: BTM v3.5 — Questionnaire Bariatrique & Therapeutique
   ()=>{
     const besT=getBesTotal();
     const besLvl=besT>=27?'Hyperphagie severe':besT>=17?'Hyperphagie moderee':besT>=10?'Legere tendance':'Pas d\'hyperphagie';
     const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
     let html=`<div class="s-emoji">BTM</div>
-    <div class="s-title">Module Bariatrique & Therapeutique v3.4</div>
-    <div class="s-sub">Scoring matriciel 27 facteurs x 6 techniques. MOD-01 a MOD-10 conformes au Dossier Maitre v3.4. <span class="ref">62+ etudes, >180K patients</span></div>`;
+    <div class="s-title">Module Bariatrique & Therapeutique v3.5</div>
+    <div class="s-sub">Scoring matriciel 27 facteurs x 6 techniques. MOD-01 a MOD-10 conformes au Dossier Maitre v3.5. <span class="ref">62+ etudes, >180K patients</span></div>`;
 
     // GERD
     html+=`<div class="sec"><div class="sec-tt">Reflux gastro-oesophagien (GERD)</div></div>`;
@@ -1225,8 +1225,8 @@ const SCR=[
       `<div class="opt${S.btm.prefPatient===o.v?' sel':''}" onclick="S.btm.prefPatient='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     S.btm.refusChir=(S.btm.prefPatient==='refus_chir')?1:0;
 
-    // FNC v3.4 — Zone climatique Koppen
-    html+=`<div class="sec"><div class="sec-tt">Zone climatique de residence (FNC v3.4)</div>
+    // FNC v3.5 — Zone climatique Koppen
+    html+=`<div class="sec"><div class="sec-tt">Zone climatique de residence (FNC v3.5)</div>
       <div style="font-size:10px;color:var(--dim3)">Normalise le score Exposome selon l'acclimatation climatique. AQI non normalise.</div></div>`;
     html+=`<div class="opts opts-compact">${Object.entries(FNC_ZONES).map(([k,z])=>
       `<div class="opt${S.fncZone===k?' sel':''}" onclick="S.fncZone='${k}';render(S.step,0)"><span>${k}: ${z.l}</span></div>`).join('')}</div>`;
@@ -1356,7 +1356,7 @@ function triggerAI(step){
 }
 
 // ════════════════════════════════════════════════════════════════
-// MOTEUR DE CALCUL — Score BMN v3.4 — Architecture CLEO + BTM + FNC
+// MOTEUR DE CALCUL — Score BMN v3.5 — Architecture CLEO + BTM + FNC
 // Ref: algorithme.html BSD v4.9 + justification-bio.html BSD v4.7.1
 // ────────────────────────────────────────────────────────────────
 // FLUX:  C(0-50) + E(0-45) + O(0-10) + L(0-10) = sD(0-100)
@@ -1539,8 +1539,8 @@ function calc(){
   // Layer B = Trajet + sedentarite (attenuee par AP)
   // Layer C = Perturbateurs (ultra-transformes, fast-food)
   // ════════════════════════════════════════════════════
-  // Layer A — Environnement physique (0-1) + FNC v3.4
-  // FNC: Facteur Normalisation Climatique Koppen (§5 Dossier v3.4)
+  // Layer A — Environnement physique (0-1) + FNC v3.5
+  // FNC: Facteur Normalisation Climatique Koppen (§5 Dossier v3.5)
   // AQI n'est PAS normalise — pollution = meme impact partout
   // FNC_eff = 1 - (1 - FNC) * min(1, mois_residence / 12)
   const fnc=FNC_ZONES[S.fncZone]||FNC_ZONES.Z4;
@@ -2290,8 +2290,8 @@ function getTherapeuticStrategy(){
 }
 
 // ════════════════════════════════════════════════════
-// BTM v3.4 — Bariatric & Therapeutic Module Decision Engine
-// MOD-01 a MOD-10 conformes au Dossier Maitre v3.4
+// BTM v3.5 — Bariatric & Therapeutic Module Decision Engine
+// MOD-01 a MOD-10 conformes au Dossier Maitre v3.5
 // Scoring matriciel 27 facteurs × 6 techniques
 // ════════════════════════════════════════════════════
 function btm_decision(){
@@ -2654,7 +2654,7 @@ function renderFinal(){
   // 4. GLP-1 RESPONSE PROFILING — Phenotypage complet
   // ══════════════════════════════════════════════════════
   const glp1=getGLP1Profile();
-  S.glp1_profile=glp1.profileCode; // v3.4: store for BTM
+  S.glp1_profile=glp1.profileCode; // v3.5: store for BTM
   const gp=glp1.profile;
   const ax=glp1.axes;
 
@@ -2947,8 +2947,8 @@ function renderFinal(){
   r+=`</div></details>`;
 
   // ══════════════════════════════════════════════════════
-  // 11. MODULE BTM v3.4 — Recommandation Thérapeutique Personnalisée
-  // MOD-01 à MOD-10 conformes au Dossier Maître v3.4
+  // 11. MODULE BTM v3.5 — Recommandation Thérapeutique Personnalisée
+  // MOD-01 à MOD-10 conformes au Dossier Maître v3.5
   // ══════════════════════════════════════════════════════
   const btm=btm_decision();
   if(btm && btm.primary){
@@ -2958,7 +2958,7 @@ function renderFinal(){
     const confCol=btm.confiance==='INDICATION CLAIRE'?'var(--green)':btm.confiance==='DISCUSSION PATIENT'?'var(--orange)':'var(--red)';
     r+=`<div style="margin-top:12px;border:2px solid var(--accent);border-radius:14px;overflow:hidden">
       <div style="background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(56,189,248,.1));padding:14px 16px;border-bottom:1px solid rgba(129,140,248,.2)">
-        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.4 — Recommandation Therapeutique</div>
+        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.5 — Recommandation Therapeutique</div>
         <div style="font-size:10px;color:var(--dim2);margin-top:2px">Bariatric & Therapeutic Module — Scoring matriciel 27 facteurs x 6 techniques — 62+ etudes</div>
       </div>
       <div style="padding:12px 14px">
@@ -3046,7 +3046,7 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
     <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
-    <b>Score BMN v3.4</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
+    <b>Score BMN v3.5</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
   </div>`;
 
   return r;

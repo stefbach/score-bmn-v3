@@ -1698,7 +1698,7 @@ All figures available in: bmn_monte_carlo_results/fig_btm1-8.png
 Validation data: bmn_monte_carlo_results/validation_btm_results.json
 """
 
-    article_path = os.path.join(OUTPUT_DIR, 'BTM_v34_NHANES_Therapeutic_Validation_Article.txt')
+    article_path = os.path.join(OUTPUT_DIR, 'BTM_v35_NHANES_Therapeutic_Validation_Article.txt')
     with open(article_path, 'w') as f:
         f.write(article)
     print(f'    Article saved: {article_path}')

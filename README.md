@@ -1,7 +1,7 @@
-# Score BMN v3.4 — Evaluation Metabolique IA + BTM v2.0 + FNC v1.0
+# Score BMN v3.5 — Evaluation Metabolique IA + BTM v2.0 + FNC v1.0
 
 ## Project Overview
-- **Name**: Score BMN v3.4
+- **Name**: Score BMN v3.5
 - **Version**: 8.0 (AI+Geo+BTM+FNC)
 - **Goal**: Questionnaire smartphone-first d'evaluation du risque metabolique et d'obesite avec intelligence artificielle adaptative, module therapeutique bariatrique et normalisation climatique
 - **Architecture**: CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0
@@ -15,8 +15,8 @@
 
 ## Changelog recents
 
-### v3.4 (4 mars 2026) — BTM v2.0 + FNC v1.0
-- **10 MOD conformes au Dossier Maitre v3.4**:
+### v3.5 (4 mars 2026) — BTM v2.0 + FNC v1.0
+- **10 MOD conformes au Dossier Maitre v3.5**:
   - MOD-01: Exclusivite IMC (PREMIER_VRAI du plus haut)
   - MOD-02: Colinearite DT2 severe (HbA1c>9) + CTI eleve (>55) = cumul +9 Bypass
   - MOD-03: Colonne BT-6 (Associations therapeutiques) ajoutee
@@ -33,7 +33,7 @@
   - Formule: FNC_eff = 1 - (1-FNC) * min(1, mois_residence/12)
   - AQI non normalise (pollution = meme impact partout)
 - **12 profils ethniques**: +3 (Metis, Arabe/MENA, Autre) avec multiplicateurs cvR (MultCV)
-- **3 prompts Claude AI v3.4** enrichis (BTM v2.0, FNC, BT-6, MOD-01 a MOD-10)
+- **3 prompts Claude AI v3.5** enrichis (BTM v2.0, FNC, BT-6, MOD-01 a MOD-10)
 - **Dossier technique**: 25 sections (+ chapitre XXV FNC)
 - **Confiance**: INDICATION CLAIRE (>=25%), DISCUSSION PATIENT (10-24%), DECISION PLURIDISCIPLINAIRE (<10%)
 
@@ -54,16 +54,16 @@
 
 ## Features completes
 
-### BTM v2.0 — Module Bariatrique & Therapeutique (v3.4)
+### BTM v2.0 — Module Bariatrique & Therapeutique (v3.5)
 - **Scoring matriciel**: 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations)
-- **10 MOD** conformes au Dossier Maitre v3.4
+- **10 MOD** conformes au Dossier Maitre v3.5
 - **BT-6 Associations**: 5 sous-categories avec efficacite (TBWL, DT2 remission, grade evidence)
 - **Confiance delta normalise**: 3 niveaux (25%+/10-24%/<10%)
 - **Score normalise %**: score_pct par technique
 - **Garde-fous**: BES>=27 CI, ASA>=4 restriction, ATCD Sleeve->Bypass
 - **MOD-08**: Distinction Orbera (6 mois) vs Spatz3 (12 mois, ajustable)
 
-### FNC v1.0 — Normalisation Climatique Koppen (v3.4)
+### FNC v1.0 — Normalisation Climatique Koppen (v3.5)
 - **6 zones**: Z1 Tropical humide, Z2 Desert chaud, Z3 Mediterraneen, Z4 Tempere reference, Z5 Continental, Z6 Tropical sec
 - **Acclimatation progressive**: FNC_eff = 1 - (1-FNC) * min(1, mois/12)
 - **AQI non normalise**: pollution = impact identique partout
@@ -73,7 +73,7 @@
 - Analyse adaptative sur 5 ecrans cles
 - Interpretation finale personnalisee avec recommandations
 - Rapport strategique complet pour le medecin traitant
-- Integration BTM v3.4 + FNC v1.0 dans les 3 prompts
+- Integration BTM v3.5 + FNC v1.0 dans les 3 prompts
 
 ### Questionnaire (20 ecrans)
 1. Accueil
@@ -93,11 +93,11 @@
 15. Comorbidites (13 declaratives + 1 auto-detectee)
 16. Score declaratif
 17. Biologie optionnelle (15 biomarqueurs, panels P5/P10/P15)
-18. BTM v3.4 questionnaire (GERD, ASA, ATCD+type, NASH, CV, preference, FNC zone, residence)
+18. BTM v3.5 questionnaire (GERD, ASA, ATCD+type, NASH, CV, preference, FNC zone, residence)
 19. BES-16 (Binge Eating Scale)
 20. Resultat final (BMN-T, Markov, CTI, GRI, SII, GLP-1, BTM/RTP, IA)
 
-### Algorithme BMN v3.4
+### Algorithme BMN v3.5
 - **BMN-C** /150 — 17 domaines cliniques
 - **BMN-K** /50 — 13+1 comorbidites avec OR/HR
 - **BMN-B** /100 — 15 biomarqueurs z-score normalises

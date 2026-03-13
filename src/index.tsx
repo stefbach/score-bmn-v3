@@ -5,7 +5,7 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '8.0', name: 'Score BMN v3.4 AI+Geo+BTM+FNC' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '8.0', name: 'Score BMN v3.5 AI+Geo+BTM+FNC' }))
 
 // ─── GEO PROXY: Geocoding via Nominatim ───
 app.get('/api/geo/search', async (c) => {
@@ -116,13 +116,13 @@ app.post('/api/ai/analyze', async (c) => {
     const { profile, question } = body
 
     const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v3.4 (Bach-Manos-Noel).
+Tu analyses le profil d'un patient dans le cadre du Score BMN v3.5 (Bach-Manos-Noel).
 Ton role:
 1. Adapter les questions du questionnaire au profil du patient
 2. Expliquer en langage simple les resultats et risques
 3. Fournir des conseils personnalises bases sur les donnees
 4. Identifier les facteurs de risque critiques
-5. Integrer le Module BTM v3.4 (Bariatric & Therapeutic Module) : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). MOD-01 exclusivite IMC, MOD-05 delta normalise, MOD-09 score_pct.
+5. Integrer le Module BTM v3.5 (Bariatric & Therapeutic Module) : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). MOD-01 exclusivite IMC, MOD-05 delta normalise, MOD-09 score_pct.
 6. Integrer FNC v1.0 (Normalisation Climatique Koppen) : 6 zones, acclimatation progressive, AQI non normalise.
 7. PROFILS ETHNIQUES (12 profils) — L'algorithme utilise des seuils IMC et des multiplicateurs de risque differencies par ethnie:
    - eu: Europeen/Caucasien (ow=25, ob=30, dR=1.0, cvR=1.0)
@@ -197,9 +197,9 @@ app.post('/api/ai/interpret', async (c) => {
     const { scores, profile } = body
 
     const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
-Tu interpretes les resultats du Score BMN v3.4 pour un patient.
+Tu interpretes les resultats du Score BMN v3.5 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
-Si le patient a un score BTM v3.4 (Module Bariatrique), integre la recommandation therapeutique personnalisee (scoring matriciel, primaire, secondaire, delta normalise, confiance, BT-6 associations, contre-indications, parcours de soins).
+Si le patient a un score BTM v3.5 (Module Bariatrique), integre la recommandation therapeutique personnalisee (scoring matriciel, primaire, secondaire, delta normalise, confiance, BT-6 associations, contre-indications, parcours de soins).
 Si FNC est appliquee (zone != Z4), mentionne la normalisation climatique et son impact sur le score Exposome.
 IMPORTANT — 12 PROFILS ETHNIQUES avec impact algorithmique : les seuils IMC (surpoids/obesite), les seuils de tour de taille, et les multiplicateurs de risque (dR pour DT2, cvR pour CV, hR pour HTA, iM pour inflammation, ev pour modulation globale) sont differencies. Par exemple, un Indo-Mauricien (dR=2.0) a un risque DT2 double vs Europeen. Un Est-Asiatique (dR=0.9) est protege. Le profil ethnique du patient influence directement : classification IMC, Score C (via ev%), Exposome Layer A (via iM), SII (seuil obesite ethnique), GLP-1 profiling (dR>=1.5 = bonus reponse), et projection Markov.
 IMPORTANT: Reponds en JSON:
@@ -260,7 +260,7 @@ app.post('/api/ai/rapport', async (c) => {
 
     const systemPrompt = `Tu es un medecin expert en endocrinologie, obesite et metabolisme, specialise dans la medecine de precision et l'aide a la decision clinique.
 
-Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.4 (architecture CLEO + BTM v2.0 + FNC v1.0).
+Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.5 (architecture CLEO + BTM v2.0 + FNC v1.0).
 
 CONTEXTE ALGORITHMIQUE:
 - Score sf = wDecl × sD + wBio × bioNorm (0-100)
@@ -270,7 +270,7 @@ CONTEXTE ALGORITHMIQUE:
 - SII = Sous-Index Inflammatoire (0-7) : 7 criteres binaires
 - K = Score de comorbidites (0-50)
 - bioNorm = score biologique normalise (0-100) calcule par z-scores ponderes
-- BTM v3.4 = Module Bariatrique & Therapeutique : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). 10 MOD appliquees: MOD-01 exclusivite IMC, MOD-02 colinearite DT2/CTI, MOD-03 BT-6, MOD-04 ASA>=4 ESG+2, MOD-05 delta normalise, MOD-06 valeurs manquantes, MOD-07 GRS R4/R5 ESG+1, MOD-08 ATCD ballon-2, MOD-09 score_pct, MOD-10 zero option.
+- BTM v3.5 = Module Bariatrique & Therapeutique : scoring matriciel 27 facteurs x 6 techniques (BT-1 Ballon, BT-2 ESG, BT-3 Sleeve, BT-4 Bypass, BT-5 GLP-1, BT-6 Associations). 10 MOD appliquees: MOD-01 exclusivite IMC, MOD-02 colinearite DT2/CTI, MOD-03 BT-6, MOD-04 ASA>=4 ESG+2, MOD-05 delta normalise, MOD-06 valeurs manquantes, MOD-07 GRS R4/R5 ESG+1, MOD-08 ATCD ballon-2, MOD-09 score_pct, MOD-10 zero option.
 - FNC v1.0 = Normalisation Climatique Koppen : 6 zones (Z1 Tropical humide, Z2 Desert chaud, Z3 Mediterraneen, Z4 Tempere reference, Z5 Continental, Z6 Tropical sec). Acclimatation progressive: FNC_eff = 1 - (1-FNC) * min(1, mois_residence/12). AQI NON normalise.
 - 12 PROFILS ETHNIQUES avec multiplicateurs differencies : eu (Europeen, ref), im (Indo-Mauricien, dR=2.0 cvR=1.8), cr (Creole, dR=1.6), si (Sino-Mauricien, dR=1.7), sa (Sud-Asiatique, dR=2.0), af (Africain, dR=1.5 hR=1.5), ea (Est-Asiatique, dR=0.9), se (Sud-Est Asiatique, dR=1.2), fm (Franco-Mauricien), met (Metis, dR=1.5), ar (Arabe/MENA, dR=1.7), oth (Autre, ref). Impact: seuils IMC (ow/ob), seuils TT (tf/tm), multiplicateurs HTA (hR), DT2 (dR), CV (cvR), inflammation (iM), modulation globale score C (ev%), GLP-1 profiling (dR>=1.5 bonus), Markov (ow pour etat initial).
 
@@ -333,7 +333,7 @@ PROFIL:
 - PSS-10 (stress): ${profil.pss10}/40 | PHQ-9 (depression): ${profil.phq9}/27 | BES-16: ${profil.bes16 || profil.bes}/46 | ISI: ${profil.isi}
 - Tabac: ${profil.tabac_cig} | Alcool: ${profil.alcool}
 
-BTM v3.4 (Module Bariatrique — Scoring Matriciel):
+BTM v3.5 (Module Bariatrique — Scoring Matriciel):
 ${body.btm ? `- GERD: ${body.btm.gerd} | ASA: ${body.btm.asa} | ATCD chirurgie: ${body.btm.atcdChir} | ATCD ballon: ${body.btm.atcdBallon||0} (type: ${body.btm.atcdBallonType||'N/A'}) | NASH: ${body.btm.nash} | CV: ${body.btm.comorbCV}
 - Preference patient: ${body.btm.prefPatient} | Refus chirurgie: ${body.btm.refusChir}
 - Ranking: ${body.btm.ranked?.join(' > ') || 'N/A'}
@@ -408,7 +408,7 @@ app.get('/dossier', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER ALGORITHME — SCORE BMN v3.4</title>
+<title>DOSSIER ALGORITHME — SCORE BMN v3.5</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -460,7 +460,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 
 <div class="hero">
   <h1>DOSSIER COMPLET</h1>
-  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.4</h1>
+  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.5</h1>
   <div class="sub">Architecture CLEO (C + E + O + L) + Integration Biologique BSD v4.9</div>
   <div class="ver">Auteurs : Bach | Manos | Noel — Version 3.1 — Verrouille le 2 mars 2026</div>
   <div style="margin-top:14px">
@@ -500,8 +500,8 @@ tr:hover{background:rgba(129,140,248,.05)}
   <a href="#s25"><span>25.</span> APIs et Sources Temps Reel</a>
   <a href="#s26"><span>26.</span> Flux de Navigation (20 ecrans)</a>
   <a href="#s27"><span>27.</span> References Scientifiques</a>
-  <a href="#s28" style="color:#14b8a6;font-weight:700"><span>28.</span> Module BTM v3.4 — Bariatric & Therapeutic Module (MOD-01 a MOD-10)</a>
-  <a href="#s29" style="color:#14b8a6;font-weight:700"><span>29.</span> FNC v1.0 — Normalisation Climatique Koppen (NOUVEAU v3.4)</a>
+  <a href="#s28" style="color:#14b8a6;font-weight:700"><span>28.</span> Module BTM v3.5 — Bariatric & Therapeutic Module (MOD-01 a MOD-10)</a>
+  <a href="#s29" style="color:#14b8a6;font-weight:700"><span>29.</span> FNC v1.0 — Normalisation Climatique Koppen (NOUVEAU v3.5)</a>
   <a href="#synth"><span>*</span> SYNTHESE — Formules Cles Verrouillees</a>
 </div>
 
@@ -509,7 +509,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <!-- 1. VUE D'ENSEMBLE -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s1">1. Vue d'ensemble</h2>
-<p>Le <strong>Score BMN v3.4</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
+<p>Le <strong>Score BMN v3.5</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
 <ul style="margin:8px 0 8px 20px;font-size:13px;color:var(--dim)">
   <li><strong>Donnees declaratives</strong> du patient (cliniques, mode de vie, psychometriques)</li>
   <li><strong>Donnees biologiques</strong> (15 biomarqueurs avec z-scores ponderes)</li>
@@ -605,7 +605,7 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 </table>
 </div>
 <p><code>ow</code> = seuil surpoids IMC | <code>ob</code> = seuil obesite IMC | <code>tf/tm</code> = tour de taille seuil F/M (cm) | <code>dR</code> = multiplicateur DT2 | <code>cvR</code> = multiplicateur CV | <code>hR</code> = risque HTA | <code>cR</code> = risque coronarien | <code>iM</code> = multiplicateur inflammation Layer A | <code>ev</code> = variation ethnique % appliquee a C</p>
-<p style="font-size:10px;color:var(--teal)">v3.4 : 12 profils (9 §Dossier Maitre + Est-Asiatique, Sud-Est Asiatique, Autre). Lignes vertes = ajouts v3.4 (Metis, Arabe/MENA, Autre).</p>
+<p style="font-size:10px;color:var(--teal)">v3.5 : 12 profils (9 §Dossier Maitre + Est-Asiatique, Sud-Est Asiatique, Autre). Lignes vertes = ajouts v3.5 (Metis, Arabe/MENA, Autre).</p>
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- 4. COMORBIDITES -->
@@ -1252,7 +1252,7 @@ SINON
 <tr><td>14</td><td>Comorbidites (13 declaratives + IR occulte auto)</td><td>[P] Pathologies</td></tr>
 <tr><td>15</td><td>Score sD + Prescription bio</td><td>[sD] Score</td></tr>
 <tr><td>16</td><td>Fiche biologique + simulation</td><td>[B] Biologie</td></tr>
-<tr><td>17</td><td>Questionnaire BTM v3.4 (GERD, ASA, ATCD, NASH, CV, preference)</td><td rowspan="2">[BTM] Bariatrique</td></tr>
+<tr><td>17</td><td>Questionnaire BTM v3.5 (GERD, ASA, ATCD, NASH, CV, preference)</td><td rowspan="2">[BTM] Bariatrique</td></tr>
 <tr><td>18</td><td>BES-16 — Binge Eating Scale (16 items, score 0-46)</td></tr>
 <tr><td>19</td><td>Resultat final complet + Section 11 BTM</td><td>[R] Resultat</td></tr>
 </table>
@@ -1308,9 +1308,9 @@ SINON
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- 28. MODULE BTM v3.4 -->
+<!-- 28. MODULE BTM v3.5 -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="s28" style="border-color:#14b8a6">28. Module BTM v3.4 — Bariatric & Therapeutic Module</h2>
+<h2 id="s28" style="border-color:#14b8a6">28. Module BTM v3.5 — Bariatric & Therapeutic Module</h2>
 
 <div style="background:rgba(20,184,166,.08);border:2px solid #14b8a6;border-radius:14px;padding:16px;margin:12px 0">
 <p style="font-size:13px;color:#14b8a6;font-weight:700">Matrice Decisionnelle Therapeutique Personnalisee — Mars 2026</p>
@@ -1419,15 +1419,15 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 </table>
 
 <h3>28.7 Integration prompts IA Claude</h3>
-<p>Les trois prompts Claude (analyse, interpretation, rapport) integrent les donnees BTM v3.4 :</p>
+<p>Les trois prompts Claude (analyse, interpretation, rapport) integrent les donnees BTM v3.5 :</p>
 <table>
-<tr><th>Prompt</th><th>Ajout BTM v3.4</th></tr>
+<tr><th>Prompt</th><th>Ajout BTM v3.5</th></tr>
 <tr><td>/api/ai/analyse</td><td>Scoring matriciel 27 facteurs x 6 techniques, MOD-01 exclusivite IMC, MOD-05 delta normalise</td></tr>
-<tr><td>/api/ai/interpreter</td><td>RTP v3.4 : scoring, classement, delta_rel, confiance, BT-6 type, CI, parcours + FNC</td></tr>
+<tr><td>/api/ai/interpreter</td><td>RTP v3.5 : scoring, classement, delta_rel, confiance, BT-6 type, CI, parcours + FNC</td></tr>
 <tr><td>/api/ai/rapport</td><td>Sections 10-12 : btm_therapeutique (score_brut, score_pct, delta, confiance, BT-6, alarmes), fnc_note, note_methodologique</td></tr>
 </table>
 
-<h3>28.8 Matrice revisee v3.4 — BT-1 a BT-6 (27 facteurs)</h3>
+<h3>28.8 Matrice revisee v3.5 — BT-1 a BT-6 (27 facteurs)</h3>
 <p>La matrice integre les 10 MOD du Dossier Maitre :</p>
 <table>
 <tr><th>Variable</th><th>BT-1 Ballon</th><th>BT-2 ESG</th><th>BT-3 Sleeve</th><th>BT-4 Bypass</th><th>BT-5 GLP-1</th><th>BT-6 Assoc.</th></tr>
@@ -1493,7 +1493,7 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 <h2 style="margin:0 0 14px;border:none;background:none;padding:0;color:var(--teal)">SYNTHESE — Formules Cles Verrouillees</h2>
 <pre>
 +----------------------------------------------------------------+
-|                    SCORE BMN v3.4 --- FORMULES                  |
+|                    SCORE BMN v3.5 --- FORMULES                  |
 +----------------------------------------------------------------+
 |                                                                 |
 |  sD = min(100, C + E + O + L)                                  |
@@ -1544,7 +1544,7 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 </div>
 
 <div style="text-align:center;margin:40px 0;padding:20px;border-top:2px solid var(--border2)">
-  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.4</p>
+  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.5</p>
   <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</p>
   <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; 4 Mars 2026</p>
   <p style="font-size:11px;color:var(--dim3)">29 sections | 20 ecrans | 13 comorbidites + IR auto | BES-16 | 62 etudes BTM | 10 MOD | FNC 6 zones | 12 profils ethniques</p>
@@ -1567,7 +1567,7 @@ app.get('/dossier-scientifique', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.4 — Méta-analyse & Justification bibliographique</title>
+<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.5 — Méta-analyse & Justification bibliographique</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1602,13 +1602,13 @@ tr:nth-child(even){background:var(--bg2)}
 
 <div style="text-align:center;padding:30px 0 20px">
   <div style="font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:2px">Document scientifique confidentiel</div>
-  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.4</div>
+  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.5</div>
   <div style="font-size:18px;color:var(--cyan);font-weight:600">Dossier Scientifique Complet</div>
   <div style="font-size:14px;color:var(--dim);margin:8px 0">Méta-analyse, justification bibliographique & validation du modèle</div>
   <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</div>
   <div style="font-size:11px;color:var(--dim3);margin-top:4px">Bach · Manos · Noël — Verrouillé le 4 mars 2026</div>
   <div style="font-size:11px;color:var(--dim3)">Version : DS-3.4-FINAL | Classification : Usage médical restreint</div>
-  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.4 : +BTM v2.0 (10 MOD, 27×6) · +FNC v1.0 (Köppen 6 zones) · 62 études · BES-16 · 12 profils ethniques</div>
+  <div style="margin-top:8px;display:inline-block;padding:4px 12px;background:rgba(129,140,248,.15);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:700">v3.5 : +BTM v2.0 (10 MOD, 27×6) · +FNC v1.0 (Köppen 6 zones) · 62 études · BES-16 · 12 profils ethniques</div>
 </div>
 
 <div class="toc">
@@ -1636,20 +1636,20 @@ tr:nth-child(even){background:var(--bg2)}
 <a href="#s21">XXI. Limites & biais potentiels</a>
 <a href="#s22">XXII. Bibliographie complète (>90 références)</a>
 <a href="#s23" style="color:var(--accent);font-weight:700">★ XXIII. MISE À JOUR v3.1 — Dyslipidémie (14e comorbidité)</a>
-<a href="#s24" style="color:var(--teal);font-weight:700">★ XXIV. MODULE BTM v3.4 — Bariatric &amp; Therapeutic Module (62 études, &gt;180K patients)</a>
-<a href="#s25" style="color:var(--teal);font-weight:700">★ XXV. FNC v1.0 — Normalisation Climatique Köppen (NOUVEAU v3.4)</a>
+<a href="#s24" style="color:var(--teal);font-weight:700">★ XXIV. MODULE BTM v3.5 — Bariatric &amp; Therapeutic Module (62 études, &gt;180K patients)</a>
+<a href="#s25" style="color:var(--teal);font-weight:700">★ XXV. FNC v1.0 — Normalisation Climatique Köppen (NOUVEAU v3.5)</a>
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s1">I. Résumé exécutif & objectifs</h1>
 
-<p>Le <b>SCORE BMN v3.4</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
+<p>Le <b>SCORE BMN v3.5</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
 
 <h3>Objectifs du modèle</h3>
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
 <p>2. <b>Personnalisation ethnique</b> : intégrer les seuils spécifiques OMS/IDF pour 12 profils ethniques (eu, im, cr, si, sa, af, ea, se, fm, met, ar, oth), reconnaissant que les seuils européens sous-estiment le risque chez les populations sud-asiatiques et est-asiatiques. Chaque profil a des multiplicateurs différenciés : dR (DT2), cvR (CV), hR (HTA), cR (coronarien), iM (inflammation), ldl, ev (modulation globale).</p>
 <p>3. <b>Prédiction pharmacologique</b> : phénotyper la réponse aux agonistes GLP-1 (sémaglutide, tirzépatide) via un modèle multi-axes (GLP-1 Response Profiling Engine v2.0) pour guider la prescription.</p>
-<p>4. <b>Aide à la décision thérapeutique (BTM v2.0)</b> : scoring matriciel 27 facteurs × 6 techniques bariatriques (BT-1 à BT-6), 10 MOD conformes au Dossier Maître v3.4, avec associations thérapeutiques et normalisation climatique (FNC v1.0).</p>
+<p>4. <b>Aide à la décision thérapeutique (BTM v2.0)</b> : scoring matriciel 27 facteurs × 6 techniques bariatriques (BT-1 à BT-6), 10 MOD conformes au Dossier Maître v3.5, avec associations thérapeutiques et normalisation climatique (FNC v1.0).</p>
 
 <h3>Design du modèle</h3>
 <div class="formula">
@@ -1665,7 +1665,7 @@ Classification : FAIBLE (&lt;30) | MODÉRÉ (30-59) | ÉLEVÉ (60-79) | TRÈS É
 <h1 id="s2">II. Méthodologie de construction du modèle</h1>
 
 <h3>2.1 Stratégie de recherche bibliographique</h3>
-<p>La construction du SCORE BMN v3.4 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
+<p>La construction du SCORE BMN v3.5 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
 
 <h4>Critères d'inclusion</h4>
 <p>• Études de cohorte prospectives (n ≥ 1 000 participants) • Méta-analyses et revues systématiques Cochrane • Essais contrôlés randomisés (ECR) de phase III pour les données pharmacologiques • Guidelines internationales (OMS, IDF, ADA, ESC/EAS) • Données de registres nationaux (NHANES, UK Biobank, Framingham Heart Study)</p>
@@ -2330,7 +2330,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
 </p>
 
 <div style="margin-top:30px;padding:20px;background:var(--bg2);border:2px solid var(--accent);border-radius:14px">
-  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.4</div>
+  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.5</div>
   <div style="font-family:var(--mono);font-size:12px;color:var(--cyan);line-height:2">
     sD = min(100, C + E + O + L)<br>
     C = min(50, round((c1+c2+c3+c4+c5+c6+c7+c8) × (1+ev/100)))<br>
@@ -2416,7 +2416,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 <tr><td>TG+HDL+HOMA-IR pathologiques + dyslipi mixte</td><td>TRIADE IR + DYSLIPIDÉMIE — Convergence maximale</td><td style="color:var(--red)">ROUGE</td></tr>
 </table>
 
-<h1 id="s24" style="border-color:var(--teal)">★ XXIV. MODULE BTM v3.4 — Bariatric &amp; Therapeutic Module</h1>
+<h1 id="s24" style="border-color:var(--teal)">★ XXIV. MODULE BTM v3.5 — Bariatric &amp; Therapeutic Module</h1>
 
 <div class="meta-box" style="border-color:var(--teal)">
 <p style="font-size:13px;color:var(--teal);font-weight:700">Matrice Décisionnelle Thérapeutique Personnalisée — Mars 2026</p>
@@ -2484,7 +2484,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 <p>Échelle validée de 16 items (score 0-46). Remplace le BES simplifié (0-8) de v3.1. Seuils : &lt;10 normal, 10-16 tendance légère, 17-26 hyperphagie modérée, ≥27 hyperphagie sévère (contre-indication chirurgicale).</p>
 
 <h3>24.7 Dix modifications BTM (MOD-01 à MOD-10)</h3>
-<p>La v3.4 introduit 10 modifications conformes au Dossier Maître :</p>
+<p>La v3.5 introduit 10 modifications conformes au Dossier Maître :</p>
 <table>
 <tr><th>MOD</th><th>Description</th><th>Justification</th></tr>
 <tr><td>MOD-01</td><td>Exclusivité IMC : PREMIER_VRAI du plus haut range. Un seul range IMC actif dans le scoring.</td><td>Évite la double comptabilisation IMC entre catégories adjacentes</td></tr>
@@ -2499,7 +2499,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 <tr><td>MOD-10</td><td>Alarme « AUCUNE OPTION STANDARD DISPONIBLE » si score primaire ≤ 0</td><td>Cas limites : concertation pluridisciplinaire obligatoire</td></tr>
 </table>
 
-<h3>24.8 Matrice révisée v3.4 — 27 facteurs × 6 techniques (valeurs numériques)</h3>
+<h3>24.8 Matrice révisée v3.5 — 27 facteurs × 6 techniques (valeurs numériques)</h3>
 <table style="font-size:10px">
 <tr><th>Facteur</th><th>BT-1</th><th>BT-2</th><th>BT-3</th><th>BT-4</th><th>BT-5</th><th>BT-6</th></tr>
 <tr><td>IMC 27-30</td><td>+2</td><td>0</td><td>-5</td><td>-5</td><td>+4</td><td>+2</td></tr>
@@ -2532,7 +2532,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 </table>
 <p class="ref">Valeurs en gras : modifiées par MOD-04 (ASA ≥4 ESG +2), MOD-07 (GRS R4/R5 ESG +1), MOD-08 (ATCD Ballon -2).</p>
 
-<h3>24.9 Table d'efficacité BT-6 (§4b Dossier v3.4)</h3>
+<h3>24.9 Table d'efficacité BT-6 (§4b Dossier v3.5)</h3>
 <table>
 <tr><th>ID</th><th>Association</th><th>TBWL 6m</th><th>TBWL 12m</th><th>TBWL 24m</th><th>DT2 / effet</th><th>Grade</th></tr>
 <tr><td>6a</td><td>ESG + GLP-1 RA</td><td>16-20 %</td><td>20-25 %</td><td>22-27 %</td><td>Rémission 65-70 %</td><td>1B</td></tr>
@@ -2546,7 +2546,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 <!-- XXV. FNC v1.0 — Normalisation Climatique Köppen -->
 <!-- ═══════════════════════════════════════════════════════ -->
 <h1 id="s25" style="border-color:var(--teal)">★ XXV. FNC v1.0 — Normalisation Climatique Köppen</h1>
-<p><b>NOUVEAU v3.4</b> — Le module FNC (Facteur de Normalisation Climatique) corrige le score Exposome Layer A pour les patients résidant dans des zones à climat extrême. L'objectif est de réduire le biais de score chez les résidents acclimatés aux climats chauds/tropicaux.</p>
+<p><b>NOUVEAU v3.5</b> — Le module FNC (Facteur de Normalisation Climatique) corrige le score Exposome Layer A pour les patients résidant dans des zones à climat extrême. L'objectif est de réduire le biais de score chez les résidents acclimatés aux climats chauds/tropicaux.</p>
 
 <h3>25.1 Rationnel scientifique</h3>
 <p>L'acclimatation à la chaleur est un processus physiologique bien documenté qui modifie les réponses thermorégulatrices : augmentation du volume plasmatique (+12-15 %), sudation précoce et abondante, réduction du seuil de vasodilatation cutanée, et amélioration de l'efficacité cardiovasculaire lors de l'exposition à la chaleur.</p>
@@ -2601,9 +2601,9 @@ Source : Sniderman 2019, ESC Guidelines 2021
 </div>
 
 <div style="margin-top:30px;text-align:center;font-size:11px;color:var(--dim3)">
-  Document confidentiel — SCORE BMN v3.4 — Bach · Manos · Noël — 4 mars 2026<br>
+  Document confidentiel — SCORE BMN v3.5 — Bach · Manos · Noël — 4 mars 2026<br>
   93+ références + 62 études BTM | 25 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0<br>
-  v3.4 : +10 MOD BTM · +FNC Köppen (6 zones) · +MultCV · Profils ethniques 12 groupes<br>
+  v3.5 : +10 MOD BTM · +FNC Köppen (6 zones) · +MultCV · Profils ethniques 12 groupes<br>
   Usage médical restreint — Ne pas diffuser sans autorisation
 </div>
 
@@ -2622,8 +2622,8 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v3.4 - Evaluez votre risque metabolique avec intelligence artificielle. Module BTM v3.4 : matrice bariatrique. Dyslipidemie integree.">
-<title>Score BMN v3.4</title>
+<meta name="description" content="Score BMN v3.5 - Evaluez votre risque metabolique avec intelligence artificielle. Module BTM v3.5 : matrice bariatrique. Dyslipidemie integree.">
+<title>Score BMN v3.5</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">
