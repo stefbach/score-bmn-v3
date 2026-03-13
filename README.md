@@ -1,7 +1,7 @@
-# Score BMN v3.4 — Evaluation Metabolique IA + BTM v2.0 + FNC v1.0
+# Score BMN v3.5 — Evaluation Metabolique IA + BTM v2.0 + FNC v1.0
 
 ## Project Overview
-- **Name**: Score BMN v3.4
+- **Name**: Score BMN v3.5
 - **Version**: 8.0 (AI+Geo+BTM+FNC)
 - **Goal**: Questionnaire smartphone-first d'evaluation du risque metabolique et d'obesite avec intelligence artificielle adaptative, module therapeutique bariatrique et normalisation climatique
 - **Architecture**: CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0
@@ -9,7 +9,8 @@
 ## URLs
 - **Production**: https://score-bmn-v3.pages.dev
 - **Dossier Technique**: https://score-bmn-v3.pages.dev/dossier
-- **API Health**: https://score-bmn-v3.pages.dev/api/health
+- **Article scientifique**: https://score-bmn-v3.pages.dev/article
+- **Article (direct)**: https://score-bmn-v3.pages.dev/static/BMN_v35_Article_Unified
 - **GitHub**: https://github.com/stefbach/score-bmn-v3
 - **Backup**: https://www.genspark.ai/api/files/s/z1LxnU65
 
@@ -132,4 +133,19 @@
 - **Platform**: Cloudflare Pages
 - **Project**: score-bmn-v3
 - **Status**: Active v8.0
-- **Last Updated**: 2026-03-04
+- **Last Updated**: 2026-03-13
+
+## Article scientifique (v3.5)
+- **Titre**: Score BMN v3.5: Development, Internal Validation, and Clinical Implementation of a Multi-Dimensional Metabolic Risk Algorithm with Integrated GLP-1 Response Prediction
+- **Auteurs**: Bach S, Manos A, Noel P
+- **Cohorte**: 22,807 adultes NHANES (2011-2018), 12,733 eligibles GLP-1 (BMI >= 27)
+- **Performances**: AUC MetS 0.876 (CI 0.875-0.878), AUC Obesite 0.778 (CI 0.776-0.780)
+- **Calibration**: ICI=0.032, E/O=1.04, slope=0.91
+- **Profils GLP-1**: R1 Excellent (2.5%, 92% resp), R2 Good (21.3%, 80.9%), R3 Partial (49%, 64%), R4 Non-resp (25%, 63.1%), CI (2.2%, 0%)
+- **Super-responder**: AUC 0.911 (metric interne, anti-circularite)
+- **16 figures** (8 principales + 9 supplementaires)
+- **52 references scientifiques**
+- **Peer-reviewed**: 23 corrections Lancet Digital Health appliquees (mars 2026)
+- **Supplementary Methods S1**: Equations FNC completes, reponderation dynamique, bioNorm, safety floors
+- **COI/Funding/CRediT**: Sections ICMJE completes avec declaration IA
+- **Cibles**: BMC Medicine (principal), Lancet Digital Health (avec validation externe)
