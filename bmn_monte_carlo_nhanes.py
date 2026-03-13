@@ -1017,8 +1017,15 @@ BIOMARKERS_DEF = {
 }
 
 
-def compute_bmn_score(row):
-    """Compute the full BMN v3.5 score for a single subject (pd.Series)."""
+def compute_bmn_score(row, exclude_mets_comorbidity=False):
+    """Compute the full BMN v3.5 score for a single subject (pd.Series).
+
+    Args:
+        row: pd.Series with patient data
+        exclude_mets_comorbidity: if True, do NOT include MetS as a comorbidity
+            input. MUST be True when validating against MetS as outcome to
+            avoid circularity (using the answer as an input).
+    """
     eth = row.get('ethnicCode', 'eu')
     ep = ETHNIC_PROFILES.get(eth, ETHNIC_PROFILES['eu'])
     sex = row.get('sex', 'M')
@@ -1064,8 +1071,9 @@ def compute_bmn_score(row):
     if row.get('has_prediabetes', 0) == 1: comorbidities.append('predmt')
     if row.get('has_hta', 0) == 1: comorbidities.append('hta')
     if row.get('has_hypothyroid', 0) == 1: comorbidities.append('hypo')
-    # MetS
-    if row.get('MetS', 0) == 1: comorbidities.append('mets')
+    # MetS — EXCLUDED when validating against MetS to avoid circularity
+    if not exclude_mets_comorbidity and row.get('MetS', 0) == 1:
+        comorbidities.append('mets')
     # Occult IR
     tghdl_val = row.get('tghdl', 0)
     if tghdl_val is not None and not np.isnan(tghdl_val) and tghdl_val > 3.5:
@@ -1303,10 +1311,17 @@ def compute_bmn_score(row):
     })
 
 
-def apply_bmn_to_dataset(df):
-    """Apply BMN scoring to entire dataset."""
-    print("\n  Applying BMN v3.5 algorithm to dataset...", end=' ', flush=True)
-    scores = df.apply(compute_bmn_score, axis=1)
+def apply_bmn_to_dataset(df, exclude_mets_comorbidity=True):
+    """Apply BMN scoring to entire dataset.
+
+    Args:
+        exclude_mets_comorbidity: if True (default), MetS is NOT used as a
+            comorbidity input. This prevents circularity when validating
+            against MetS as the prediction target.
+    """
+    print(f"\n  Applying BMN v3.5 algorithm to dataset "
+          f"(exclude_mets_comorbidity={exclude_mets_comorbidity})...", end=' ', flush=True)
+    scores = df.apply(lambda row: compute_bmn_score(row, exclude_mets_comorbidity), axis=1)
     result = pd.concat([df, scores], axis=1)
     print(f"done ({len(result)} subjects scored)")
     return result
@@ -1476,16 +1491,19 @@ def compute_idi(y_true, p_old, p_new):
 
 
 def hosmer_lemeshow_test(y_true, y_prob, n_groups=10):
-    """Hosmer-Lemeshow goodness-of-fit test."""
+    """Hosmer-Lemeshow goodness-of-fit test (correct formula)."""
     df_hl = pd.DataFrame({'y': y_true, 'p': y_prob})
     df_hl['group'] = pd.qcut(df_hl['p'], n_groups, duplicates='drop')
 
-    observed = df_hl.groupby('group')['y'].sum()
-    expected = df_hl.groupby('group')['p'].sum()
-    n_group = df_hl.groupby('group')['y'].count()
+    observed = df_hl.groupby('group')['y'].sum()      # O_k
+    expected = df_hl.groupby('group')['p'].sum()       # E_k = Σ π_k
+    n_group = df_hl.groupby('group')['y'].count()      # n_k
+    pi_k = expected / n_group                           # mean predicted prob
 
-    # Chi-squared
-    hl_stat = ((observed - expected)**2 / (expected * (1 - expected / n_group))).sum()
+    # Correct HL formula: Σ (O_k - E_k)² / (n_k × π̄_k × (1 - π̄_k))
+    denom = n_group * pi_k * (1 - pi_k)
+    denom = denom.replace(0, np.nan)  # avoid division by zero
+    hl_stat = ((observed - expected)**2 / denom).sum()
     df_chi = len(observed) - 2
     p_value = 1 - stats.chi2.cdf(hl_stat, df_chi) if df_chi > 0 else 1.0
 
@@ -1533,11 +1551,20 @@ def validate_bmn_comprehensive(scored_datasets, target='MetS'):
         brier = brier_score_loss(y_true, sf_scores.clip(0, 1))
         all_brier.append(brier)
 
-        # Compare with logistic regression baseline
-        X = df_valid[['sf']].values
-        lr = LogisticRegression(random_state=42, max_iter=1000)
-        lr.fit(X, y_true)
-        lr_probs = lr.predict_proba(X)[:, 1]
+        # Compare with simple baseline model (BMI + age + sex)
+        # NOT logistic(sf) which would be self-referential
+        baseline_cols = ['bmi', 'age']
+        baseline_avail = [c for c in baseline_cols if c in df_valid.columns]
+        if baseline_avail:
+            X_base = df_valid[baseline_avail].fillna(df_valid[baseline_avail].median()).values
+            # Add sex as dummy
+            sex_dummy = (df_valid['sex'] == 'M').astype(float).values.reshape(-1, 1)
+            X_base = np.hstack([X_base, sex_dummy])
+            lr_base = LogisticRegression(random_state=42, max_iter=1000)
+            lr_base.fit(X_base, y_true)
+            lr_probs = lr_base.predict_proba(X_base)[:, 1]
+        else:
+            lr_probs = np.full_like(sf_scores, np.mean(y_true))
 
         nri = compute_nri(y_true, lr_probs, sf_scores)
         all_nris.append(nri)
@@ -1703,20 +1730,23 @@ def comparative_models_analysis(scored_datasets, target='MetS'):
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
+    # NOTE: BMN score is applied to full data (not fitted), so it is already
+    # a fair "out-of-sample" comparison — BMN weights are expert-derived,
+    # not data-fitted. ML models are cross-validated to prevent overfitting.
     models = {
-        'BMN v3.5': df_valid['sf'].values / 100.0,
-        'Logistic Regression': None,
-        'Random Forest': None,
-        'Gradient Boosting': None,
+        'BMN v3.5 (expert weights)': df_valid['sf'].values / 100.0,
+        'Logistic Regression (5-fold CV)': None,
+        'Random Forest (5-fold CV)': None,
+        'Gradient Boosting (5-fold CV)': None,
     }
 
-    # Cross-validated predictions
+    # Cross-validated predictions for ML models
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
     for name, clf in [
-        ('Logistic Regression', LogisticRegression(random_state=42, max_iter=1000)),
-        ('Random Forest', RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)),
-        ('Gradient Boosting', GradientBoostingClassifier(n_estimators=200, random_state=42)),
+        ('Logistic Regression (5-fold CV)', LogisticRegression(random_state=42, max_iter=1000)),
+        ('Random Forest (5-fold CV)', RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)),
+        ('Gradient Boosting (5-fold CV)', GradientBoostingClassifier(n_estimators=200, random_state=42)),
     ]:
         try:
             probs = cross_val_predict(clf, X_scaled, y, cv=cv, method='predict_proba')[:, 1]
@@ -1744,10 +1774,10 @@ def comparative_models_analysis(scored_datasets, target='MetS'):
     print(f"  └───────────────────────────────────────────────────────────┘")
 
     # DeLong test: BMN vs each model
-    bmn_probs = models['BMN v3.5']
+    bmn_probs = models['BMN v3.5 (expert weights)']
     print(f"\n  DeLong tests (BMN v3.5 vs others):")
     for name, probs in models.items():
-        if name == 'BMN v3.5' or probs is None:
+        if name == 'BMN v3.5 (expert weights)' or probs is None:
             continue
         # Approximate DeLong using bootstrap
         n_boot = 1000
@@ -1877,6 +1907,69 @@ def validate_mc_indicator_recovery(df, n_mc=500):
 # ═══════════════════════════════════════════════════════════════════════════
 # PART 9: SUBGROUP ANALYSIS
 # ═══════════════════════════════════════════════════════════════════════════
+
+def temporal_validation(scored_datasets, target='MetS'):
+    """
+    Temporal validation: development (2011-2014) vs test (2015-2018).
+    Mimics prospective validation by testing on future data unseen during development.
+    """
+    print("\n" + "━" * 78)
+    print(f"  TEMPORAL VALIDATION — {target}")
+    print("  Development: 2011-2014 | Test: 2015-2018")
+    print("━" * 78)
+
+    dev_cycles = {'2011-2012', '2013-2014'}
+    test_cycles = {'2015-2016', '2017-2018'}
+
+    results = {}
+    for split_name, split_cycles in [('Development', dev_cycles), ('Test', test_cycles)]:
+        all_aucs = []
+        all_brier = []
+        for df in scored_datasets:
+            mask = df['cycle'].isin(split_cycles) & df['sf'].notna() & df[target].notna()
+            df_split = df[mask]
+            if len(df_split) < 100:
+                continue
+            y = df_split[target].values.astype(int)
+            sf = df_split['sf'].values / 100.0
+            if len(np.unique(y)) < 2:
+                continue
+            try:
+                auc = roc_auc_score(y, sf)
+                all_aucs.append(auc)
+                all_brier.append(brier_score_loss(y, sf.clip(0, 1)))
+            except Exception:
+                continue
+
+        if all_aucs:
+            # Bootstrap on pooled data from first imputed dataset
+            df0 = scored_datasets[0]
+            mask0 = df0['cycle'].isin(split_cycles) & df0['sf'].notna() & df0[target].notna()
+            df0_split = df0[mask0]
+            y0 = df0_split[target].values.astype(int)
+            sf0 = df0_split['sf'].values / 100.0
+            boot = bootstrap_auc(y0, sf0, n_bootstrap=N_BOOTSTRAP)
+
+            results[split_name] = {
+                'n': len(df0_split),
+                'auc': np.mean(all_aucs),
+                'auc_ci_lower': boot['ci_lower'],
+                'auc_ci_upper': boot['ci_upper'],
+                'brier': np.mean(all_brier),
+                'prevalence': np.mean(y0),
+            }
+            print(f"  {split_name:12s} (N={len(df0_split):,d}): "
+                  f"AUC = {np.mean(all_aucs):.3f} "
+                  f"(95% CI: {boot['ci_lower']:.3f}–{boot['ci_upper']:.3f}), "
+                  f"Brier = {np.mean(all_brier):.4f}")
+
+    if 'Development' in results and 'Test' in results:
+        delta = results['Test']['auc'] - results['Development']['auc']
+        print(f"\n  ΔAUC (Test − Dev) = {delta:+.3f}")
+        print(f"  → {'Stable' if abs(delta) < 0.02 else 'Degradation detected'}")
+
+    return results
+
 
 def subgroup_analysis(scored_datasets, target='MetS'):
     """Subgroup AUC analysis by demographics."""
@@ -2685,6 +2778,10 @@ def main():
 
     # ── Step 11: Statistical validation (Obesity) ──
     validation_obes = validate_bmn_comprehensive(scored_datasets, target='Obesity')
+
+    # ── Step 11b: Temporal validation ──
+    temporal_mets = temporal_validation(scored_datasets, target='MetS')
+    temporal_obes = temporal_validation(scored_datasets, target='Obesity')
 
     # ── Step 12: Comparative models ──
     comparison_results = comparative_models_analysis(scored_datasets, target='MetS')

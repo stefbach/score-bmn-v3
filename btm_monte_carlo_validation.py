@@ -44,12 +44,13 @@ N_BOOTSTRAP = 2000       # Bootstrap for CI
 RESPONDER_THRESHOLD = 10.0   # TBWL >= 10% = responder
 SUPER_RESP_THRESHOLD = 20.0  # TBWL >= 20% = super-responder
 
-# Ethnic profiles (from BMN v3.5)
+# Ethnic profiles — CANONICAL values from score-bmn-v3.js
+# Note: waist thresholds are BMN clinical scoring thresholds (not IDF MetS criteria)
 ETHNIC_PROFILES = {
-    "eu": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 94, "waistF": 80, "dR": 1.0, "hR": 1.0, "cR": 1.0, "ev": 0},
-    "af": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 94, "waistF": 80, "dR": 1.7, "hR": 1.45, "cR": 1.15, "ev": 3},
-    "ea": {"bmiSurpoids": 23, "bmiObesite": 27.5, "waistM": 85, "waistF": 75, "dR": 1.5, "hR": 1.1, "cR": 1.05, "ev": 2},
-    "sa": {"bmiSurpoids": 23, "bmiObesite": 25, "waistM": 80, "waistF": 72, "dR": 2.0, "hR": 1.3, "cR": 1.2, "ev": 5},
+    "eu": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 102, "waistF": 88, "dR": 1.0, "hR": 1.0, "cR": 1.0, "ev": 0},
+    "af": {"bmiSurpoids": 25, "bmiObesite": 30, "waistM": 102, "waistF": 88, "dR": 1.3, "hR": 1.5, "cR": 1.2, "ev": -1.5},
+    "ea": {"bmiSurpoids": 23, "bmiObesite": 27.5, "waistM": 88, "waistF": 80, "dR": 0.9, "hR": 0.9, "cR": 0.7, "ev": 1.5},
+    "sa": {"bmiSurpoids": 23, "bmiObesite": 27.5, "waistM": 90, "waistF": 80, "dR": 2.0, "hR": 1.3, "cR": 1.5, "ev": -1.5},
 }
 
 COMORBIDITIES_DEF = {
