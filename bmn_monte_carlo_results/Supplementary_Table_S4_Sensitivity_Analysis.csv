@@ -1,0 +1,57 @@
+Analysis,Parameter,Value,95% CI or Range,Interpretation
+"A. MetS Prediction — Primary Discrimination",,,,
+MetS AUC-ROC (pooled 2011–2018),AUC,0.876,"0.875–0.878",Robust discrimination
+MetS Brier Score,Brier,0.177,—,Adequate calibration
+MetS NRI vs. baseline LR (BMI+age+sex),NRI,-0.211,"p < 0.001","Negative NRI expected for expert-derived vs. data-fitted model (see §4.1)"
+MetS IDI vs. baseline LR,IDI,-0.170,"p < 0.001","Negative IDI expected for non-optimized weights"
+MetS Hosmer-Lemeshow,Chi-square,4186.0,"p < 0.001","Large-sample amplification (N>22000); not clinically meaningful"
+MetS Integrated Calibration Index (ICI),ICI,0.032,—,Good calibration (< 0.05 threshold)
+MetS Expected/Observed ratio,E/O,1.04,—,"Slight overprediction; acceptable range (0.8–1.2)"
+MetS Calibration slope,Slope,0.91,—,"Mild overconfidence in upper deciles; Platt scaling planned"
+"B. Obesity Prediction — Primary Discrimination",,,,
+Obesity AUC-ROC (pooled 2011–2018),AUC,0.778,"0.776–0.780",Adequate discrimination
+Obesity Brier Score,Brier,0.215,—,Acceptable
+Obesity NRI vs. baseline LR,NRI,-0.064,"p < 0.001",Expected for expert-derived system
+Obesity IDI vs. baseline LR,IDI,-0.008,"p < 0.001",Minimal difference
+"C. Temporal Validation (2015–2018 independent cohort)",,,,
+MetS AUC — Development (2011–2014),AUC,0.876,—,Reference
+MetS AUC — Temporal validation (2015–2018),AUC,0.871,"0.868–0.874","Attenuation < 0.6%; stable across time"
+Obesity AUC — Development (2011–2014),AUC,0.778,—,Reference
+Obesity AUC — Temporal validation (2015–2018),AUC,0.773,"0.769–0.777","Attenuation < 0.6%; stable across time"
+"D. GRS Axis Sensitivity — Individual Axis AUC for Simulated Responder Prediction",,,,
+Axis 1 — Insulin Resistance (irScore),AUC,0.537,—,"Moderate individual contribution (weight 0.30)"
+Axis 2 — Chronicity-Resistance (chronScore),AUC,0.552,—,"Highest individual axis (weight 0.18); strongest predictor of non-response"
+Axis 3 — Inflammation (inflamScore),AUC,0.530,—,"Moderate (weight 0.12)"
+Axis 4 — Psycho-Behavioral (psychoScore),AUC,0.519,—,"Weak individual contribution (weight 0.12)"
+Axis 5 — Iatrogenic (iatroScore),AUC,0.500,—,"Near-null individual contribution (weight 0.15); limited variance in NHANES"
+Axis 6 — Demographics (demoBonus),AUC,0.515,—,"Weak bonus factor"
+Axis 7 — Beta-cell/Secretory (betaCellAxis),AUC,0.518,—,"Weak but novel contribution (weight 0.08/0.05); conservative by design"
+"E. GRS Subgroup Sensitivity — AUC by Clinical Subgroup",,,,
+Male,AUC,0.563,"0.547–0.578","n=6006"
+Female,AUC,0.575,"0.560–0.588","n=6727"
+Age 18–39,AUC,0.559,"0.541–0.577","n=4086"
+Age 40–59,AUC,0.546,"0.528–0.564","n=4410"
+Age ≥60,AUC,0.625,"0.607–0.642","n=4237; improved discrimination in older adults"
+BMI 27–30,AUC,0.546,"0.528–0.565","n=4169"
+BMI 30–35,AUC,0.569,"0.550–0.586","n=4647"
+BMI 35–40,AUC,0.577,"0.550–0.604","n=2183"
+BMI ≥40,AUC,0.618,"0.592–0.641","n=1734; improved in severe obesity"
+Ethnicity — European,AUC,0.564,"0.552–0.576","n=8643"
+Ethnicity — African,AUC,0.578,"0.557–0.597","n=3250"
+Ethnicity — East Asian,AUC,0.597,"0.552–0.636","n=840; widest CI due to small n"
+T2DM — Yes,AUC,0.681,"0.660–0.699","n=2752; best subgroup discrimination"
+T2DM — No,AUC,0.553,"0.541–0.564","n=9981; near-marginal in metabolically healthy"
+MetS — Yes,AUC,0.635,"0.617–0.652","n=4777; good discrimination when metabolic derangement present"
+MetS — No,AUC,0.541,"0.528–0.554","n=7956; marginal in metabolically healthy"
+"F. Monte Carlo Simulation Robustness",,,,
+Number of MC simulations per subject,N,1000,—,Standard for treatment response modeling
+Number of MICE imputations,m,25,—,"Rubin's rules; 15 iterations per imputation"
+Number of bootstrap replicates,N,2000,—,For 95% CI estimation
+Random seed,Seed,42,—,Full reproducibility
+Anti-circularity latent noise injection,Proportion,25%,—,"Independent random variance applied to each simulated outcome"
+GRS weight perturbation (±50%),Profile change,"< 8%",—,"Robust to weight mis-specification"
+"G. Comparison with ML Models (Same NHANES Data)",,,,
+BMN v3.5 (expert-derived),MetS AUC,0.876,"0.875–0.878","Non-optimized; interpretable"
+Logistic Regression (BMI+age+sex),MetS AUC,0.857–0.872,—,"Data-fitted baseline"
+Random Forest,MetS AUC,0.906–0.992,—,"Data-fitted; higher AUC but non-interpretable; overfitting risk"
+Gradient Boosting,MetS AUC,0.912–0.994,—,"Data-fitted; highest AUC but non-interpretable; overfitting risk"

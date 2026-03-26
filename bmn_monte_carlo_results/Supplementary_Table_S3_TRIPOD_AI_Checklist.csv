@@ -1,0 +1,41 @@
+Section,Item,TRIPOD+AI Item,Location in Manuscript,Compliance
+Title,1,Identify the study as developing and/or validating a multivariable prediction model. Identify the target population and outcome.,Title and Abstract,Yes — Title: "Development and Internal Validation of a Multidimensional Metabolic Risk and GLP-1 Response Profiling Algorithm (NHANES N=22807)"
+Abstract,2,"Provide a summary of objectives, study design, setting, participants, sample size, predictors, outcome, statistical analysis, results, and conclusions.",Abstract,Yes — Structured abstract (Background/Methods/Results/Conclusions) with all required elements
+Introduction,3a,Explain the medical context and rationale for developing the prediction model.,§1 Introduction,Yes — MetS prevalence; GLP-1 RA heterogeneity (30–40% non-response); gap in integrated tools
+Introduction,3b,"Specify the objectives, including whether the study describes development or validation of the model.",§1 Introduction (last paragraph),Yes — Development + internal (temporal) validation of BMN v3.5; proof-of-concept BTM
+Methods — Source of data,4a,"Describe the study design (e.g., cohort, cross-sectional).",§2.1,Yes — Cross-sectional analysis of NHANES 2011–2018
+Methods — Source of data,4b,"Specify the key dates (e.g., recruitment, follow-up, data collection).",§2.1,Yes — Four cycles: 2011–2012 through 2017–2018
+Methods — Participants,5a,Specify key elements of the study setting.,§2.1,Yes — Nationally representative US survey (NCHS/CDC)
+Methods — Participants,5b,Describe eligibility criteria.,§2.1,Yes — Age ≥18 years; complete interview + exam (RIDSTATR=2); valid body measurements
+Methods — Participants,5c,Provide details of treatment received if relevant.,§2.7,Partial — No treatment data in NHANES; Monte Carlo simulation for GLP-1 response (proof-of-concept only)
+Methods — Outcome,6a,Clearly define the outcome.,§2.8,Yes — MetS (IDF harmonized criteria); obesity (ethnic-adjusted BMI thresholds); simulated TBWL for BTM
+Methods — Outcome,6b,Describe any actions to blind outcome assessment.,§2.8,Not applicable — Outcomes derived from NHANES laboratory/exam data (objective measurements)
+Methods — Predictors,7a,Clearly define all predictors used in developing the model.,§2.3; §2.4; Table in §2.4; Supplementary Methods S1,Yes — CLEO framework (4 domains); bioNorm (18 biomarkers); CTI (7 factors); GRS (7 axes)
+Methods — Predictors,7b,Report any actions to blind assessment of predictors.,N/A,Not applicable — Predictors from standardized NHANES protocols
+Methods — Sample size,8,"Explain how the study size was arrived at. If applicable, provide a sample size calculation.",§2.1,Partial — Full NHANES 2011–2018 population meeting criteria (N=22807); no formal power calculation (population-based design)
+Methods — Missing data,9,"Describe how missing data were handled, with details of any imputation method.",§2.5; §2.6,Yes — Monte Carlo simulation (N=1000/subject) for 11 absent indicators; MICE (m=25) for partially missing NHANES variables
+Methods — Statistical analysis,10a,Describe how predictors were handled in the analyses.,§2.3; Supplementary Methods S1,Yes — Adaptive z-score weighting for bioNorm; dynamic reweighting (w_Bio 0.35–0.65); expert-derived CLEO weights
+Methods — Statistical analysis,10b,Specify type of model and method for internal validation.,§2.8; §2.10,Yes — Expert-derived composite score; temporal validation (2011–2014 dev → 2015–2018 test)
+Methods — Statistical analysis,10d,"Specify all measures used to assess model performance (discrimination, calibration).",§2.8,Yes — AUC-ROC (bootstrap 2000); NRI; IDI; Brier score; Hosmer-Lemeshow; ICI; E/O ratio; calibration slope
+Methods — Statistical analysis,10e,Describe any model updating.,§2.3,Not applicable — Expert-derived weights not optimized on data
+Methods — Risk groups,11,Provide details on how risk groups were created.,§3.A.2,Yes — LOW/MODERATE/HIGH/VERY HIGH based on sf thresholds
+Results — Participants,13a,Describe the flow of participants through the study.,§3.A.1; Table 1,Yes — N=22807 from 4 NHANES cycles; 12733 GLP-1 eligible (BMI ≥27)
+Results — Participants,13b,Describe participant characteristics.,Table 1,Yes — Age; sex; BMI; MetS; obesity; T2DM; hypertension; HOMA-IR; HbA1c; TG; HDL; BMN score
+Results — Model development,14a,Specify the number of participants and outcome events.,Tables 1–3,Yes — N=22807; MetS+ n=8402 (36.8%); Obesity n=8552 (37.5%)
+Results — Model development,14b,"If done, report the unadjusted association between each candidate predictor and outcome.",§3.B.3; Supplementary Table S4,Partial — Axis sensitivity analysis (individual AUC per GRS axis); subgroup analysis (Table 5)
+Results — Model specification,15a,Present the full prediction model.,§2.3; §2.4; Supplementary Methods S1,Yes — Complete architecture in S1; axis weights/ranges in Table (§2.4)
+Results — Model specification,15b,"Explain how to use the prediction model (e.g., online calculator).",§2.9,Yes — Point-of-care web app (https://score-bmn-v3.pages.dev); source code on GitHub
+Results — Model performance,16,"Report performance measures (with CIs) for discrimination, calibration.",Tables 2 and 4; Figure 3,Yes — AUC with 95% CI; Brier; ICI=0.032; E/O=1.04; calibration slope=0.91
+Discussion — Limitations,18,Discuss limitations (non-representativeness; over/underfitting; missing variables; etc.).,§4.8,Yes — 8 explicit limitations including cross-sectional design; simulated outcomes; imputed indicators; marginal GRS AUC
+Discussion — Interpretation,19a,"Give an overall interpretation of results, considering objectives, limitations, multiplicity of analyses.",§4.1–§4.6,Yes — Comprehensive discussion of MetS prediction; BTM proof-of-concept; R3/R4 limitation; NRI context
+Discussion — Implications,20,"Discuss the potential clinical use and implications for future research. If applicable, recommend a validation study.",§4.9,Yes — 6 future directions including prospective validation (critical priority); hybrid models; EHR integration
+Other — Supplementary information,21,Provide information about the availability of supplementary resources.,§2.9; Declarations,Yes — GitHub repository; web application; Supplementary Methods S1; Tables S1–S4; Figures S1–S9
+Other — Funding,22,Give the source of funding and the role of the funders.,Declarations — Funding,Yes — No external funding
+TRIPOD+AI — AI Model Type,AI-1,Describe the type of AI/ML model used.,§2.3; §2.8,Yes — Expert-derived composite score (not ML-optimized); comparison with LR/RF/GBM; Claude AI for report generation
+TRIPOD+AI — AI Training,AI-2,"Describe training procedure, hyperparameters, stopping criteria.",§2.3; Supplementary Methods S1,Not applicable — Expert-derived weights (no training/optimization on outcome data)
+TRIPOD+AI — AI Feature Engineering,AI-3,Describe feature engineering and selection.,§2.3; §2.4; DOSSIER_ALGORITHME_BMN.md,Yes — 24+ features across CLEO + bioNorm + CTI + GRS; clinical rationale for each
+TRIPOD+AI — AI Explainability,AI-4,Describe model explainability or interpretability.,§2.3; §2.4; §4.6,Yes — Fully interpretable composite score; axis decomposition; no black-box components
+TRIPOD+AI — AI Software,AI-5,"Report software, libraries, versions, and random seeds.",§2.8,Yes — Python 3.11; scikit-learn; SciPy; seed=42; JavaScript 1113-line engine
+TRIPOD+AI — AI Fairness,AI-6,Report model performance across demographic subgroups.,Table 5; §3.B.3,Yes — Performance by sex; age group; BMI category; ethnicity; T2DM; MetS status
+TRIPOD+AI — AI Deployment,AI-7,Describe the intended deployment setting and user interface.,§2.9,Yes — Point-of-care web application; 20-screen questionnaire; real-time computation; AI-assisted reports
+TRIPOD+AI — AI Updates,AI-8,Describe plans for model monitoring and updating.,§4.9,Yes — Prospective validation planned; Platt scaling recalibration; ML weight optimization with real outcomes
