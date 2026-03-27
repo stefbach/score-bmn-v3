@@ -5,7 +5,7 @@ const app = new Hono()
 app.use('/api/*', cors())
 
 // ─── Health ───
-app.get('/api/health', (c) => c.json({ status: 'ok', version: '8.0', name: 'Score BMN v3.4 AI+Geo+BTM+FNC' }))
+app.get('/api/health', (c) => c.json({ status: 'ok', version: '8.0', name: 'COMPASS - Comprehensive Metabolic Profiling & Stratification System' }))
 
 // ─── GEO PROXY: Geocoding via Nominatim ───
 app.get('/api/geo/search', async (c) => {
@@ -2622,8 +2622,8 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Score BMN v3.4 - Evaluez votre risque metabolique avec intelligence artificielle. Module BTM v3.4 : matrice bariatrique. Dyslipidemie integree.">
-<title>Score BMN v3.4</title>
+<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Evaluez votre risque metabolique avec intelligence artificielle.">
+<title>COMPASS &mdash; Bilan metabolique</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">
@@ -2635,445 +2635,546 @@ app.get('/', (c) => {
 </html>`)
 })
 
-// ─── HOME PAGE — Pourquoi ce module ───
+// ─── HOME PAGE — COMPASS — Page grand public ───
 app.get('/home', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Score BMN v3.5 — Pourquoi ce module ?</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>COMPASS &mdash; Comprenez votre sante metabolique</title>
+<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Un bilan de sante metabolique complet, gratuit et confidentiel en 10 minutes.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F9ED;</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--accent:#818cf8;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--purple:#a855f7;--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+:root{
+  --white:#ffffff;--bg:#f8fafc;--bg2:#ffffff;--bg3:#f1f5f9;
+  --txt:#1e293b;--txt2:#334155;--dim:#64748b;--dim2:#94a3b8;
+  --primary:#4f46e5;--primary-light:#818cf8;--primary-bg:rgba(79,70,229,.06);
+  --green:#059669;--green-bg:rgba(5,150,105,.08);
+  --blue:#0284c7;--blue-bg:rgba(2,132,199,.08);
+  --orange:#d97706;--orange-bg:rgba(217,119,6,.08);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.06);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,.08);
+  --teal:#0d9488;--teal-bg:rgba(13,148,136,.08);
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08),0 4px 10px rgba(0,0,0,.04);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --radius:16px;--radius-sm:12px;--radius-xs:8px;
+}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.8;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.7;-webkit-font-smoothing:antialiased}
 
-/* NAVIGATION */
-.nav{position:sticky;top:0;z-index:100;background:rgba(15,23,42,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);padding:0 24px}
-.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-.nav-logo{font-size:18px;font-weight:900;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:8px}
-.nav-logo span{font-size:22px}
-.nav-links{display:flex;gap:6px}
-.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;font-weight:600;padding:6px 14px;border-radius:8px;transition:.2s}
-.nav-links a:hover{color:var(--txt);background:var(--bg2)}
-.nav-links a.primary{background:var(--accent);color:#fff}
-.nav-links a.primary:hover{opacity:.9}
+/* ══ NAVIGATION ══ */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px}
+.nav-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo .compass-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.nav-logo .logo-text{font-size:20px;font-weight:900;color:var(--primary);letter-spacing:-.5px}
+.nav-logo .logo-sub{font-size:10px;color:var(--dim);font-weight:500;letter-spacing:.5px;margin-top:-2px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:600;padding:8px 16px;border-radius:var(--radius-xs);transition:.2s}
+.nav-links a:hover{color:var(--txt);background:var(--bg3)}
+.nav-links .cta-nav{background:var(--primary);color:#fff !important;padding:10px 24px;border-radius:var(--radius-sm)}
+.nav-links .cta-nav:hover{background:#4338ca;transform:translateY(-1px)}
 
-/* HERO */
-.hero{text-align:center;padding:80px 24px 60px;background:linear-gradient(135deg,var(--bg),var(--bg2) 50%,var(--bg));position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(129,140,248,.08) 0%,transparent 70%);pointer-events:none}
-.hero-tag{display:inline-block;padding:4px 14px;background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.25);border-radius:20px;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
-.hero h1{font-size:clamp(32px,5vw,52px);font-weight:900;color:var(--txt);line-height:1.2;margin-bottom:16px;letter-spacing:-.5px}
-.hero h1 em{color:var(--accent);font-style:normal}
-.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--dim);max-width:700px;margin:0 auto 32px;line-height:1.6}
-.hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:32px}
-.hero-stat{text-align:center}
-.hero-stat .num{font-size:36px;font-weight:900;color:var(--accent);font-family:var(--mono)}
-.hero-stat .lab{font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
-.hero-btns{display:flex;gap:12px;justify-content:center;margin-top:36px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:.2s;border:none;cursor:pointer}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
-.btn-outline:hover{background:rgba(129,140,248,.1)}
+/* ══ HERO ══ */
+.hero{padding:80px 24px 100px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#f0f4ff 100%)}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(79,70,229,.07) 0%,rgba(79,70,229,.02) 40%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;background:var(--green-bg);border:1px solid rgba(5,150,105,.2);border-radius:50px;font-size:13px;font-weight:600;color:var(--green);margin-bottom:28px}
+.hero-badge i{font-size:11px}
+.hero h1{font-size:clamp(36px,5.5vw,60px);font-weight:900;color:var(--txt);line-height:1.15;margin-bottom:20px;letter-spacing:-1px;max-width:800px;margin-left:auto;margin-right:auto}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--primary),var(--primary-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(17px,2vw,21px);color:var(--dim);max-width:640px;margin:0 auto 40px;line-height:1.65;font-weight:400}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:var(--radius-sm);font-size:16px;font-weight:700;text-decoration:none;transition:all .25s;border:none;cursor:pointer;letter-spacing:-.2px}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,.3)}
+.btn-primary:hover{background:#4338ca;transform:translateY(-2px);box-shadow:0 6px 20px rgba(79,70,229,.35)}
+.btn-secondary{background:var(--white);color:var(--txt);border:2px solid var(--border2);box-shadow:var(--shadow)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-1px)}
+.trust-bar{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-item{text-align:center}
+.trust-item .t-num{font-size:32px;font-weight:900;color:var(--primary);letter-spacing:-1px}
+.trust-item .t-label{font-size:13px;color:var(--dim);font-weight:500;margin-top:2px}
 
-/* SECTIONS */
-.section{max-width:1100px;margin:0 auto;padding:80px 24px}
-.section-tag{display:inline-block;padding:3px 12px;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.25);border-radius:16px;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
-.section h2{font-size:clamp(26px,3.5vw,38px);font-weight:900;color:var(--txt);margin-bottom:12px;letter-spacing:-.3px}
-.section h2 em{color:var(--accent);font-style:normal}
-.section-desc{font-size:16px;color:var(--dim);max-width:700px;margin-bottom:40px;line-height:1.7}
+/* ══ SECTION COMMON ══ */
+.section{max-width:1100px;margin:0 auto;padding:100px 24px}
+.section-header{text-align:center;margin-bottom:56px}
+.section-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 16px;border-radius:50px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:16px}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(2,132,199,.15)}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,.15)}
+.badge-purple{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(124,58,237,.15)}
+.badge-orange{background:var(--orange-bg);color:var(--orange);border:1px solid rgba(217,119,6,.15)}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(13,148,136,.15)}
+.section-header h2{font-size:clamp(28px,3.5vw,42px);font-weight:900;color:var(--txt);margin-bottom:16px;letter-spacing:-.5px;line-height:1.2}
+.section-header p{font-size:17px;color:var(--dim);max-width:640px;margin:0 auto;line-height:1.7}
+.sep{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:0}
 
-/* PROBLEM CARDS */
-.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:40px 0}
-.pcard{background:var(--bg2);border-radius:16px;padding:28px 24px;border:1px solid var(--border2);transition:.3s}
-.pcard:hover{border-color:var(--accent);transform:translateY(-2px)}
-.pcard .icon{font-size:32px;margin-bottom:12px}
-.pcard h3{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
-.pcard p{font-size:13px;color:var(--dim);line-height:1.7}
-.pcard .ref{font-size:10px;color:var(--dim2);margin-top:10px;font-style:italic}
+/* ══ WHY SECTION ══ */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.why-card{background:var(--bg2);border-radius:var(--radius);padding:32px 28px;border:1px solid var(--border);transition:all .3s;position:relative;overflow:hidden}
+.why-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary-light)}
+.why-card .card-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
+.why-card .icon-blue{background:var(--blue-bg);color:var(--blue)}
+.why-card .icon-green{background:var(--green-bg);color:var(--green)}
+.why-card .icon-orange{background:var(--orange-bg);color:var(--orange)}
+.why-card .icon-purple{background:var(--purple-bg);color:var(--purple)}
+.why-card .icon-teal{background:var(--teal-bg);color:var(--teal)}
+.why-card .icon-red{background:var(--red-bg);color:var(--red)}
+.why-card h3{font-size:18px;font-weight:800;color:var(--txt);margin-bottom:10px;line-height:1.3}
+.why-card p{font-size:15px;color:var(--dim);line-height:1.7}
 
-/* ARCHITECTURE */
-.arch-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:40px 0}
-.arch-box{background:var(--bg2);border-radius:14px;padding:24px 20px;border-left:4px solid var(--accent);position:relative;overflow:hidden}
-.arch-box::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(129,140,248,.06),transparent);border-radius:50%}
-.arch-box.c{border-color:var(--red)} .arch-box.e{border-color:var(--orange)} .arch-box.o{border-color:var(--teal)} .arch-box.l{border-color:var(--green)}
-.arch-box .letter{font-size:28px;font-weight:900;font-family:var(--mono);margin-bottom:6px}
-.arch-box.c .letter{color:var(--red)} .arch-box.e .letter{color:var(--orange)} .arch-box.o .letter{color:var(--teal)} .arch-box.l .letter{color:var(--green)}
-.arch-box h3{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px}
-.arch-box p{font-size:12px;color:var(--dim)}
-.arch-box .range{font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px}
+/* ══ HOW IT WORKS ══ */
+.steps-container{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps-container::before{content:'';position:absolute;top:40px;left:calc(12.5%);right:calc(12.5%);height:3px;background:linear-gradient(to right,var(--primary),var(--teal),var(--green),var(--orange));border-radius:4px;z-index:0}
+.step{text-align:center;padding:0 16px;position:relative;z-index:1}
+.step-num{width:80px;height:80px;border-radius:50%;background:var(--white);border:3px solid var(--primary);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;font-weight:900;color:var(--primary);box-shadow:var(--shadow);transition:.3s}
+.step:nth-child(2) .step-num{border-color:var(--teal);color:var(--teal)}
+.step:nth-child(3) .step-num{border-color:var(--green);color:var(--green)}
+.step:nth-child(4) .step-num{border-color:var(--orange);color:var(--orange)}
+.step h3{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.step p{font-size:14px;color:var(--dim);line-height:1.6}
+.step .step-time{display:inline-block;margin-top:10px;padding:3px 12px;background:var(--bg3);border-radius:50px;font-size:12px;font-weight:700;color:var(--dim)}
 
-/* RESULTS */
-.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:40px 0}
-.rcard{background:var(--bg2);border-radius:16px;padding:24px;border:1px solid var(--border2);text-align:center}
-.rcard .metric{font-size:42px;font-weight:900;font-family:var(--mono);margin:8px 0}
-.rcard .metric.green{color:var(--green)} .rcard .metric.accent{color:var(--accent)} .rcard .metric.teal{color:var(--teal)} .rcard .metric.orange{color:var(--orange)}
-.rcard .label{font-size:13px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.rcard .detail{font-size:11px;color:var(--dim2);margin-top:6px}
+/* ══ WHAT WE ANALYZE ══ */
+.analyze-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.analyze-card{background:var(--bg2);border-radius:var(--radius);padding:28px;border:1px solid var(--border);display:flex;gap:20px;align-items:flex-start;transition:all .3s}
+.analyze-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.analyze-card .a-icon{flex-shrink:0;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.analyze-card h3{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:6px}
+.analyze-card p{font-size:14px;color:var(--dim);line-height:1.65}
 
-/* GLP1 PROFILES */
-.profile-strip{display:flex;gap:4px;margin:30px 0;flex-wrap:wrap}
-.profile-chip{flex:1;min-width:100px;padding:14px 10px;border-radius:10px;text-align:center}
-.profile-chip.r1{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
-.profile-chip.r2{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.3)}
-.profile-chip.r3{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
-.profile-chip.r4{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
-.profile-chip.ci{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.3)}
-.profile-chip .code{font-size:18px;font-weight:900;font-family:var(--mono)}
-.profile-chip.r1 .code{color:var(--green)} .profile-chip.r2 .code{color:var(--teal)} .profile-chip.r3 .code{color:var(--orange)} .profile-chip.r4 .code{color:var(--red)} .profile-chip.ci .code{color:var(--dim2)}
-.profile-chip .pname{font-size:10px;color:var(--dim);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
-.profile-chip .pct{font-size:12px;font-weight:700;color:var(--dim);margin-top:4px}
+/* ══ RESULTS SECTION ══ */
+.results-preview{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.results-text h3{font-size:24px;font-weight:800;color:var(--txt);margin-bottom:16px}
+.results-text p{font-size:15px;color:var(--dim);line-height:1.7;margin-bottom:16px}
+.results-text .result-list{list-style:none;padding:0}
+.results-text .result-list li{padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;font-size:15px;color:var(--txt2)}
+.results-text .result-list li i{color:var(--green);font-size:16px;width:20px}
+.results-text .result-list li:last-child{border:none}
+.results-visual{background:linear-gradient(135deg,var(--primary-bg),var(--teal-bg));border-radius:var(--radius);padding:40px;border:1px solid var(--border)}
+.gauge-demo{text-align:center}
+.gauge-circle{width:180px;height:180px;border-radius:50%;background:conic-gradient(var(--green) 0deg,var(--green) 120deg,var(--orange) 120deg,var(--orange) 240deg,var(--red) 240deg,var(--red) 360deg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;position:relative}
+.gauge-circle::before{content:'';width:140px;height:140px;border-radius:50%;background:var(--white);position:absolute}
+.gauge-circle .gauge-text{position:relative;z-index:1;text-align:center}
+.gauge-circle .gauge-score{font-size:42px;font-weight:900;color:var(--txt);display:block}
+.gauge-circle .gauge-label{font-size:12px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.gauge-categories{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap}
+.gauge-cat{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim);font-weight:600}
+.gauge-cat .dot{width:10px;height:10px;border-radius:50%}
+.gauge-cat .dot.low{background:var(--green)}
+.gauge-cat .dot.mod{background:var(--orange)}
+.gauge-cat .dot.high{background:var(--red)}
 
-/* INNOVATION TABLE */
-.inno-table{width:100%;border-collapse:collapse;margin:30px 0}
-.inno-table th{background:var(--bg3);color:var(--cyan);padding:12px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
-.inno-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--dim);vertical-align:top}
-.inno-table tr:hover{background:rgba(129,140,248,.04)}
-.inno-table .check{color:var(--green);font-weight:900;font-size:16px}
-.inno-table .cross{color:var(--dim2);font-size:16px}
+/* ══ TRUST / SCIENCE ══ */
+.science-bar{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center}
+.science-stat{padding:20px;border-right:1px solid var(--border)}
+.science-stat:last-child{border:none}
+.science-stat .s-num{font-size:36px;font-weight:900;color:var(--primary);letter-spacing:-1px}
+.science-stat .s-label{font-size:13px;color:var(--dim);font-weight:500;margin-top:4px;line-height:1.4}
 
-/* TIMELINE */
-.timeline{position:relative;margin:40px 0;padding-left:32px}
-.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(var(--accent),var(--teal),var(--green))}
-.tl-item{position:relative;margin-bottom:32px}
-.tl-item::before{content:'';position:absolute;left:-26px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
-.tl-item h4{font-size:15px;font-weight:800;color:var(--txt);margin-bottom:4px}
-.tl-item p{font-size:13px;color:var(--dim)}
+/* ══ FAQ ══ */
+.faq-list{max-width:760px;margin:0 auto}
+.faq-item{background:var(--bg2);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;transition:.3s}
+.faq-item:hover{border-color:var(--primary-light)}
+.faq-q{padding:20px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:700;color:var(--txt);user-select:none;transition:.2s}
+.faq-q:hover{color:var(--primary)}
+.faq-q i{color:var(--dim);transition:transform .3s;font-size:14px}
+.faq-a{padding:0 24px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease}
+.faq-item.open .faq-a{max-height:300px;padding:0 24px 20px}
+.faq-item.open .faq-q i{transform:rotate(180deg);color:var(--primary)}
+.faq-a p{font-size:15px;color:var(--dim);line-height:1.7}
 
-/* CTA SECTION */
-.cta-section{background:linear-gradient(135deg,rgba(129,140,248,.08),rgba(20,184,166,.08));border:1px solid rgba(129,140,248,.2);border-radius:20px;padding:60px 40px;text-align:center;margin:40px 0}
-.cta-section h2{font-size:32px;font-weight:900;margin-bottom:12px}
-.cta-section p{font-size:16px;color:var(--dim);margin-bottom:30px;max-width:600px;margin-left:auto;margin-right:auto}
+/* ══ CTA ══ */
+.cta-section{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:var(--radius);padding:72px 40px;text-align:center;margin:0 auto;max-width:1100px;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);pointer-events:none}
+.cta-section h2{font-size:clamp(28px,4vw,40px);font-weight:900;color:#fff;margin-bottom:16px;letter-spacing:-.5px}
+.cta-section p{font-size:18px;color:rgba(255,255,255,.8);margin-bottom:36px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.6}
+.cta-section .btn-white{background:#fff;color:var(--primary);font-size:18px;padding:16px 40px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.cta-section .btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.cta-section .btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);font-size:16px;padding:14px 32px}
+.cta-section .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.1)}
 
-/* FOOTER */
-.footer{background:var(--bg2);border-top:1px solid var(--border2);padding:40px 24px;text-align:center}
-.footer p{font-size:12px;color:var(--dim2);margin:4px 0}
-.footer a{color:var(--accent);text-decoration:none}
+/* ══ FOOTER ══ */
+.footer{background:var(--txt);padding:56px 24px 32px;color:rgba(255,255,255,.6)}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand .f-logo{font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.footer-brand .f-logo i{font-size:20px;color:var(--primary-light)}
+.footer-brand .f-full{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px}
+.footer-brand p{font-size:14px;line-height:1.7;max-width:340px}
+.footer-col h4{font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.footer-col a{display:block;color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;padding:4px 0;transition:.2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-bottom p{font-size:12px}
+.footer-bottom a{color:var(--primary-light);text-decoration:none}
 
-/* DIVIDER */
-.divider{height:1px;background:linear-gradient(to right,transparent,var(--border2),transparent);margin:0}
-
-/* FORMULA BOX */
-.formula-highlight{background:var(--bg2);border:2px solid var(--accent);border-radius:16px;padding:24px 28px;text-align:center;margin:30px 0}
-.formula-highlight .f{font-family:var(--mono);font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--accent);margin:8px 0}
-.formula-highlight .d{font-size:12px;color:var(--dim2)}
-
-@media(max-width:768px){
-  .hero{padding:50px 16px 40px}
-  .hero-stats{gap:20px}
-  .hero-stat .num{font-size:28px}
-  .section{padding:50px 16px}
-  .nav-links a:not(.primary){display:none}
-  .profile-strip{flex-direction:column}
-  .arch-container{grid-template-columns:1fr}
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .why-grid{grid-template-columns:1fr}
+  .steps-container{grid-template-columns:repeat(2,1fr);gap:32px}
+  .steps-container::before{display:none}
+  .analyze-grid{grid-template-columns:1fr}
+  .results-preview{grid-template-columns:1fr}
+  .science-bar{grid-template-columns:repeat(2,1fr)}
+  .science-stat{border-bottom:1px solid var(--border)}
+  .science-stat:nth-child(2){border-right:none}
+  .footer-top{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .hero{padding:48px 16px 64px}
+  .section{padding:64px 16px}
+  .steps-container{grid-template-columns:1fr;gap:24px}
+  .nav-links a:not(.cta-nav){display:none}
+  .trust-bar{gap:24px}
+  .hero-btns{flex-direction:column;align-items:center}
+  .btn{width:100%;max-width:320px;justify-content:center}
+  .cta-section{margin:0 16px;padding:48px 24px}
+  .footer-bottom{flex-direction:column;text-align:center}
 }
 @media print{
-  body{background:#fff;color:#000}
-  .nav,.hero-btns,.cta-section .btn{display:none}
-  h1,h2,h3,h4{color:#000}
-  .section{padding:20px 0}
+  body{background:#fff}
+  .nav,.hero-btns,.cta-section,.footer{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- NAVIGATION -->
+<!-- ══════ NAVIGATION ══════ -->
 <nav class="nav">
 <div class="nav-inner">
-  <a href="/home" class="nav-logo"><span>&#x2695;</span> Score BMN v3.5</a>
+  <a href="/home" class="nav-logo">
+    <div class="compass-icon"><i class="fas fa-compass"></i></div>
+    <div>
+      <div class="logo-text">COMPASS</div>
+      <div class="logo-sub">Bilan metabolique</div>
+    </div>
+  </a>
   <div class="nav-links">
-    <a href="#probleme">Le probleme</a>
-    <a href="#solution">La solution</a>
-    <a href="#resultats">Resultats</a>
-    <a href="#innovation">Innovation</a>
-    <a href="/" class="primary">Utiliser le Score</a>
+    <a href="#pourquoi">Pourquoi ?</a>
+    <a href="#comment">Comment</a>
+    <a href="#analyse">Ce qu'on analyse</a>
+    <a href="#faq">FAQ</a>
+    <a href="/" class="cta-nav">Faire mon bilan <i class="fas fa-arrow-right" style="font-size:12px"></i></a>
   </div>
 </div>
 </nav>
 
-<!-- HERO -->
+<!-- ══════ HERO ══════ -->
 <section class="hero">
-  <div class="hero-tag">Recherche clinique &mdash; NHANES 2011-2018</div>
-  <h1>Pourquoi le <em>Score BMN</em> ?</h1>
-  <p class="hero-sub">Parce que l'obesite est une maladie chronique multi-factorielle et qu'aucun outil existant ne combinait biologie, exposome, psychometrie et pharmacophenotypage GLP-1 dans un seul algorithme valide.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="num">22 807</div><div class="lab">Adultes NHANES</div></div>
-    <div class="hero-stat"><div class="num">0.876</div><div class="lab">AUC MetS</div></div>
-    <div class="hero-stat"><div class="num">53</div><div class="lab">References</div></div>
-    <div class="hero-stat"><div class="num">4</div><div class="lab">Composantes CLEO</div></div>
-  </div>
+  <div class="hero-badge"><i class="fas fa-shield-halved"></i> Gratuit, confidentiel, sans inscription</div>
+  <h1>Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</h1>
+  <p class="hero-sub">COMPASS analyse votre mode de vie, votre environnement et vos marqueurs de sante pour vous donner un bilan personnalise clair et des pistes d'action concretes.</p>
   <div class="hero-btns">
-    <a href="/" class="btn btn-primary">Evaluer un patient</a>
-    <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-outline">Lire l'article</a>
+    <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan gratuit</a>
+    <a href="#comment" class="btn btn-secondary"><i class="fas fa-info-circle"></i> En savoir plus</a>
+  </div>
+  <div class="trust-bar">
+    <div class="trust-item"><div class="t-num">22 807</div><div class="t-label">Personnes dans l'etude</div></div>
+    <div class="trust-item"><div class="t-num">10 min</div><div class="t-label">Pour votre bilan</div></div>
+    <div class="trust-item"><div class="t-num">53</div><div class="t-label">Etudes scientifiques</div></div>
+    <div class="trust-item"><div class="t-num">100%</div><div class="t-label">Gratuit</div></div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="sep"></div>
 
-<!-- SECTION 1 — LE PROBLEME -->
-<section class="section" id="probleme">
-  <div class="section-tag">Le constat</div>
-  <h2>L'obesite est <em>sous-diagnostiquee</em> et <em>sous-phenotypee</em></h2>
-  <p class="section-desc">Les scores de risque existants (Framingham, SCORE2, FINDRISC, Edmonton) partagent des lacunes majeures qui limitent la prise en charge de precision en 2026.</p>
-
-  <div class="problem-grid">
-    <div class="pcard">
-      <div class="icon">&#x1F9EC;</div>
-      <h3>Pas de prise en compte de l'ethnicite</h3>
-      <p>Les seuils IMC europeens (25/30) <strong>sous-estiment le risque</strong> chez les populations sud-asiatiques et est-asiatiques. Un Indo-Mauricien a un risque DT2 <strong>2x superieur</strong> a IMC equivalent (dR = 2.0).</p>
-      <div class="ref">WHO Expert Consultation, Lancet 2004 ; Ramachandran 2010</div>
+<!-- ══════ POURQUOI ══════ -->
+<section class="section" id="pourquoi">
+  <div class="section-header">
+    <div class="section-badge badge-blue"><i class="fas fa-lightbulb"></i> Pourquoi COMPASS ?</div>
+    <h2>Parce que votre sante ne se resume<br>pas a un chiffre sur la balance</h2>
+    <p>L'obesite et les maladies metaboliques dependent de dizaines de facteurs. COMPASS est le premier outil a les analyser tous ensemble, pour <strong>vous</strong> donner une image complete.</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="card-icon icon-blue"><i class="fas fa-fingerprint"></i></div>
+      <h3>Chaque personne est unique</h3>
+      <p>Votre origine, votre morphologie, votre histoire familiale changent completement votre profil de risque. COMPASS adapte ses seuils a <strong>12 profils</strong> differents.</p>
     </div>
-    <div class="pcard">
-      <div class="icon">&#x1F321;</div>
-      <h3>Exposome ignore</h3>
-      <p>La pollution (PM2.5 : OR 1.18 pour MetS), les perturbateurs endocriniens, le stress thermique et la sedentarite professionnelle ne sont integres dans <strong>aucun score clinique courant</strong>.</p>
-      <div class="ref">Eze et al., Environ Health Perspect 2015 ; Biswas et al. 2015</div>
+    <div class="why-card">
+      <div class="card-icon icon-green"><i class="fas fa-tree-city"></i></div>
+      <h3>Votre environnement compte</h3>
+      <p>Pollution, climat, trajet quotidien&hellip; Tout cela influence votre metabolisme. COMPASS est le seul outil a integrer les donnees environnementales <strong>en temps reel</strong> autour de chez vous.</p>
     </div>
-    <div class="pcard">
-      <div class="icon">&#x1F9E0;</div>
-      <h3>Dimension psycho-comportementale absente</h3>
-      <p>Le stress chronique (PSS-10), la depression (PHQ-9) et l'hyperphagie boulimique (BES-16) sont des facteurs <strong>independants</strong> de gain ponderal, absents des outils standards.</p>
-      <div class="ref">Luppino et al., Arch Gen Psychiatry 2010 : OR 1.58 depression-&gt;obesite</div>
+    <div class="why-card">
+      <div class="card-icon icon-purple"><i class="fas fa-brain"></i></div>
+      <h3>Le mental joue un role cle</h3>
+      <p>Stress, sommeil, moral&hellip; Ces facteurs sont souvent oublies. COMPASS mesure leur impact reel sur votre sante metabolique grace a des questionnaires valides scientifiquement.</p>
     </div>
-    <div class="pcard">
-      <div class="icon">&#x1F489;</div>
-      <h3>Reponse GLP-1 non predite</h3>
-      <p>30 a 40 % des patients traites par GLP-1 sont des <strong>repondeurs partiels ou non-repondeurs</strong>. Aucun outil ne phenotypait cette reponse avant le Score BMN.</p>
-      <div class="ref">Post-hoc STEP 1, Wilding 2021 ; SURMOUNT-1, Jastreboff 2022</div>
+    <div class="why-card">
+      <div class="card-icon icon-orange"><i class="fas fa-capsules"></i></div>
+      <h3>Trouver le bon traitement</h3>
+      <p>Tous les traitements ne conviennent pas a tout le monde. COMPASS peut estimer votre profil de reponse aux <strong>nouveaux medicaments</strong> (GLP-1) pour guider votre medecin.</p>
     </div>
-    <div class="pcard">
-      <div class="icon">&#x1F52C;</div>
-      <h3>Biologie et declaratif deconnectes</h3>
-      <p>Les scores existants utilisent <em>soit</em> des biomarqueurs, <em>soit</em> des questionnaires. Le BMN est le premier a <strong>integrer dynamiquement</strong> les deux avec reponderation adaptative.</p>
-      <div class="ref">ERFC 2010, n = 1.2 M ; CTT Collaboration 2010, n = 170 000</div>
+    <div class="why-card">
+      <div class="card-icon icon-teal"><i class="fas fa-vial"></i></div>
+      <h3>Vos analyses de sang parle</h3>
+      <p>Si vous avez des resultats biologiques recents, COMPASS les integre pour affiner votre bilan. <strong>15 marqueurs</strong> sont pris en compte (facultatif).</p>
     </div>
-    <div class="pcard">
-      <div class="icon">&#x2702;</div>
-      <h3>Aucune aide a la decision bariatrique</h3>
-      <p>Ballon, ESG, Sleeve, Bypass, GLP-1 ou associations : <strong>aucun algorithme</strong> ne scorait simultanement 6 techniques sur 27 facteurs avec 10 modifications de consensus.</p>
-      <div class="ref">62 etudes, &gt;180 000 patients (Module BTM v3.4)</div>
+    <div class="why-card">
+      <div class="card-icon icon-red"><i class="fas fa-robot"></i></div>
+      <h3>Un rapport clair par IA</h3>
+      <p>A la fin, vous recevez un rapport en langage simple, redige par intelligence artificielle, avec des <strong>recommandations concretes</strong> a partager avec votre medecin.</p>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="sep"></div>
 
-<!-- SECTION 2 — LA SOLUTION : ARCHITECTURE CLEO -->
-<section class="section" id="solution">
-  <div class="section-tag">L'innovation</div>
-  <h2>Architecture <em>CLEO</em> : 4 dimensions, 1 score</h2>
-  <p class="section-desc">Le Score BMN v3.5 combine quatre piliers d'evaluation dans un algorithme unique, valide sur 22 807 adultes de la cohorte NHANES 2011-2018.</p>
-
-  <div class="formula-highlight">
-    <div class="d">FORMULE CENTRALE DU SCORE BMN</div>
-    <div class="f">sf = 0.65 &times; sD + 0.35 &times; bioNorm</div>
-    <div class="d">sD = min(100, C + E + O + L) &nbsp;|&nbsp; bioNorm = (&Sigma; z<sub>i</sub> &times; w<sub>i</sub> / &Sigma; w<sub>i</sub>) &times; 100</div>
-  </div>
-
-  <div class="arch-container">
-    <div class="arch-box c">
-      <div class="letter">C</div>
-      <h3>Clinique</h3>
-      <p>Age, sexe, IMC, tour de taille, WHtR, comorbidites (14 items), ATCD familiaux, tabac, sante mentale (PSS-10, PHQ-9, BES-16), sommeil (ISI)</p>
-      <div class="range">0-50 pts &middot; 8 sous-scores &middot; 12 profils ethniques</div>
+<!-- ══════ COMMENT CA MARCHE ══════ -->
+<section class="section" id="comment" style="background:var(--bg3);margin:0;max-width:100%;padding-top:100px;padding-bottom:100px">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="section-header">
+      <div class="section-badge badge-green"><i class="fas fa-route"></i> Comment ca marche ?</div>
+      <h2>4 etapes simples, 10 minutes</h2>
+      <p>Pas d'inscription, pas de carte bancaire, pas de donnees conservees sur nos serveurs.</p>
     </div>
-    <div class="arch-box e">
-      <div class="letter">E</div>
-      <h3>Exposome</h3>
-      <p>Qualite de l'air (PM2.5, NO2, O3) en temps reel, temperature, UV, trajet domicile-travail, sedentarite, perturbateurs endocriniens alimentaires, normalisation climatique FNC</p>
-      <div class="range">0-45 pts &middot; 3 couches (A/B/C) &middot; 6 zones Koppen</div>
-    </div>
-    <div class="arch-box o">
-      <div class="letter">O</div>
-      <h3>Occupationnel</h3>
-      <p>Type de travail, horaires decales, travail de nuit (OR 1.29), posture, isolement social (retraite), charge mentale professionnelle (Karasek)</p>
-      <div class="range">0-10 pts &middot; Modele Karasek + Valtorta 2016</div>
-    </div>
-    <div class="arch-box l">
-      <div class="letter">L</div>
-      <h3>Lifestyle</h3>
-      <p>Activite physique (IPAQ), alimentation (PREDIMED-equiv, 10 items), consommation d'alcool (AUDIT-C), qualite du sommeil</p>
-      <div class="range">0-10 pts &middot; 4 sous-scores (l1-l4)</div>
-    </div>
-  </div>
-
-  <div style="margin-top:40px">
-    <h3 style="font-size:20px;font-weight:800;margin-bottom:20px;color:var(--teal)">&#x2795; Modules additionnels integres</h3>
-    <div class="problem-grid" style="margin-top:16px">
-      <div class="pcard" style="border-left:3px solid var(--cyan)">
-        <h3 style="color:var(--cyan)">bioNorm &mdash; 15 biomarqueurs</h3>
-        <p>HOMA-IR, HbA1c, glycemie, CRP hs, TSH, LDL, HDL, TG, adiponectine, transaminases, ApoB, GGT, TG/HDL, acide urique, leptine. Poids proportionnels aux HR/OR des meta-analyses (somme = 23.2).</p>
+    <div class="steps-container">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Vos infos de base</h3>
+        <p>Age, taille, poids, origine&hellip; Des questions simples pour commencer.</p>
+        <span class="step-time"><i class="fas fa-clock"></i> 2 min</span>
       </div>
-      <div class="pcard" style="border-left:3px solid var(--purple)">
-        <h3 style="color:var(--purple)">GLP-1 Profiling Engine v2.0</h3>
-        <p>6 axes de phenotypage (IR, chronicite, inflammation, psycho, iatrogene, demographique) &rarr; 5 profils de reponse (R1 Excellent a R5 Echec) + contre-indications. Prediction PPE individualisee.</p>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Votre mode de vie</h3>
+        <p>Alimentation, activite physique, sommeil, travail, stress au quotidien.</p>
+        <span class="step-time"><i class="fas fa-clock"></i> 4 min</span>
       </div>
-      <div class="pcard" style="border-left:3px solid var(--orange)">
-        <h3 style="color:var(--orange)">BTM v3.4 &mdash; Module Bariatrique</h3>
-        <p>Matrice decisionnelle : 27 facteurs &times; 6 techniques (Ballon, ESG, Sleeve, Bypass, GLP-1, Associations). 10 MOD de consensus. 62 etudes, >180 000 patients.</p>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Biologie (facultatif)</h3>
+        <p>Ajoutez vos analyses de sang recentes pour un bilan encore plus precis.</p>
+        <span class="step-time"><i class="fas fa-clock"></i> 3 min</span>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Votre rapport</h3>
+        <p>Score global, profil de risque, conseils personnalises et rapport IA complet.</p>
+        <span class="step-time"><i class="fas fa-bolt"></i> Instantane</span>
       </div>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="sep"></div>
 
-<!-- SECTION 3 — RESULTATS -->
-<section class="section" id="resultats">
-  <div class="section-tag">Validation interne &mdash; NHANES 2011-2018</div>
-  <h2>Des performances <em>robustes</em> et reproductibles</h2>
-  <p class="section-desc">Validation interne par Monte Carlo (B = 5 000, seed = 42) avec imputation multiple MICE sur 22 807 adultes americains.</p>
-
-  <div class="results-grid">
-    <div class="rcard">
-      <div class="label">AUC Syndrome Metabolique</div>
-      <div class="metric green">0.876</div>
-      <div class="detail">IC 95 % : 0.875&ndash;0.878</div>
+<!-- ══════ CE QU'ON ANALYSE ══════ -->
+<section class="section" id="analyse">
+  <div class="section-header">
+    <div class="section-badge badge-purple"><i class="fas fa-microscope"></i> Analyse complete</div>
+    <h2>Un bilan en 4 dimensions</h2>
+    <p>COMPASS croise des informations que les outils classiques ne regardent jamais ensemble.</p>
+  </div>
+  <div class="analyze-grid">
+    <div class="analyze-card">
+      <div class="a-icon" style="background:var(--red-bg);color:var(--red)"><i class="fas fa-heart-pulse"></i></div>
+      <div>
+        <h3>Clinique &amp; antecedents</h3>
+        <p>Morphologie, historique familial, comorbidites existantes (diabete, hypertension, apnee du sommeil&hellip;), traitements en cours. COMPASS adapte ses seuils a votre origine ethnique.</p>
+      </div>
     </div>
-    <div class="rcard">
-      <div class="label">AUC Prediction Obesite</div>
-      <div class="metric accent">0.778</div>
-      <div class="detail">Prediction du passage vers l'obesite clinique</div>
+    <div class="analyze-card">
+      <div class="a-icon" style="background:var(--orange-bg);color:var(--orange)"><i class="fas fa-smog"></i></div>
+      <div>
+        <h3>Environnement &amp; exposition</h3>
+        <p>Qualite de l'air autour de chez vous, climat, exposition aux polluants, trajet quotidien. Des donnees geographiques analysees en temps reel grace a votre localisation.</p>
+      </div>
     </div>
-    <div class="rcard">
-      <div class="label">Calibration ICI</div>
-      <div class="metric teal">0.032</div>
-      <div class="detail">Integrated Calibration Index (&lt; 0.05 = excellent)</div>
+    <div class="analyze-card">
+      <div class="a-icon" style="background:var(--teal-bg);color:var(--teal)"><i class="fas fa-briefcase"></i></div>
+      <div>
+        <h3>Vie professionnelle &amp; sociale</h3>
+        <p>Type de travail, horaires, sedentarite au bureau, travail de nuit, isolement social&hellip; Autant de facteurs qui influencent directement votre metabolisme.</p>
+      </div>
     </div>
-    <div class="rcard">
-      <div class="label">Rapport E/O</div>
-      <div class="metric orange">1.04</div>
-      <div class="detail">Evenements attendus / observes (ideal = 1.0)</div>
+    <div class="analyze-card">
+      <div class="a-icon" style="background:var(--green-bg);color:var(--green)"><i class="fas fa-utensils"></i></div>
+      <div>
+        <h3>Mode de vie &amp; bien-etre</h3>
+        <p>Alimentation, activite physique, qualite du sommeil, stress, humeur. Des questionnaires courts et valides scientifiquement pour mesurer l'impact reel sur votre sante.</p>
+      </div>
     </div>
   </div>
+</section>
 
-  <h3 style="font-size:20px;font-weight:800;margin:40px 0 16px;color:var(--purple)">Profils de reponse GLP-1 simules (N = 12 733, IMC &ge; 27)</h3>
-  <div class="profile-strip">
-    <div class="profile-chip r1">
-      <div class="code">R1</div>
-      <div class="pname">Excellent</div>
-      <div class="pct">2.5 % &middot; PPE 15-22 %</div>
-    </div>
-    <div class="profile-chip r2">
-      <div class="code">R2</div>
-      <div class="pname">Bon</div>
-      <div class="pct">21.3 % &middot; PPE 10-17 %</div>
-    </div>
-    <div class="profile-chip r3">
-      <div class="code">R3</div>
-      <div class="pname">Partiel</div>
-      <div class="pct">49.0 % &middot; PPE 5-12 %</div>
-    </div>
-    <div class="profile-chip r4">
-      <div class="code">R4</div>
-      <div class="pname">Non-repondeur</div>
-      <div class="pct">25.0 % &middot; PPE &lt;5 %</div>
-    </div>
-    <div class="profile-chip ci">
-      <div class="code">CI</div>
-      <div class="pname">Contre-indication</div>
-      <div class="pct">2.2 %</div>
+<div class="sep"></div>
+
+<!-- ══════ CE QUE VOUS OBTENEZ ══════ -->
+<section class="section" style="background:var(--bg3);margin:0;max-width:100%;padding-top:100px;padding-bottom:100px">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="results-preview">
+      <div class="results-text">
+        <div class="section-badge badge-teal" style="margin-bottom:20px"><i class="fas fa-chart-line"></i> Vos resultats</div>
+        <h3>Un bilan clair et des actions concretes</h3>
+        <p>A la fin de l'evaluation, vous recevez un rapport complet, redigé dans un langage simple et comprehensible.</p>
+        <ul class="result-list">
+          <li><i class="fas fa-check-circle"></i> Score global de sante metabolique sur 100</li>
+          <li><i class="fas fa-check-circle"></i> Classification de votre niveau de risque</li>
+          <li><i class="fas fa-check-circle"></i> Profil personnalise de reponse aux traitements</li>
+          <li><i class="fas fa-check-circle"></i> Recommandations adaptees a votre situation</li>
+          <li><i class="fas fa-check-circle"></i> Rapport IA complet a partager avec votre medecin</li>
+          <li><i class="fas fa-check-circle"></i> Projection a 10 ans de l'evolution de votre profil</li>
+        </ul>
+      </div>
+      <div class="results-visual">
+        <div class="gauge-demo">
+          <div class="gauge-circle">
+            <div class="gauge-text">
+              <span class="gauge-score">42</span>
+              <span class="gauge-label">sur 100</span>
+            </div>
+          </div>
+          <p style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px">Risque modere</p>
+          <p style="font-size:14px;color:var(--dim);margin-bottom:20px">Exemple de resultat</p>
+          <div class="gauge-categories">
+            <div class="gauge-cat"><span class="dot low"></span> Faible</div>
+            <div class="gauge-cat"><span class="dot mod"></span> Modere</div>
+            <div class="gauge-cat"><span class="dot high"></span> Eleve</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <p style="font-size:12px;color:var(--dim2);margin-top:8px;text-align:center">PPE = Perte de Poids Estimee (% du poids initial, 12-18 mois). Molecules : Semaglutide (Wegovy), Tirzepatide (Mounjaro/Zepbound), Liraglutide (Saxenda).</p>
 </section>
 
-<div class="divider"></div>
+<div class="sep"></div>
 
-<!-- SECTION 4 — INNOVATION vs EXISTANT -->
-<section class="section" id="innovation">
-  <div class="section-tag">Analyse comparative</div>
-  <h2>Ce que le BMN apporte de <em>nouveau</em></h2>
-  <p class="section-desc">Aucun framework publie ne combine les 4 composantes : biomarqueurs d'insulinoresistance, exposome temps reel, psychometrie validee et pharmacophenotypage GLP-1 (Supplementary Table S6 de l'article).</p>
-
-  <table class="inno-table">
-    <thead>
-      <tr><th>Fonctionnalite</th><th>Framingham</th><th>SCORE2</th><th>FINDRISC</th><th>Edmonton</th><th style="color:var(--accent)">Score BMN v3.5</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Biomarqueurs d'IR (HOMA-IR, adiponectine)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Exposome environnemental temps reel</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Psychometrie validee (PSS-10 + PHQ-9 + BES)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Phenotypage reponse GLP-1</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Seuils IMC ethniques (12 profils)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Projection Markov a 10 ans</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Score continu 0-100</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Module bariatrique 6 techniques</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Normalisation climatique Koppen</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-      <tr><td>Rapport IA medecin integre</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<div class="divider"></div>
-
-<!-- SECTION 5 — PARCOURS DU PATIENT -->
+<!-- ══════ FIABILITE SCIENTIFIQUE ══════ -->
 <section class="section">
-  <div class="section-tag">Parcours clinique</div>
-  <h2>Du questionnaire au <em>rapport strategique</em></h2>
-  <p class="section-desc">20 ecrans guides, 10-15 minutes, du premier clic au rapport IA personnalise pour le medecin traitant.</p>
-
-  <div class="timeline">
-    <div class="tl-item">
-      <h4>1. Identite & anthropometrie</h4>
-      <p>Date de naissance, sexe, origine ethnique (12 profils), poids, taille, tour de taille. Calcul automatique IMC et WHtR.</p>
+  <div class="section-header">
+    <div class="section-badge badge-blue"><i class="fas fa-flask"></i> Base scientifique</div>
+    <h2>Un outil fonde sur la recherche</h2>
+    <p>COMPASS s'appuie sur les donnees de la plus grande etude americaine de sante (NHANES) et sur 53 publications scientifiques internationales.</p>
+  </div>
+  <div class="science-bar">
+    <div class="science-stat">
+      <div class="s-num">22 807</div>
+      <div class="s-label">Adultes dans l'etude de validation</div>
     </div>
-    <div class="tl-item">
-      <h4>2. Antecedents & localisation</h4>
-      <p>Heredite (parents obeses, DT2), regimes yoyo, geolocalisation GPS avec qualite de l'air et meteo en temps reel.</p>
+    <div class="science-stat">
+      <div class="s-num">87.6%</div>
+      <div class="s-label">Precision de detection<br>(syndrome metabolique)</div>
     </div>
-    <div class="tl-item">
-      <h4>3. Mode de vie & psychometrie</h4>
-      <p>Profil professionnel, alimentation (10 items), activite physique, sommeil, tabac, alcool, PSS-10 (stress), PHQ-9 (depression).</p>
+    <div class="science-stat">
+      <div class="s-num">53</div>
+      <div class="s-label">Publications scientifiques<br>de reference</div>
     </div>
-    <div class="tl-item">
-      <h4>4. Comorbidites & Score sD</h4>
-      <p>14 comorbidites declaratives + IR occulte auto-detectee. Calcul CLEO = C+E+O+L. Classification : Faible / Modere / Eleve / Tres Eleve. Prescription biologique P0/P5/P10/P15.</p>
-    </div>
-    <div class="tl-item">
-      <h4>5. Biologie & BES-16</h4>
-      <p>Saisie optionnelle de 15 biomarqueurs. Echelle BES-16 (hyperphagie, Gormally 1982). Calcul bioNorm, score final sf, CTI, GLP-1 Profiling, Markov.</p>
-    </div>
-    <div class="tl-item">
-      <h4>6. Resultat final & Rapport IA</h4>
-      <p>Score sf/100, classification, CTI, profil GLP-1 (R1-R5), module BTM (recommandation bariatrique primaire et secondaire), rapport strategique Claude AI pour le medecin traitant.</p>
+    <div class="science-stat">
+      <div class="s-num">15</div>
+      <div class="s-label">Marqueurs biologiques<br>analyses</div>
     </div>
   </div>
 </section>
 
-<div class="divider"></div>
+<div class="sep"></div>
 
-<!-- CTA -->
-<section class="section">
+<!-- ══════ FAQ ══════ -->
+<section class="section" id="faq">
+  <div class="section-header">
+    <div class="section-badge badge-orange"><i class="fas fa-circle-question"></i> Questions frequentes</div>
+    <h2>Vos questions, nos reponses</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        C'est vraiment gratuit ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>Oui, completement gratuit. COMPASS est un outil de recherche academique. Aucun paiement, aucune inscription, aucune publicite.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        Mes donnees sont-elles conservees ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>Non. Toutes les donnees sont traitees en temps reel dans votre navigateur. Rien n'est stocke sur nos serveurs. Quand vous fermez la page, tout disparait.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        Est-ce que ca remplace un avis medical ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>Non. COMPASS est un outil d'aide a la comprehension de votre sante metabolique. Il ne pose pas de diagnostic et ne remplace pas une consultation medicale. Les resultats sont a partager avec votre medecin traitant.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        Faut-il avoir des analyses de sang ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>Non, c'est facultatif. COMPASS fonctionne tres bien avec uniquement vos reponses au questionnaire. Si vous avez des analyses recentes, vous pouvez les ajouter pour un bilan plus precis.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        Combien de temps ca prend ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>Environ 10 minutes pour le questionnaire complet. Les resultats sont instantanes. Si vous ajoutez vos analyses biologiques, comptez 2-3 minutes de plus.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        Qu'est-ce que le &laquo; Score COMPASS &raquo; ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>C'est un score de 0 a 100 qui resume votre profil de risque metabolique. Il combine vos donnees cliniques, votre environnement, votre mode de vie et, si disponibles, vos analyses biologiques. Plus le score est bas, mieux c'est.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        A qui s'adresse COMPASS ?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-a"><p>A toute personne adulte souhaitant mieux comprendre sa sante metabolique. Que vous soyez en surpoids, en bonne sante, ou simplement curieux, COMPASS vous fournit un bilan utile et personnalise.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CTA ══════ -->
+<section style="padding:0 24px 100px">
   <div class="cta-section">
-    <h2>Pret a evaluer un patient ?</h2>
-    <p>Le Score BMN v3.5 est accessible gratuitement. Application web, aucune installation requise, resultats en 10-15 minutes.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/" class="btn btn-primary" style="font-size:17px;padding:14px 36px">Demarrer l'evaluation</a>
-      <a href="/dossier" class="btn btn-outline">Dossier technique</a>
-      <a href="/dossier-scientifique" class="btn btn-outline">Dossier scientifique</a>
-      <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-outline">Article complet</a>
+    <h2>Pret a comprendre votre sante ?</h2>
+    <p>10 minutes, gratuit, confidentiel. Decouvrez votre profil metabolique personnalise et des recommandations adaptees.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="/" class="btn btn-white"><i class="fas fa-play"></i> Commencer mon bilan</a>
+      <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-ghost"><i class="fas fa-book-open"></i> Lire l'article scientifique</a>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ══════ FOOTER ══════ -->
 <footer class="footer">
-  <p style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px">Score BMN v3.5 &mdash; Bach &middot; Manos &middot; Noel</p>
-  <p>Architecture CLEO + bioNorm + CTI + GLP-1 Profiling + BTM v3.4 + FNC v1.0</p>
-  <p>Validation interne NHANES 2011-2018, N = 22 807 | AUC MetS = 0.876 | 53 references</p>
-  <p style="margin-top:12px">
-    <a href="https://score-bmn-v3.pages.dev" target="_blank">Application</a> &middot;
-    <a href="https://github.com/stefbach/score-bmn-v3" target="_blank">GitHub</a> &middot;
-    <a href="/dossier">Dossier technique</a> &middot;
-    <a href="/dossier-scientifique">Dossier scientifique</a> &middot;
-    <a href="/static/BMN_v35_Article_Unified.html">Article</a>
-  </p>
-  <p style="margin-top:12px;font-size:10px;color:var(--dim2)">Outil d'aide a la decision clinique — Ne remplace pas le jugement medical</p>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="f-logo"><i class="fas fa-compass"></i> COMPASS</div>
+        <div class="f-full">Comprehensive Metabolic Profiling &amp; Stratification System</div>
+        <p>Un outil de recherche academique pour mieux comprendre les facteurs de risque metabolique. Developpe par Bach, Manos &amp; Noel.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <a href="/">Faire mon bilan</a>
+        <a href="#pourquoi">Pourquoi COMPASS ?</a>
+        <a href="#comment">Comment ca marche</a>
+        <a href="#faq">Questions frequentes</a>
+      </div>
+      <div class="footer-col">
+        <h4>Pour les professionnels</h4>
+        <a href="/dossier">Dossier technique</a>
+        <a href="/dossier-scientifique">Dossier scientifique</a>
+        <a href="/static/BMN_v35_Article_Unified.html">Article complet</a>
+        <a href="https://github.com/stefbach/score-bmn-v3" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>COMPASS v3.5 &mdash; Outil d'aide a la comprehension. Ne remplace pas un avis medical.</p>
+      <p>Validation : <a href="https://score-bmn-v3.pages.dev">score-bmn-v3.pages.dev</a></p>
+    </div>
+  </div>
 </footer>
 
 </body>
