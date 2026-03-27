@@ -2643,7 +2643,7 @@ app.get('/home', (c) => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COMPASS &mdash; Comprenez votre sante metabolique</title>
-<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Un bilan de sante metabolique complet, gratuit et confidentiel en 10 minutes.">
+<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Un bilan de sante metabolique complet et personnalise en 10 minutes. Etude prospective.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F9ED;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" rel="stylesheet">
@@ -2866,18 +2866,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 
 <!-- ══════ HERO ══════ -->
 <section class="hero">
-  <div class="hero-badge"><i class="fas fa-shield-halved"></i> Gratuit, confidentiel, sans inscription</div>
+  <div class="hero-badge"><i class="fas fa-flask-vial"></i> Etude prospective &mdash; Recherche academique</div>
   <h1>Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</h1>
   <p class="hero-sub">COMPASS analyse votre mode de vie, votre environnement et vos marqueurs de sante pour vous donner un bilan personnalise clair et des pistes d'action concretes.</p>
   <div class="hero-btns">
-    <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan gratuit</a>
+    <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan</a>
     <a href="#comment" class="btn btn-secondary"><i class="fas fa-info-circle"></i> En savoir plus</a>
   </div>
   <div class="trust-bar">
     <div class="trust-item"><div class="t-num">22 807</div><div class="t-label">Personnes dans l'etude</div></div>
     <div class="trust-item"><div class="t-num">10 min</div><div class="t-label">Pour votre bilan</div></div>
     <div class="trust-item"><div class="t-num">53</div><div class="t-label">Etudes scientifiques</div></div>
-    <div class="trust-item"><div class="t-num">100%</div><div class="t-label">Gratuit</div></div>
+    <div class="trust-item"><div class="t-num">15</div><div class="t-label">Biomarqueurs analyses</div></div>
   </div>
 </section>
 
@@ -2913,8 +2913,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     </div>
     <div class="why-card">
       <div class="card-icon icon-teal"><i class="fas fa-vial"></i></div>
-      <h3>Vos analyses de sang parle</h3>
-      <p>Si vous avez des resultats biologiques recents, COMPASS les integre pour affiner votre bilan. <strong>15 marqueurs</strong> sont pris en compte (facultatif).</p>
+      <h3>Vos analyses de sang parlent</h3>
+      <p>Le bilan fonctionne sans analyses biologiques, mais avec elles il est <strong>beaucoup plus precis</strong>. Pourquoi ? Parce que des marqueurs comme l'insulinoresistance (HOMA-IR), l'inflammation (CRP) ou les graisses dans le sang (triglycerides, HDL) revelent des desequilibres <strong>invisibles sans prise de sang</strong>. COMPASS integre jusqu'a <strong>15 marqueurs</strong> pour affiner votre profil.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-red"><i class="fas fa-robot"></i></div>
@@ -2932,7 +2932,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     <div class="section-header">
       <div class="section-badge badge-green"><i class="fas fa-route"></i> Comment ca marche ?</div>
       <h2>4 etapes simples, 10 minutes</h2>
-      <p>Pas d'inscription, pas de carte bancaire, pas de donnees conservees sur nos serveurs.</p>
+      <p>Pas d'inscription requise. Vos donnees contribuent anonymement a une etude prospective de recherche.</p>
     </div>
     <div class="steps-container">
       <div class="step">
@@ -2949,8 +2949,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>Biologie (facultatif)</h3>
-        <p>Ajoutez vos analyses de sang recentes pour un bilan encore plus precis.</p>
+        <h3>Biologie (recommande)</h3>
+        <p>Pas obligatoire, mais vos analyses de sang permettent de detecter des risques invisibles (insulinoresistance, inflammation&hellip;).</p>
         <span class="step-time"><i class="fas fa-clock"></i> 3 min</span>
       </div>
       <div class="step">
@@ -3084,17 +3084,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
   <div class="faq-list">
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        C'est vraiment gratuit ?
-        <i class="fas fa-chevron-down"></i>
-      </div>
-      <div class="faq-a"><p>Oui, completement gratuit. COMPASS est un outil de recherche academique. Aucun paiement, aucune inscription, aucune publicite.</p></div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
         Mes donnees sont-elles conservees ?
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Non. Toutes les donnees sont traitees en temps reel dans votre navigateur. Rien n'est stocke sur nos serveurs. Quand vous fermez la page, tout disparait.</p></div>
+      <div class="faq-a"><p>Oui. Vos donnees sont conservees de maniere <strong>anonymisee</strong> dans le cadre d'une <strong>etude prospective</strong> de recherche academique. Elles contribuent a ameliorer la comprehension des facteurs de risque metabolique a grande echelle. Aucune information permettant de vous identifier personnellement n'est partagee.</p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
@@ -3108,7 +3101,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         Faut-il avoir des analyses de sang ?
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Non, c'est facultatif. COMPASS fonctionne tres bien avec uniquement vos reponses au questionnaire. Si vous avez des analyses recentes, vous pouvez les ajouter pour un bilan plus precis.</p></div>
+      <div class="faq-a"><p>Ce n'est <strong>pas obligatoire</strong> : COMPASS fonctionne avec le questionnaire seul. Cependant, c'est <strong>fortement recommande</strong>. Pourquoi ? Parce que certains desequilibres metaboliques &mdash; comme l'insulinoresistance, l'inflammation chronique de bas grade ou un desequilibre des graisses dans le sang &mdash; ne provoquent <strong>aucun symptome perceptible</strong>. Seule une prise de sang peut les reveler. Avec vos resultats biologiques, COMPASS analyse jusqu'a 15 marqueurs et votre bilan gagne considerablement en precision.</p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
@@ -3138,7 +3131,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <section style="padding:0 24px 100px">
   <div class="cta-section">
     <h2>Pret a comprendre votre sante ?</h2>
-    <p>10 minutes, gratuit, confidentiel. Decouvrez votre profil metabolique personnalise et des recommandations adaptees.</p>
+    <p>10 minutes pour decouvrir votre profil metabolique personnalise et des recommandations adaptees. Vos donnees contribuent a la recherche.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="/" class="btn btn-white"><i class="fas fa-play"></i> Commencer mon bilan</a>
       <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-ghost"><i class="fas fa-book-open"></i> Lire l'article scientifique</a>
