@@ -2643,7 +2643,7 @@ app.get('/home', (c) => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COMPASS &mdash; Comprenez votre sante metabolique</title>
-<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Un bilan de sante metabolique complet et personnalise en 10 minutes. Etude prospective.">
+<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Bilan de sante metabolique adapte a la population mauricienne. Etude prospective a Maurice.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F9ED;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" rel="stylesheet">
@@ -2887,9 +2887,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 
 <!-- ══════ HERO ══════ -->
 <section class="hero">
-  <div class="hero-badge"><i class="fas fa-flask-vial"></i> Etude prospective &mdash; Recherche academique</div>
+  <div class="hero-badge"><i class="fas fa-flask-vial"></i> Etude prospective &mdash; Ile Maurice</div>
   <h1>Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</h1>
-  <p class="hero-sub">COMPASS analyse votre mode de vie, votre environnement et vos marqueurs de sante pour vous donner un bilan personnalise clair et des pistes d'action concretes.</p>
+  <p class="hero-sub">A Maurice, pres d'<strong>1 adulte sur 4</strong> est diabetique et l'obesite progresse dans toutes les communautes. COMPASS est le premier outil adapte a la realite mauricienne : votre origine, votre environnement tropical, votre mode de vie &mdash; un bilan personnalise avec des pistes d'action concretes.</p>
   <div class="hero-btns">
     <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan</a>
     <a href="#comment" class="btn btn-secondary"><i class="fas fa-info-circle"></i> En savoir plus</a>
@@ -2909,28 +2909,28 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
   <div class="section-header">
     <div class="section-badge badge-blue"><i class="fas fa-lightbulb"></i> Pourquoi COMPASS ?</div>
     <h2>Parce que votre sante ne se resume<br>pas a un chiffre sur la balance</h2>
-    <p>L'obesite et les maladies metaboliques dependent de dizaines de facteurs. COMPASS est le premier outil a les analyser tous ensemble, pour <strong>vous</strong> donner une image complete.</p>
+    <p>A Maurice, le diabete, l'obesite et les maladies cardiovasculaires touchent toutes les communautes. Mais les outils existants ne tiennent pas compte de nos specificites. COMPASS est le premier outil concu pour la realite mauricienne.</p>
   </div>
   <div class="why-grid">
     <div class="why-card">
       <div class="card-icon icon-blue"><i class="fas fa-fingerprint"></i></div>
-      <h3>Chaque personne est unique</h3>
-      <p>Votre origine, votre morphologie, votre histoire familiale changent completement votre profil de risque. COMPASS adapte ses seuils a <strong>12 profils</strong> differents.</p>
+      <h3>Adapte a notre diversite</h3>
+      <p>Indo-Mauricien, Creole, Sino-Mauricien, Franco-Mauricien&hellip; Les seuils de risque varient considerablement selon l'origine ethnique. Un Indo-Mauricien a un risque de diabete <strong>2 fois superieur</strong> a IMC equivalent. COMPASS integre <strong>12 profils ethniques</strong> avec des seuils adaptes.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-green"><i class="fas fa-tree-city"></i></div>
-      <h3>Votre environnement compte</h3>
-      <p>Pollution, climat, trajet quotidien&hellip; Tout cela influence votre metabolisme. COMPASS est le seul outil a integrer les donnees environnementales <strong>en temps reel</strong> autour de chez vous.</p>
+      <h3>Notre environnement tropical compte</h3>
+      <p>Chaleur, humidite, qualite de l'air dans les zones industrielles (ex. Plaines Wilhems), trajet quotidien en voiture&hellip; COMPASS integre les donnees environnementales <strong>en temps reel</strong> de votre zone de vie a Maurice avec normalisation climatique tropicale.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-purple"><i class="fas fa-brain"></i></div>
-      <h3>Le mental joue un role cle</h3>
-      <p>Stress, sommeil, moral&hellip; Ces facteurs sont souvent oublies. COMPASS mesure leur impact reel sur votre sante metabolique grace a des questionnaires valides scientifiquement.</p>
+      <h3>Le stress quotidien joue un role cle</h3>
+      <p>Pression au travail, embouteillages, rythme de vie qui s'accelere&hellip; Le stress, le manque de sommeil et le moral affectent directement votre metabolisme. COMPASS mesure ces facteurs souvent negliges grace a des questionnaires valides scientifiquement.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-orange"><i class="fas fa-capsules"></i></div>
       <h3>Trouver le bon traitement</h3>
-      <p>Tous les traitements ne conviennent pas a tout le monde. COMPASS peut estimer votre profil de reponse aux <strong>nouveaux medicaments</strong> (GLP-1) pour guider votre medecin.</p>
+      <p>Les nouveaux medicaments (GLP-1 : Ozempic, Wegovy, Mounjaro) arrivent a Maurice, mais <strong>30 a 40 % des patients n'y repondent pas bien</strong>. COMPASS estime votre profil de reponse individuel pour guider votre medecin vers le traitement le plus adapte.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-teal"><i class="fas fa-vial"></i></div>
@@ -3056,28 +3056,28 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
       <div class="a-icon" style="background:var(--red-bg);color:var(--red)"><i class="fas fa-heart-pulse"></i></div>
       <div>
         <h3>Clinique &amp; antecedents</h3>
-        <p>Morphologie, historique familial, comorbidites existantes (diabete, hypertension, apnee du sommeil&hellip;), traitements en cours. COMPASS adapte ses seuils a votre origine ethnique.</p>
+        <p>Morphologie, historique familial, comorbidites (diabete, hypertension, apnee du sommeil&hellip;), traitements en cours. Seuils IMC adaptes a votre communaute (Indo-Mauricien, Creole, Sino-Mauricien&hellip;).</p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--orange-bg);color:var(--orange)"><i class="fas fa-smog"></i></div>
       <div>
         <h3>Environnement &amp; exposition</h3>
-        <p>Qualite de l'air autour de chez vous, climat, exposition aux polluants, trajet quotidien. Des donnees geographiques analysees en temps reel grace a votre localisation.</p>
+        <p>Qualite de l'air de votre region (Port-Louis, Curepipe, Flacq&hellip;), climat tropical, exposition a la chaleur, trajet quotidien. Donnees geographiques mauriciennes analysees en temps reel avec normalisation climatique.</p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--teal-bg);color:var(--teal)"><i class="fas fa-briefcase"></i></div>
       <div>
         <h3>Vie professionnelle &amp; sociale</h3>
-        <p>Type de travail, horaires, sedentarite au bureau, travail de nuit, isolement social&hellip; Autant de facteurs qui influencent directement votre metabolisme.</p>
+        <p>Type de travail, horaires, sedentarite au bureau, travail de nuit, longs trajets en voiture, isolement social (notamment chez les retraites)&hellip; Des facteurs courants a Maurice qui influencent directement votre metabolisme.</p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--green-bg);color:var(--green)"><i class="fas fa-utensils"></i></div>
       <div>
-        <h3>Mode de vie &amp; bien-etre</h3>
-        <p>Alimentation, activite physique, qualite du sommeil, stress, humeur. Des questionnaires courts et valides scientifiquement pour mesurer l'impact reel sur votre sante.</p>
+        <h3>Mode de vie &amp; alimentation</h3>
+        <p>Habitudes alimentaires, activite physique, qualite du sommeil, consommation d'alcool, stress quotidien. Des questionnaires courts et valides pour mesurer l'impact reel de votre mode de vie sur votre sante metabolique.</p>
       </div>
     </div>
   </div>
@@ -3130,7 +3130,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
   <div class="section-header">
     <div class="section-badge badge-blue"><i class="fas fa-flask"></i> Base scientifique</div>
     <h2>Un outil fonde sur la recherche</h2>
-    <p>COMPASS s'appuie sur les donnees de la plus grande etude americaine de sante (NHANES) et sur 53 publications scientifiques internationales.</p>
+    <p>COMPASS s'appuie sur 53 publications scientifiques internationales et est valide sur 22 807 adultes. L'algorithme integre les specificites des populations sud-asiatiques et insulaires, directement applicables a la realite mauricienne.</p>
   </div>
   <div class="science-bar">
     <div class="science-stat">
@@ -3201,7 +3201,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         A qui s'adresse COMPASS ?
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>A toute personne adulte souhaitant mieux comprendre sa sante metabolique. Que vous soyez en surpoids, en bonne sante, ou simplement curieux, COMPASS vous fournit un bilan utile et personnalise.</p></div>
+      <div class="faq-a"><p>A tout adulte vivant a Maurice, quelle que soit votre communaute d'origine. Que vous soyez en surpoids, diabetique, sous traitement, ou simplement soucieux de votre sante, COMPASS vous fournit un bilan adapte a votre profil ethnique et a votre environnement local.</p></div>
     </div>
   </div>
 </section>
@@ -3213,7 +3213,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     <p>10 minutes pour decouvrir votre profil metabolique personnalise et des recommandations adaptees. Vos donnees contribuent a la recherche.</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="/" class="btn btn-white"><i class="fas fa-play"></i> Commencer mon bilan</a>
-      <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-ghost"><i class="fas fa-book-open"></i> Lire l'article scientifique</a>
     </div>
   </div>
 </section>
@@ -3225,7 +3224,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
       <div class="footer-brand">
         <div class="f-logo"><i class="fas fa-compass"></i> COMPASS</div>
         <div class="f-full">Comprehensive Metabolic Profiling &amp; Stratification System</div>
-        <p>Un outil de recherche academique pour mieux comprendre les facteurs de risque metabolique. Developpe par Bach, Manos &amp; Noel.</p>
+        <p>Etude prospective a Maurice pour mieux comprendre les facteurs de risque metabolique dans notre population. Developpe par Bach, Manos &amp; Noel.</p>
       </div>
       <div class="footer-col">
         <h4>Navigation</h4>
@@ -3238,7 +3237,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         <h4>Pour les professionnels</h4>
         <a href="/dossier">Dossier technique</a>
         <a href="/dossier-scientifique">Dossier scientifique</a>
-        <a href="/static/BMN_v35_Article_Unified.html">Article complet</a>
         <a href="https://github.com/stefbach/score-bmn-v3" target="_blank">GitHub</a>
       </div>
     </div>
