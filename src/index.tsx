@@ -2635,6 +2635,451 @@ app.get('/', (c) => {
 </html>`)
 })
 
+// ─── HOME PAGE — Pourquoi ce module ───
+app.get('/home', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Score BMN v3.5 — Pourquoi ce module ?</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--txt:#e2e8f0;--dim:#94a3b8;--dim2:#64748b;--accent:#818cf8;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--purple:#a855f7;--teal:#14b8a6;--cyan:#22d3ee;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.8;-webkit-font-smoothing:antialiased}
+
+/* NAVIGATION */
+.nav{position:sticky;top:0;z-index:100;background:rgba(15,23,42,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);padding:0 24px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-size:18px;font-weight:900;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-logo span{font-size:22px}
+.nav-links{display:flex;gap:6px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;font-weight:600;padding:6px 14px;border-radius:8px;transition:.2s}
+.nav-links a:hover{color:var(--txt);background:var(--bg2)}
+.nav-links a.primary{background:var(--accent);color:#fff}
+.nav-links a.primary:hover{opacity:.9}
+
+/* HERO */
+.hero{text-align:center;padding:80px 24px 60px;background:linear-gradient(135deg,var(--bg),var(--bg2) 50%,var(--bg));position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(129,140,248,.08) 0%,transparent 70%);pointer-events:none}
+.hero-tag{display:inline-block;padding:4px 14px;background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.25);border-radius:20px;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:clamp(32px,5vw,52px);font-weight:900;color:var(--txt);line-height:1.2;margin-bottom:16px;letter-spacing:-.5px}
+.hero h1 em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--dim);max-width:700px;margin:0 auto 32px;line-height:1.6}
+.hero-stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:32px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:36px;font-weight:900;color:var(--accent);font-family:var(--mono)}
+.hero-stat .lab{font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.hero-btns{display:flex;gap:12px;justify-content:center;margin-top:36px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:.2s;border:none;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn-outline:hover{background:rgba(129,140,248,.1)}
+
+/* SECTIONS */
+.section{max-width:1100px;margin:0 auto;padding:80px 24px}
+.section-tag{display:inline-block;padding:3px 12px;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.25);border-radius:16px;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
+.section h2{font-size:clamp(26px,3.5vw,38px);font-weight:900;color:var(--txt);margin-bottom:12px;letter-spacing:-.3px}
+.section h2 em{color:var(--accent);font-style:normal}
+.section-desc{font-size:16px;color:var(--dim);max-width:700px;margin-bottom:40px;line-height:1.7}
+
+/* PROBLEM CARDS */
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:40px 0}
+.pcard{background:var(--bg2);border-radius:16px;padding:28px 24px;border:1px solid var(--border2);transition:.3s}
+.pcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pcard .icon{font-size:32px;margin-bottom:12px}
+.pcard h3{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.pcard p{font-size:13px;color:var(--dim);line-height:1.7}
+.pcard .ref{font-size:10px;color:var(--dim2);margin-top:10px;font-style:italic}
+
+/* ARCHITECTURE */
+.arch-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:40px 0}
+.arch-box{background:var(--bg2);border-radius:14px;padding:24px 20px;border-left:4px solid var(--accent);position:relative;overflow:hidden}
+.arch-box::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(129,140,248,.06),transparent);border-radius:50%}
+.arch-box.c{border-color:var(--red)} .arch-box.e{border-color:var(--orange)} .arch-box.o{border-color:var(--teal)} .arch-box.l{border-color:var(--green)}
+.arch-box .letter{font-size:28px;font-weight:900;font-family:var(--mono);margin-bottom:6px}
+.arch-box.c .letter{color:var(--red)} .arch-box.e .letter{color:var(--orange)} .arch-box.o .letter{color:var(--teal)} .arch-box.l .letter{color:var(--green)}
+.arch-box h3{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.arch-box p{font-size:12px;color:var(--dim)}
+.arch-box .range{font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:40px 0}
+.rcard{background:var(--bg2);border-radius:16px;padding:24px;border:1px solid var(--border2);text-align:center}
+.rcard .metric{font-size:42px;font-weight:900;font-family:var(--mono);margin:8px 0}
+.rcard .metric.green{color:var(--green)} .rcard .metric.accent{color:var(--accent)} .rcard .metric.teal{color:var(--teal)} .rcard .metric.orange{color:var(--orange)}
+.rcard .label{font-size:13px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.rcard .detail{font-size:11px;color:var(--dim2);margin-top:6px}
+
+/* GLP1 PROFILES */
+.profile-strip{display:flex;gap:4px;margin:30px 0;flex-wrap:wrap}
+.profile-chip{flex:1;min-width:100px;padding:14px 10px;border-radius:10px;text-align:center}
+.profile-chip.r1{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
+.profile-chip.r2{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.3)}
+.profile-chip.r3{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
+.profile-chip.r4{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
+.profile-chip.ci{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.3)}
+.profile-chip .code{font-size:18px;font-weight:900;font-family:var(--mono)}
+.profile-chip.r1 .code{color:var(--green)} .profile-chip.r2 .code{color:var(--teal)} .profile-chip.r3 .code{color:var(--orange)} .profile-chip.r4 .code{color:var(--red)} .profile-chip.ci .code{color:var(--dim2)}
+.profile-chip .pname{font-size:10px;color:var(--dim);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.profile-chip .pct{font-size:12px;font-weight:700;color:var(--dim);margin-top:4px}
+
+/* INNOVATION TABLE */
+.inno-table{width:100%;border-collapse:collapse;margin:30px 0}
+.inno-table th{background:var(--bg3);color:var(--cyan);padding:12px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
+.inno-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--dim);vertical-align:top}
+.inno-table tr:hover{background:rgba(129,140,248,.04)}
+.inno-table .check{color:var(--green);font-weight:900;font-size:16px}
+.inno-table .cross{color:var(--dim2);font-size:16px}
+
+/* TIMELINE */
+.timeline{position:relative;margin:40px 0;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(var(--accent),var(--teal),var(--green))}
+.tl-item{position:relative;margin-bottom:32px}
+.tl-item::before{content:'';position:absolute;left:-26px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+.tl-item h4{font-size:15px;font-weight:800;color:var(--txt);margin-bottom:4px}
+.tl-item p{font-size:13px;color:var(--dim)}
+
+/* CTA SECTION */
+.cta-section{background:linear-gradient(135deg,rgba(129,140,248,.08),rgba(20,184,166,.08));border:1px solid rgba(129,140,248,.2);border-radius:20px;padding:60px 40px;text-align:center;margin:40px 0}
+.cta-section h2{font-size:32px;font-weight:900;margin-bottom:12px}
+.cta-section p{font-size:16px;color:var(--dim);margin-bottom:30px;max-width:600px;margin-left:auto;margin-right:auto}
+
+/* FOOTER */
+.footer{background:var(--bg2);border-top:1px solid var(--border2);padding:40px 24px;text-align:center}
+.footer p{font-size:12px;color:var(--dim2);margin:4px 0}
+.footer a{color:var(--accent);text-decoration:none}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(to right,transparent,var(--border2),transparent);margin:0}
+
+/* FORMULA BOX */
+.formula-highlight{background:var(--bg2);border:2px solid var(--accent);border-radius:16px;padding:24px 28px;text-align:center;margin:30px 0}
+.formula-highlight .f{font-family:var(--mono);font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--accent);margin:8px 0}
+.formula-highlight .d{font-size:12px;color:var(--dim2)}
+
+@media(max-width:768px){
+  .hero{padding:50px 16px 40px}
+  .hero-stats{gap:20px}
+  .hero-stat .num{font-size:28px}
+  .section{padding:50px 16px}
+  .nav-links a:not(.primary){display:none}
+  .profile-strip{flex-direction:column}
+  .arch-container{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .nav,.hero-btns,.cta-section .btn{display:none}
+  h1,h2,h3,h4{color:#000}
+  .section{padding:20px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+<div class="nav-inner">
+  <a href="/home" class="nav-logo"><span>&#x2695;</span> Score BMN v3.5</a>
+  <div class="nav-links">
+    <a href="#probleme">Le probleme</a>
+    <a href="#solution">La solution</a>
+    <a href="#resultats">Resultats</a>
+    <a href="#innovation">Innovation</a>
+    <a href="/" class="primary">Utiliser le Score</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Recherche clinique &mdash; NHANES 2011-2018</div>
+  <h1>Pourquoi le <em>Score BMN</em> ?</h1>
+  <p class="hero-sub">Parce que l'obesite est une maladie chronique multi-factorielle et qu'aucun outil existant ne combinait biologie, exposome, psychometrie et pharmacophenotypage GLP-1 dans un seul algorithme valide.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">22 807</div><div class="lab">Adultes NHANES</div></div>
+    <div class="hero-stat"><div class="num">0.876</div><div class="lab">AUC MetS</div></div>
+    <div class="hero-stat"><div class="num">53</div><div class="lab">References</div></div>
+    <div class="hero-stat"><div class="num">4</div><div class="lab">Composantes CLEO</div></div>
+  </div>
+  <div class="hero-btns">
+    <a href="/" class="btn btn-primary">Evaluer un patient</a>
+    <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-outline">Lire l'article</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 1 — LE PROBLEME -->
+<section class="section" id="probleme">
+  <div class="section-tag">Le constat</div>
+  <h2>L'obesite est <em>sous-diagnostiquee</em> et <em>sous-phenotypee</em></h2>
+  <p class="section-desc">Les scores de risque existants (Framingham, SCORE2, FINDRISC, Edmonton) partagent des lacunes majeures qui limitent la prise en charge de precision en 2026.</p>
+
+  <div class="problem-grid">
+    <div class="pcard">
+      <div class="icon">&#x1F9EC;</div>
+      <h3>Pas de prise en compte de l'ethnicite</h3>
+      <p>Les seuils IMC europeens (25/30) <strong>sous-estiment le risque</strong> chez les populations sud-asiatiques et est-asiatiques. Un Indo-Mauricien a un risque DT2 <strong>2x superieur</strong> a IMC equivalent (dR = 2.0).</p>
+      <div class="ref">WHO Expert Consultation, Lancet 2004 ; Ramachandran 2010</div>
+    </div>
+    <div class="pcard">
+      <div class="icon">&#x1F321;</div>
+      <h3>Exposome ignore</h3>
+      <p>La pollution (PM2.5 : OR 1.18 pour MetS), les perturbateurs endocriniens, le stress thermique et la sedentarite professionnelle ne sont integres dans <strong>aucun score clinique courant</strong>.</p>
+      <div class="ref">Eze et al., Environ Health Perspect 2015 ; Biswas et al. 2015</div>
+    </div>
+    <div class="pcard">
+      <div class="icon">&#x1F9E0;</div>
+      <h3>Dimension psycho-comportementale absente</h3>
+      <p>Le stress chronique (PSS-10), la depression (PHQ-9) et l'hyperphagie boulimique (BES-16) sont des facteurs <strong>independants</strong> de gain ponderal, absents des outils standards.</p>
+      <div class="ref">Luppino et al., Arch Gen Psychiatry 2010 : OR 1.58 depression-&gt;obesite</div>
+    </div>
+    <div class="pcard">
+      <div class="icon">&#x1F489;</div>
+      <h3>Reponse GLP-1 non predite</h3>
+      <p>30 a 40 % des patients traites par GLP-1 sont des <strong>repondeurs partiels ou non-repondeurs</strong>. Aucun outil ne phenotypait cette reponse avant le Score BMN.</p>
+      <div class="ref">Post-hoc STEP 1, Wilding 2021 ; SURMOUNT-1, Jastreboff 2022</div>
+    </div>
+    <div class="pcard">
+      <div class="icon">&#x1F52C;</div>
+      <h3>Biologie et declaratif deconnectes</h3>
+      <p>Les scores existants utilisent <em>soit</em> des biomarqueurs, <em>soit</em> des questionnaires. Le BMN est le premier a <strong>integrer dynamiquement</strong> les deux avec reponderation adaptative.</p>
+      <div class="ref">ERFC 2010, n = 1.2 M ; CTT Collaboration 2010, n = 170 000</div>
+    </div>
+    <div class="pcard">
+      <div class="icon">&#x2702;</div>
+      <h3>Aucune aide a la decision bariatrique</h3>
+      <p>Ballon, ESG, Sleeve, Bypass, GLP-1 ou associations : <strong>aucun algorithme</strong> ne scorait simultanement 6 techniques sur 27 facteurs avec 10 modifications de consensus.</p>
+      <div class="ref">62 etudes, &gt;180 000 patients (Module BTM v3.4)</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 2 — LA SOLUTION : ARCHITECTURE CLEO -->
+<section class="section" id="solution">
+  <div class="section-tag">L'innovation</div>
+  <h2>Architecture <em>CLEO</em> : 4 dimensions, 1 score</h2>
+  <p class="section-desc">Le Score BMN v3.5 combine quatre piliers d'evaluation dans un algorithme unique, valide sur 22 807 adultes de la cohorte NHANES 2011-2018.</p>
+
+  <div class="formula-highlight">
+    <div class="d">FORMULE CENTRALE DU SCORE BMN</div>
+    <div class="f">sf = 0.65 &times; sD + 0.35 &times; bioNorm</div>
+    <div class="d">sD = min(100, C + E + O + L) &nbsp;|&nbsp; bioNorm = (&Sigma; z<sub>i</sub> &times; w<sub>i</sub> / &Sigma; w<sub>i</sub>) &times; 100</div>
+  </div>
+
+  <div class="arch-container">
+    <div class="arch-box c">
+      <div class="letter">C</div>
+      <h3>Clinique</h3>
+      <p>Age, sexe, IMC, tour de taille, WHtR, comorbidites (14 items), ATCD familiaux, tabac, sante mentale (PSS-10, PHQ-9, BES-16), sommeil (ISI)</p>
+      <div class="range">0-50 pts &middot; 8 sous-scores &middot; 12 profils ethniques</div>
+    </div>
+    <div class="arch-box e">
+      <div class="letter">E</div>
+      <h3>Exposome</h3>
+      <p>Qualite de l'air (PM2.5, NO2, O3) en temps reel, temperature, UV, trajet domicile-travail, sedentarite, perturbateurs endocriniens alimentaires, normalisation climatique FNC</p>
+      <div class="range">0-45 pts &middot; 3 couches (A/B/C) &middot; 6 zones Koppen</div>
+    </div>
+    <div class="arch-box o">
+      <div class="letter">O</div>
+      <h3>Occupationnel</h3>
+      <p>Type de travail, horaires decales, travail de nuit (OR 1.29), posture, isolement social (retraite), charge mentale professionnelle (Karasek)</p>
+      <div class="range">0-10 pts &middot; Modele Karasek + Valtorta 2016</div>
+    </div>
+    <div class="arch-box l">
+      <div class="letter">L</div>
+      <h3>Lifestyle</h3>
+      <p>Activite physique (IPAQ), alimentation (PREDIMED-equiv, 10 items), consommation d'alcool (AUDIT-C), qualite du sommeil</p>
+      <div class="range">0-10 pts &middot; 4 sous-scores (l1-l4)</div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px">
+    <h3 style="font-size:20px;font-weight:800;margin-bottom:20px;color:var(--teal)">&#x2795; Modules additionnels integres</h3>
+    <div class="problem-grid" style="margin-top:16px">
+      <div class="pcard" style="border-left:3px solid var(--cyan)">
+        <h3 style="color:var(--cyan)">bioNorm &mdash; 15 biomarqueurs</h3>
+        <p>HOMA-IR, HbA1c, glycemie, CRP hs, TSH, LDL, HDL, TG, adiponectine, transaminases, ApoB, GGT, TG/HDL, acide urique, leptine. Poids proportionnels aux HR/OR des meta-analyses (somme = 23.2).</p>
+      </div>
+      <div class="pcard" style="border-left:3px solid var(--purple)">
+        <h3 style="color:var(--purple)">GLP-1 Profiling Engine v2.0</h3>
+        <p>6 axes de phenotypage (IR, chronicite, inflammation, psycho, iatrogene, demographique) &rarr; 5 profils de reponse (R1 Excellent a R5 Echec) + contre-indications. Prediction PPE individualisee.</p>
+      </div>
+      <div class="pcard" style="border-left:3px solid var(--orange)">
+        <h3 style="color:var(--orange)">BTM v3.4 &mdash; Module Bariatrique</h3>
+        <p>Matrice decisionnelle : 27 facteurs &times; 6 techniques (Ballon, ESG, Sleeve, Bypass, GLP-1, Associations). 10 MOD de consensus. 62 etudes, >180 000 patients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 3 — RESULTATS -->
+<section class="section" id="resultats">
+  <div class="section-tag">Validation interne &mdash; NHANES 2011-2018</div>
+  <h2>Des performances <em>robustes</em> et reproductibles</h2>
+  <p class="section-desc">Validation interne par Monte Carlo (B = 5 000, seed = 42) avec imputation multiple MICE sur 22 807 adultes americains.</p>
+
+  <div class="results-grid">
+    <div class="rcard">
+      <div class="label">AUC Syndrome Metabolique</div>
+      <div class="metric green">0.876</div>
+      <div class="detail">IC 95 % : 0.875&ndash;0.878</div>
+    </div>
+    <div class="rcard">
+      <div class="label">AUC Prediction Obesite</div>
+      <div class="metric accent">0.778</div>
+      <div class="detail">Prediction du passage vers l'obesite clinique</div>
+    </div>
+    <div class="rcard">
+      <div class="label">Calibration ICI</div>
+      <div class="metric teal">0.032</div>
+      <div class="detail">Integrated Calibration Index (&lt; 0.05 = excellent)</div>
+    </div>
+    <div class="rcard">
+      <div class="label">Rapport E/O</div>
+      <div class="metric orange">1.04</div>
+      <div class="detail">Evenements attendus / observes (ideal = 1.0)</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:20px;font-weight:800;margin:40px 0 16px;color:var(--purple)">Profils de reponse GLP-1 simules (N = 12 733, IMC &ge; 27)</h3>
+  <div class="profile-strip">
+    <div class="profile-chip r1">
+      <div class="code">R1</div>
+      <div class="pname">Excellent</div>
+      <div class="pct">2.5 % &middot; PPE 15-22 %</div>
+    </div>
+    <div class="profile-chip r2">
+      <div class="code">R2</div>
+      <div class="pname">Bon</div>
+      <div class="pct">21.3 % &middot; PPE 10-17 %</div>
+    </div>
+    <div class="profile-chip r3">
+      <div class="code">R3</div>
+      <div class="pname">Partiel</div>
+      <div class="pct">49.0 % &middot; PPE 5-12 %</div>
+    </div>
+    <div class="profile-chip r4">
+      <div class="code">R4</div>
+      <div class="pname">Non-repondeur</div>
+      <div class="pct">25.0 % &middot; PPE &lt;5 %</div>
+    </div>
+    <div class="profile-chip ci">
+      <div class="code">CI</div>
+      <div class="pname">Contre-indication</div>
+      <div class="pct">2.2 %</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--dim2);margin-top:8px;text-align:center">PPE = Perte de Poids Estimee (% du poids initial, 12-18 mois). Molecules : Semaglutide (Wegovy), Tirzepatide (Mounjaro/Zepbound), Liraglutide (Saxenda).</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 4 — INNOVATION vs EXISTANT -->
+<section class="section" id="innovation">
+  <div class="section-tag">Analyse comparative</div>
+  <h2>Ce que le BMN apporte de <em>nouveau</em></h2>
+  <p class="section-desc">Aucun framework publie ne combine les 4 composantes : biomarqueurs d'insulinoresistance, exposome temps reel, psychometrie validee et pharmacophenotypage GLP-1 (Supplementary Table S6 de l'article).</p>
+
+  <table class="inno-table">
+    <thead>
+      <tr><th>Fonctionnalite</th><th>Framingham</th><th>SCORE2</th><th>FINDRISC</th><th>Edmonton</th><th style="color:var(--accent)">Score BMN v3.5</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Biomarqueurs d'IR (HOMA-IR, adiponectine)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Exposome environnemental temps reel</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Psychometrie validee (PSS-10 + PHQ-9 + BES)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Phenotypage reponse GLP-1</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Seuils IMC ethniques (12 profils)</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Projection Markov a 10 ans</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Score continu 0-100</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="check">&#x2713;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Module bariatrique 6 techniques</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Normalisation climatique Koppen</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+      <tr><td>Rapport IA medecin integre</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="cross">&mdash;</td><td class="check">&#x2713;</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- SECTION 5 — PARCOURS DU PATIENT -->
+<section class="section">
+  <div class="section-tag">Parcours clinique</div>
+  <h2>Du questionnaire au <em>rapport strategique</em></h2>
+  <p class="section-desc">20 ecrans guides, 10-15 minutes, du premier clic au rapport IA personnalise pour le medecin traitant.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <h4>1. Identite & anthropometrie</h4>
+      <p>Date de naissance, sexe, origine ethnique (12 profils), poids, taille, tour de taille. Calcul automatique IMC et WHtR.</p>
+    </div>
+    <div class="tl-item">
+      <h4>2. Antecedents & localisation</h4>
+      <p>Heredite (parents obeses, DT2), regimes yoyo, geolocalisation GPS avec qualite de l'air et meteo en temps reel.</p>
+    </div>
+    <div class="tl-item">
+      <h4>3. Mode de vie & psychometrie</h4>
+      <p>Profil professionnel, alimentation (10 items), activite physique, sommeil, tabac, alcool, PSS-10 (stress), PHQ-9 (depression).</p>
+    </div>
+    <div class="tl-item">
+      <h4>4. Comorbidites & Score sD</h4>
+      <p>14 comorbidites declaratives + IR occulte auto-detectee. Calcul CLEO = C+E+O+L. Classification : Faible / Modere / Eleve / Tres Eleve. Prescription biologique P0/P5/P10/P15.</p>
+    </div>
+    <div class="tl-item">
+      <h4>5. Biologie & BES-16</h4>
+      <p>Saisie optionnelle de 15 biomarqueurs. Echelle BES-16 (hyperphagie, Gormally 1982). Calcul bioNorm, score final sf, CTI, GLP-1 Profiling, Markov.</p>
+    </div>
+    <div class="tl-item">
+      <h4>6. Resultat final & Rapport IA</h4>
+      <p>Score sf/100, classification, CTI, profil GLP-1 (R1-R5), module BTM (recommandation bariatrique primaire et secondaire), rapport strategique Claude AI pour le medecin traitant.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="section">
+  <div class="cta-section">
+    <h2>Pret a evaluer un patient ?</h2>
+    <p>Le Score BMN v3.5 est accessible gratuitement. Application web, aucune installation requise, resultats en 10-15 minutes.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/" class="btn btn-primary" style="font-size:17px;padding:14px 36px">Demarrer l'evaluation</a>
+      <a href="/dossier" class="btn btn-outline">Dossier technique</a>
+      <a href="/dossier-scientifique" class="btn btn-outline">Dossier scientifique</a>
+      <a href="/static/BMN_v35_Article_Unified.html" class="btn btn-outline">Article complet</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px">Score BMN v3.5 &mdash; Bach &middot; Manos &middot; Noel</p>
+  <p>Architecture CLEO + bioNorm + CTI + GLP-1 Profiling + BTM v3.4 + FNC v1.0</p>
+  <p>Validation interne NHANES 2011-2018, N = 22 807 | AUC MetS = 0.876 | 53 references</p>
+  <p style="margin-top:12px">
+    <a href="https://score-bmn-v3.pages.dev" target="_blank">Application</a> &middot;
+    <a href="https://github.com/stefbach/score-bmn-v3" target="_blank">GitHub</a> &middot;
+    <a href="/dossier">Dossier technique</a> &middot;
+    <a href="/dossier-scientifique">Dossier scientifique</a> &middot;
+    <a href="/static/BMN_v35_Article_Unified.html">Article</a>
+  </p>
+  <p style="margin-top:12px;font-size:10px;color:var(--dim2)">Outil d'aide a la decision clinique — Ne remplace pas le jugement medical</p>
+</footer>
+
+</body>
+</html>`)
+})
+
 // ─── ARTICLE SCIENTIFIQUE UNIFIÉ ───
 app.get('/article', (c) => {
   return c.redirect('/static/BMN_v35_Article_Unified')
