@@ -2727,17 +2727,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 .why-card h3{font-size:18px;font-weight:800;color:var(--txt);margin-bottom:10px;line-height:1.3}
 .why-card p{font-size:15px;color:var(--dim);line-height:1.7}
 
-/* ══ HOW IT WORKS ══ */
-.steps-container{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
-.steps-container::before{content:'';position:absolute;top:40px;left:calc(12.5%);right:calc(12.5%);height:3px;background:linear-gradient(to right,var(--primary),var(--teal),var(--green),var(--orange));border-radius:4px;z-index:0}
-.step{text-align:center;padding:0 16px;position:relative;z-index:1}
-.step-num{width:80px;height:80px;border-radius:50%;background:var(--white);border:3px solid var(--primary);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;font-weight:900;color:var(--primary);box-shadow:var(--shadow);transition:.3s}
-.step:nth-child(2) .step-num{border-color:var(--teal);color:var(--teal)}
-.step:nth-child(3) .step-num{border-color:var(--green);color:var(--green)}
-.step:nth-child(4) .step-num{border-color:var(--orange);color:var(--orange)}
-.step h3{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
-.step p{font-size:14px;color:var(--dim);line-height:1.6}
-.step .step-time{display:inline-block;margin-top:10px;padding:3px 12px;background:var(--bg3);border-radius:50px;font-size:12px;font-weight:700;color:var(--dim)}
+/* ══ HOW IT WORKS — TIMELINE ══ */
+.journey{max-width:800px;margin:0 auto;position:relative}
+.phase-label{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:50px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:32px}
+.phase-1{background:var(--primary-bg);color:var(--primary);border:1px solid rgba(79,70,229,.2)}
+.phase-2{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,.2)}
+.phase-divider{display:flex;align-items:center;gap:16px;margin:40px 0;padding:0 20px}
+.phase-divider::before,.phase-divider::after{content:'';flex:1;height:2px;background:var(--border)}
+.phase-divider .divider-icon{width:48px;height:48px;border-radius:50%;background:var(--orange-bg);border:2px solid rgba(217,119,6,.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--orange);flex-shrink:0}
+.tl-step{display:flex;gap:24px;margin-bottom:8px;position:relative}
+.tl-step:last-child{margin-bottom:0}
+.tl-left{flex-shrink:0;display:flex;flex-direction:column;align-items:center;width:72px}
+.tl-num{width:56px;height:56px;border-radius:50%;border:3px solid var(--primary);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--primary);box-shadow:var(--shadow);z-index:1}
+.tl-num.clr-teal{border-color:var(--teal);color:var(--teal)}
+.tl-num.clr-green{border-color:var(--green);color:var(--green)}
+.tl-num.clr-orange{border-color:var(--orange);color:var(--orange)}
+.tl-num.clr-purple{border-color:var(--purple);color:var(--purple)}
+.tl-num.clr-blue{border-color:var(--blue);color:var(--blue)}
+.tl-line{width:3px;flex:1;background:linear-gradient(to bottom,var(--border2),var(--border));margin:6px 0}
+.tl-step:last-child .tl-line{display:none}
+.tl-content{flex:1;background:var(--bg2);border-radius:var(--radius);padding:24px 28px;border:1px solid var(--border);margin-bottom:16px;transition:all .3s}
+.tl-content:hover{box-shadow:var(--shadow-lg);border-color:var(--primary-light)}
+.tl-content h3{font-size:18px;font-weight:800;color:var(--txt);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.tl-content h3 .step-icon{font-size:16px}
+.tl-content p{font-size:14px;color:var(--dim);line-height:1.65}
+.tl-content .step-tag{display:inline-block;margin-top:10px;padding:3px 12px;border-radius:50px;font-size:11px;font-weight:700}
+.tag-time{background:var(--bg3);color:var(--dim)}
+.tag-doctor{background:rgba(220,38,38,.07);color:var(--red);border:1px solid rgba(220,38,38,.15)}
+.tag-lab{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,.15)}
+.tag-ai{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(124,58,237,.15)}
+.tl-content .highlight-box{background:var(--primary-bg);border:1px solid rgba(79,70,229,.12);border-radius:var(--radius-xs);padding:12px 16px;margin-top:12px;font-size:13px;color:var(--txt2);line-height:1.6}
+.tl-content .highlight-box i{color:var(--primary);margin-right:6px}
 
 /* ══ WHAT WE ANALYZE ══ */
 .analyze-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
@@ -2816,8 +2836,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 /* ══ RESPONSIVE ══ */
 @media(max-width:900px){
   .why-grid{grid-template-columns:1fr}
-  .steps-container{grid-template-columns:repeat(2,1fr);gap:32px}
-  .steps-container::before{display:none}
+  .tl-step{flex-direction:column;align-items:stretch}
+  .tl-left{flex-direction:row;width:auto;gap:12px;margin-bottom:0}
+  .tl-line{width:auto;height:3px;flex:0;display:none}
   .analyze-grid{grid-template-columns:1fr}
   .results-preview{grid-template-columns:1fr}
   .science-bar{grid-template-columns:repeat(2,1fr)}
@@ -2828,7 +2849,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 @media(max-width:640px){
   .hero{padding:48px 16px 64px}
   .section{padding:64px 16px}
-  .steps-container{grid-template-columns:1fr;gap:24px}
+  .tl-left{justify-content:flex-start}
   .nav-links a:not(.cta-nav){display:none}
   .trust-bar{gap:24px}
   .hero-btns{flex-direction:column;align-items:center}
@@ -2931,33 +2952,91 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
   <div style="max-width:1100px;margin:0 auto">
     <div class="section-header">
       <div class="section-badge badge-green"><i class="fas fa-route"></i> Comment ca marche ?</div>
-      <h2>4 etapes simples, 10 minutes</h2>
-      <p>Pas d'inscription requise. Vos donnees contribuent anonymement a une etude prospective de recherche.</p>
+      <h2>Votre parcours en 6 etapes</h2>
+      <p>Un processus en deux phases pour un bilan metabolique complet, encadre par votre medecin. Vos donnees contribuent anonymement a une etude prospective.</p>
     </div>
-    <div class="steps-container">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>Vos infos de base</h3>
-        <p>Age, taille, poids, origine&hellip; Des questions simples pour commencer.</p>
-        <span class="step-time"><i class="fas fa-clock"></i> 2 min</span>
+
+    <!-- PHASE 1 -->
+    <div class="phase-label phase-1"><i class="fas fa-clipboard-list"></i> Phase 1 &mdash; Questionnaire &amp; prescription</div>
+    <div class="journey">
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num">1</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--primary)"><i class="fas fa-user"></i></span> Questionnaire en ligne</h3>
+          <p>Vous remplissez le questionnaire COMPASS : informations de base (age, taille, poids, origine), antecedents familiaux, mode de vie (alimentation, activite physique, sommeil, stress), environnement et situation professionnelle.</p>
+          <span class="step-tag tag-time"><i class="fas fa-clock"></i> ~10 minutes</span>
+          <div class="highlight-box"><i class="fas fa-chart-bar"></i> A l'issue de cette etape, COMPASS genere un <strong>premier score declaratif</strong> (score sD) base sur vos reponses, avec une classification preliminaire de votre profil de risque.</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>Votre mode de vie</h3>
-        <p>Alimentation, activite physique, sommeil, travail, stress au quotidien.</p>
-        <span class="step-time"><i class="fas fa-clock"></i> 4 min</span>
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num clr-teal">2</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--teal)"><i class="fas fa-user-doctor"></i></span> Consultation medicale &amp; prescription</h3>
+          <p>Vous consultez votre medecin avec votre premier bilan COMPASS. Sur cette base, le medecin evalue la pertinence d'un bilan biologique et vous prescrit les analyses de sang adaptees a votre profil (bilan lipidique, glycemie, HbA1c, CRP, bilan hepatique&hellip;).</p>
+          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> Avec votre medecin</span>
+          <div class="highlight-box"><i class="fas fa-lightbulb"></i> Le medecin peut orienter la prescription en fonction de votre score preliminaire : un profil a risque eleve peut justifier un bilan biologique plus complet (jusqu'a 15 marqueurs).</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>Biologie (recommande)</h3>
-        <p>Pas obligatoire, mais vos analyses de sang permettent de detecter des risques invisibles (insulinoresistance, inflammation&hellip;).</p>
-        <span class="step-time"><i class="fas fa-clock"></i> 3 min</span>
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num clr-green">3</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--green)"><i class="fas fa-vial"></i></span> Prise de sang &amp; resultats</h3>
+          <p>Vous effectuez la prise de sang en laboratoire. A la reception des resultats, vous les saisissez dans COMPASS. L'algorithme integre alors jusqu'a <strong>15 biomarqueurs</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, transaminases&hellip;) pour reveler des desequilibres invisibles sans biologie.</p>
+          <span class="step-tag tag-lab"><i class="fas fa-flask"></i> Laboratoire d'analyses</span>
+          <div class="highlight-box"><i class="fas fa-triangle-exclamation"></i> <strong>Pourquoi c'est important :</strong> l'insulinoresistance, l'inflammation chronique de bas grade et les dyslipidemies ne provoquent souvent <strong>aucun symptome</strong>. Seule la biologie peut les detecter.</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h3>Votre rapport</h3>
-        <p>Score global, profil de risque, conseils personnalises et rapport IA complet.</p>
-        <span class="step-time"><i class="fas fa-bolt"></i> Instantane</span>
+    </div>
+
+    <!-- PHASE DIVIDER -->
+    <div class="phase-divider">
+      <div class="divider-icon"><i class="fas fa-arrows-rotate"></i></div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase-label phase-2"><i class="fas fa-chart-line"></i> Phase 2 &mdash; Analyse complete &amp; restitution</div>
+    <div class="journey">
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num clr-orange">4</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--orange)"><i class="fas fa-microchip"></i></span> Analyse COMPASS complete</h3>
+          <p>L'algorithme recalcule votre score final en integrant la biologie au questionnaire : score global sf/100, classification de risque, profil de reponse GLP-1, module bariatrique (si indique) et projection Markov a 10 ans.</p>
+          <span class="step-tag tag-ai"><i class="fas fa-robot"></i> Traitement automatique</span>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num clr-purple">5</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--purple)"><i class="fas fa-file-medical"></i></span> Rapport IA personnalise</h3>
+          <p>COMPASS genere un rapport strategique complet, redige par intelligence artificielle en langage clair. Il inclut votre score, votre profil detaille, les points d'alerte et des recommandations personnalisees adaptees a votre situation clinique.</p>
+          <span class="step-tag tag-ai"><i class="fas fa-sparkles"></i> Generation IA</span>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-left">
+          <div class="tl-num clr-blue">6</div>
+        </div>
+        <div class="tl-content">
+          <h3><span class="step-icon" style="color:var(--blue)"><i class="fas fa-handshake"></i></span> Restitution avec votre medecin</h3>
+          <p>Vous revenez chez votre medecin avec le rapport COMPASS complet. Il valide les resultats, discute des axes de prise en charge (modifications du mode de vie, traitements, orientation specialisee) et definit avec vous une strategie personnalisee.</p>
+          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> Avec votre medecin</span>
+          <div class="highlight-box"><i class="fas fa-circle-check" style="color:var(--green)"></i> Le rapport COMPASS est concu pour faciliter le dialogue avec votre medecin : langage clair, donnees sourcees, recommandations argumentees.</div>
+        </div>
       </div>
     </div>
   </div>
