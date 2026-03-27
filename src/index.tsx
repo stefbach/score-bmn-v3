@@ -13,7 +13,7 @@ app.get('/api/geo/search', async (c) => {
   if (!q) return c.json({ error: 'Missing q parameter' }, 400)
   try {
     const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&accept-language=fr`, {
-      headers: { 'User-Agent': 'ScoreBMN/2.0 (health-assessment-tool)' }
+      headers: { 'User-Agent': 'COMPASS/3.5 (health-assessment-tool)' }
     })
     const data: any = await r.json()
     if (data.length) {
@@ -37,7 +37,7 @@ app.get('/api/geo/reverse', async (c) => {
   if (!lat || !lon) return c.json({ error: 'Missing lat/lon' }, 400)
   try {
     const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr`, {
-      headers: { 'User-Agent': 'ScoreBMN/2.0 (health-assessment-tool)' }
+      headers: { 'User-Agent': 'COMPASS/3.5 (health-assessment-tool)' }
     })
     const d: any = await r.json()
     return c.json({
@@ -116,7 +116,7 @@ app.post('/api/ai/analyze', async (c) => {
     const { profile, question } = body
 
     const systemPrompt = `Tu es un assistant medical expert en obesite, metabolisme et medecine preventive.
-Tu analyses le profil d'un patient dans le cadre du Score BMN v3.4 (Bach-Manos-Noel).
+Tu analyses le profil d'un patient dans le cadre de COMPASS v3.5 (Comprehensive Metabolic Profiling & Stratification System — Bach-Manos-Noel).
 Ton role:
 1. Adapter les questions du questionnaire au profil du patient
 2. Expliquer en langage simple les resultats et risques
@@ -197,7 +197,7 @@ app.post('/api/ai/interpret', async (c) => {
     const { scores, profile } = body
 
     const systemPrompt = `Tu es un medecin expert en obesite et metabolisme.
-Tu interpretes les resultats du Score BMN v3.4 pour un patient.
+Tu interpretes les resultats de COMPASS v3.5 pour un patient.
 Donne une interpretation personnalisee, empathique et actionnable en francais.
 Si le patient a un score BTM v3.4 (Module Bariatrique), integre la recommandation therapeutique personnalisee (scoring matriciel, primaire, secondaire, delta normalise, confiance, BT-6 associations, contre-indications, parcours de soins).
 Si FNC est appliquee (zone != Z4), mentionne la normalisation climatique et son impact sur le score Exposome.
@@ -226,7 +226,7 @@ IMPORTANT: Reponds en JSON:
         system: systemPrompt,
         messages: [{
           role: 'user',
-          content: `Scores BMN: ${JSON.stringify(scores)}\nProfil complet: ${JSON.stringify(profile)}`
+          content: `Scores COMPASS: ${JSON.stringify(scores)}\nProfil complet: ${JSON.stringify(profile)}`
         }]
       })
     })
@@ -260,7 +260,7 @@ app.post('/api/ai/rapport', async (c) => {
 
     const systemPrompt = `Tu es un medecin expert en endocrinologie, obesite et metabolisme, specialise dans la medecine de precision et l'aide a la decision clinique.
 
-Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats du Score BMN v3.4 (architecture CLEO + BTM v2.0 + FNC v1.0).
+Tu rediges un RAPPORT STRATEGIQUE COMPLET a destination du medecin traitant, base sur les resultats de COMPASS v3.5 (Comprehensive Metabolic Profiling & Stratification System — architecture CLEO + BTM v2.0 + FNC v1.0).
 
 CONTEXTE ALGORITHMIQUE:
 - Score sf = wDecl × sD + wBio × bioNorm (0-100)
@@ -401,14 +401,14 @@ Redige le rapport strategique complet.`
   }
 })
 
-// ─── Dossier Algorithme BMN ───
+// ─── Dossier Algorithme COMPASS ───
 app.get('/dossier', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER ALGORITHME — SCORE BMN v3.4</title>
+<title>DOSSIER ALGORITHME — COMPASS v3.5</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -460,12 +460,12 @@ tr:hover{background:rgba(129,140,248,.05)}
 
 <div class="hero">
   <h1>DOSSIER COMPLET</h1>
-  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME SCORE BMN v3.4</h1>
+  <h1 style="font-size:24px;border:none;margin-top:4px">ALGORITHME COMPASS v3.5</h1>
   <div class="sub">Architecture CLEO (C + E + O + L) + Integration Biologique BSD v4.9</div>
   <div class="ver">Auteurs : Bach | Manos | Noel — Version 3.1 — Verrouille le 2 mars 2026</div>
   <div style="margin-top:14px">
     <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
-    <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
+    <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour COMPASS</a>
   </div>
 </div>
 
@@ -509,7 +509,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <!-- 1. VUE D'ENSEMBLE -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s1">1. Vue d'ensemble</h2>
-<p>Le <strong>Score BMN v3.4</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
+<p>Le <strong>Score COMPASS v3.5</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
 <ul style="margin:8px 0 8px 20px;font-size:13px;color:var(--dim)">
   <li><strong>Donnees declaratives</strong> du patient (cliniques, mode de vie, psychometriques)</li>
   <li><strong>Donnees biologiques</strong> (15 biomarqueurs avec z-scores ponderes)</li>
@@ -611,7 +611,7 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <!-- 4. COMORBIDITES -->
 <!-- ═══════════════════════════════════════════ -->
 <h2 id="s4">4. Comorbidites (13 declaratives + IR occulte auto-detectee)</h2>
-<p><strong>Sources :</strong> ADA 2024, IDF MetS, DPP. Score BMN-K = somme des points, cap <strong>50</strong>.</p>
+<p><strong>Sources :</strong> ADA 2024, IDF MetS, DPP. Score COMPASS-K = somme des points, cap <strong>50</strong>.</p>
 
 <h3>Maladies etablies</h3>
 <table>
@@ -631,7 +631,7 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <table>
 <tr><th>ID</th><th>Nom</th><th>Pts</th><th>Evidence</th><th>Description</th><th>ca</th><th>gr</th><th>Fav</th></tr>
 <tr><td><code>monw</code></td><td>Phenotype MONW</td><td><b>10</b></td><td>OR 2.38</td><td>IMC &lt; 25 mais 2+ criteres MetS</td><td>1.1</td><td>0.70</td><td><span class="badge g">Oui</span></td></tr>
-<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td><code>ir_occ</code></td><td>IR occulte <b>(AUTO)</b></td><td><b>8</b></td><td>OR 2.12</td><td>⚠ Non declarable. Detection automatique si TG/HDL &gt; 3.5 dans la biologie. +8 pts BMN-K injectes automatiquement.</td><td>1.2</td><td>0.55</td><td><span class="badge g">Auto</span></td></tr>
+<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td><code>ir_occ</code></td><td>IR occulte <b>(AUTO)</b></td><td><b>8</b></td><td>OR 2.12</td><td>⚠ Non declarable. Detection automatique si TG/HDL &gt; 3.5 dans la biologie. +8 pts COMPASS-K injectes automatiquement.</td><td>1.2</td><td>0.55</td><td><span class="badge g">Auto</span></td></tr>
 </table>
 
 <h3>Traitements aggravants</h3>
@@ -1001,7 +1001,7 @@ Si gap &gt; 20 : extraW = min(0.30, (gap-20)/100*0.60)
 <tr><td>HOMA-IR biologique</td><td>&ge; 2.5</td><td>+2</td><td>Biologie</td></tr>
 <tr><td>DT2 declare (proxy)</td><td>Oui</td><td>+3</td><td>Declaratif</td></tr>
 <tr><td>Pre-diabete / MetS (proxy)</td><td>Oui</td><td>+2 / +2</td><td>Declaratif</td></tr>
-<tr style="background:rgba(239,68,68,.08)"><td>IR occulte (auto-detectee)</td><td>TG/HDL &gt; 3.5</td><td>+8 pts BMN-K auto + irScore via bio</td><td>Biologie (v3.1.1)</td></tr>
+<tr style="background:rgba(239,68,68,.08)"><td>IR occulte (auto-detectee)</td><td>TG/HDL &gt; 3.5</td><td>+8 pts COMPASS-K auto + irScore via bio</td><td>Biologie (v3.1.1)</td></tr>
 <tr><td>Adiponectine basse</td><td>&lt; 6 ug/mL</td><td>+1.5</td><td>Biologie</td></tr>
 <tr><td>TG/HDL eleve</td><td>&gt; 3.5</td><td>+1.5</td><td>Biologie</td></tr>
 <tr><td>SOPK</td><td>Oui</td><td>+1</td><td>Declaratif</td></tr>
@@ -1493,7 +1493,7 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 <h2 style="margin:0 0 14px;border:none;background:none;padding:0;color:var(--teal)">SYNTHESE — Formules Cles Verrouillees</h2>
 <pre>
 +----------------------------------------------------------------+
-|                    SCORE BMN v3.4 --- FORMULES                  |
+|                    SCORE COMPASS v3.5 --- FORMULES                  |
 +----------------------------------------------------------------+
 |                                                                 |
 |  sD = min(100, C + E + O + L)                                  |
@@ -1544,13 +1544,13 @@ SI cti >= 55 → note: chirurgie prioritaire si eligible
 </div>
 
 <div style="text-align:center;margin:40px 0;padding:20px;border-top:2px solid var(--border2)">
-  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME SCORE BMN v3.4</p>
+  <p style="font-size:14px;font-weight:700;color:var(--accent)">FIN DU DOSSIER &mdash; ALGORITHME COMPASS v3.5</p>
   <p style="font-size:12px;color:var(--dim)">Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</p>
   <p style="font-size:12px;color:var(--dim2)">Bach | Manos | Noel &mdash; 4 Mars 2026</p>
   <p style="font-size:11px;color:var(--dim3)">29 sections | 20 ecrans | 13 comorbidites + IR auto | BES-16 | 62 etudes BTM | 10 MOD | FNC 6 zones | 12 profils ethniques</p>
   <div style="margin-top:14px">
     <button class="print-btn" onclick="window.print()">Imprimer / PDF</button>
-    <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour Score BMN</a>
+    <a href="/" class="print-btn" style="text-decoration:none;background:var(--teal)">Retour COMPASS</a>
     <a href="#top" class="print-btn" style="text-decoration:none;background:var(--dim3)">Haut de page</a>
   </div>
 </div>
@@ -1567,7 +1567,7 @@ app.get('/dossier-scientifique', (c) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSSIER SCIENTIFIQUE — SCORE BMN v3.4 — Méta-analyse & Justification bibliographique</title>
+<title>DOSSIER SCIENTIFIQUE — COMPASS v3.5 — Méta-analyse & Justification bibliographique</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1602,7 +1602,7 @@ tr:nth-child(even){background:var(--bg2)}
 
 <div style="text-align:center;padding:30px 0 20px">
   <div style="font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:2px">Document scientifique confidentiel</div>
-  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">SCORE BMN v3.4</div>
+  <div style="font-size:36px;font-weight:900;color:var(--accent);margin:10px 0">COMPASS v3.5</div>
   <div style="font-size:18px;color:var(--cyan);font-weight:600">Dossier Scientifique Complet</div>
   <div style="font-size:14px;color:var(--dim);margin:8px 0">Méta-analyse, justification bibliographique & validation du modèle</div>
   <div style="font-size:12px;color:var(--dim2);margin-top:12px">Architecture CLEO (C+E+O+L) + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0</div>
@@ -1643,7 +1643,7 @@ tr:nth-child(even){background:var(--bg2)}
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s1">I. Résumé exécutif & objectifs</h1>
 
-<p>Le <b>SCORE BMN v3.4</b> (Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
+<p>Le <b>COMPASS v3.5</b> (Comprehensive Metabolic Profiling & Stratification System — Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
 
 <h3>Objectifs du modèle</h3>
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
@@ -1665,7 +1665,7 @@ Classification : FAIBLE (&lt;30) | MODÉRÉ (30-59) | ÉLEVÉ (60-79) | TRÈS É
 <h1 id="s2">II. Méthodologie de construction du modèle</h1>
 
 <h3>2.1 Stratégie de recherche bibliographique</h3>
-<p>La construction du SCORE BMN v3.4 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
+<p>La construction de COMPASS v3.5 repose sur une revue systématique de la littérature menée entre 2023 et 2026, suivant les directives PRISMA 2020. Les bases de données consultées incluent PubMed/MEDLINE, Cochrane Library, Embase, et Google Scholar.</p>
 
 <h4>Critères d'inclusion</h4>
 <p>• Études de cohorte prospectives (n ≥ 1 000 participants) • Méta-analyses et revues systématiques Cochrane • Essais contrôlés randomisés (ECR) de phase III pour les données pharmacologiques • Guidelines internationales (OMS, IDF, ADA, ESC/EAS) • Données de registres nationaux (NHANES, UK Biobank, Framingham Heart Study)</p>
@@ -1707,11 +1707,11 @@ Hypothyroïdie : OR 1.74 → β = 0.554 → 6 pts
 <tr><td>CMDS Score</td><td>Risque cardiométabolique</td><td>IMC, TT, TG, HDL, glycémie, PA</td><td>Pas d'exposome, pas de psychométrie, pas d'ethnie détaillée</td><td>Guo et al. 2014</td></tr>
 </table>
 
-<p><b>Justification du SCORE BMN :</b> Aucun score existant ne combine simultanément (1) les biomarqueurs d'insulinorésistance, (2) l'exposome environnemental temps réel, (3) la psychométrie validée (PSS-10 + PHQ-9 + BES), (4) le phénotypage GLP-1, (5) la projection Markov, et (6) les seuils ethniques IDF. Le SCORE BMN comble ce vide en intégrant ces 6 dimensions dans un modèle unique.</p>
+<p><b>Justification de COMPASS :</b> Aucun score existant ne combine simultanément (1) les biomarqueurs d'insulinorésistance, (2) l'exposome environnemental temps réel, (3) la psychométrie validée (PSS-10 + PHQ-9 + BES), (4) le phénotypage GLP-1, (5) la projection Markov, et (6) les seuils ethniques IDF. Le COMPASS comble ce vide en intégrant ces 6 dimensions dans un modèle unique.</p>
 
 <h3>3.2 Méta-analyses fondatrices utilisées</h3>
 <table>
-<tr><th>Méta-analyse</th><th>n (participants)</th><th>Résultat clé pour BMN</th><th>Impact sur le modèle</th></tr>
+<tr><th>Méta-analyse</th><th>n (participants)</th><th>Résultat clé pour COMPASS</th><th>Impact sur le modèle</th></tr>
 <tr><td>CTT Collaboration 2010</td><td>170 000</td><td>Réduction LDL de 1 mmol/L → -22% événements CV</td><td>Poids LDL w=1.8</td></tr>
 <tr><td>ERFC 2010 (Emerging Risk Factors)</td><td>1 200 000</td><td>CRP : HR 1.37/log, HbA1c : HR 1.15/0.1%, TG : HR 1.22/SD</td><td>Poids CRP w=2.0, HbA1c w=2.0</td></tr>
 <tr><td>CKD-PC 2010</td><td>1 000 000</td><td>eGFR &lt; 60 : HR 1.56 mortalité toutes causes</td><td>Inclusion créatinine dans P10</td></tr>
@@ -1772,14 +1772,14 @@ Justification des plages :<br>
 </table>
 
 <h4>WHtR — Waist-to-Height Ratio (0-3 pts bonus)</h4>
-<p>Le WHtR est supérieur à l'IMC pour prédire le risque cardiométabolique (Ashwell & Hsieh 2005, méta-analyse n=300 000). Seuil universel ≥ 0.50 validé toutes ethnies (Browning et al., Obes Rev 2010). Le SCORE BMN attribue : WHtR ≥ 0.50 = +1, ≥ 0.55 = +2, ≥ 0.60 = +3.</p>
+<p>Le WHtR est supérieur à l'IMC pour prédire le risque cardiométabolique (Ashwell & Hsieh 2005, méta-analyse n=300 000). Seuil universel ≥ 0.50 validé toutes ethnies (Browning et al., Obes Rev 2010). Le COMPASS attribue : WHtR ≥ 0.50 = +1, ≥ 0.55 = +2, ≥ 0.60 = +3.</p>
 <p class="ref">Ashwell M, Hsieh SD. Six reasons why the waist-to-height ratio is a rapid and effective global indicator for health risks of obesity. Int J Food Sci Nutr 2005;56:303-7. | Browning LM et al. A systematic review of waist-to-height ratio as a screening tool. Obes Rev 2010;11:67-75.</p>
 
 <h4>Tour de taille (0-2 pts additionnel)</h4>
 <p>Seuils IDF 2006 spécifiques par ethnie et sexe. Dépassement du seuil = +1 pt, dépassement &gt;10 cm = +2 pts. L'obésité abdominale est le meilleur prédicteur de la résistance à l'insuline (Després 2012, Nature).</p>
 
 <h3>5.4 Sous-score c4 — Comorbidités projetées (0-10 pts)</h3>
-<p>Projection du score BMN-K (0-50, somme pondérée des 13 comorbidités déclaratives + IR occulte auto-détectée) sur une échelle 0-10 avec modulation ethnique pour l'HTA (multiplicateur hR) et le diabète (multiplicateur dR). v3.1 : inclut la dyslipidémie avec 3 sous-types et interaction MetS (+3). v3.1.1 : IR occulte retirée du déclaratif → détection automatique via TG/HDL > 3.5 (+8 pts BMN-K). Voir section X et XXIII pour le détail.</p>
+<p>Projection du score COMPASS-K (0-50, somme pondérée des 13 comorbidités déclaratives + IR occulte auto-détectée) sur une échelle 0-10 avec modulation ethnique pour l'HTA (multiplicateur hR) et le diabète (multiplicateur dR). v3.1 : inclut la dyslipidémie avec 3 sous-types et interaction MetS (+3). v3.1.1 : IR occulte retirée du déclaratif → détection automatique via TG/HDL > 3.5 (+8 pts COMPASS-K). Voir section X et XXIII pour le détail.</p>
 
 <h3>5.5 Sous-score c5 — Antécédents familiaux & génétique (0-10 pts)</h3>
 <table>
@@ -1795,7 +1795,7 @@ Justification des plages :<br>
 <p>Modulation ethnique : si cvRisk ethnique &gt; 1.2, amplification de c5 par (1 + (cR-1)×0.3). Justification : les populations à risque CV élevé (sud-asiatiques, cR=1.5) cumulent prédisposition génétique et facteurs environnementaux (Yusuf et al., INTERHEART 2004).</p>
 
 <h3>5.6 Sous-score c6 — Tabac (0-8 pts)</h3>
-<p>Le tabagisme augmente le risque d'obésité abdominale par redistribution adipeuse (OR 1.35, méta-analyse Morris et al., BMC Public Health 2015) et l'arrêt du tabac s'accompagne d'une prise de poids moyenne de +4.7 kg à 12 mois (Aubin et al., BMJ 2012, méta-analyse n=62 études). Le SCORE BMN attribue : jamais=0, ex >1an=1, ex récent=2 (risque résiduel de prise de poids), &lt;10 cig/j=4, ≥10 cig/j=8.</p>
+<p>Le tabagisme augmente le risque d'obésité abdominale par redistribution adipeuse (OR 1.35, méta-analyse Morris et al., BMC Public Health 2015) et l'arrêt du tabac s'accompagne d'une prise de poids moyenne de +4.7 kg à 12 mois (Aubin et al., BMJ 2012, méta-analyse n=62 études). Le COMPASS attribue : jamais=0, ex >1an=1, ex récent=2 (risque résiduel de prise de poids), &lt;10 cig/j=4, ≥10 cig/j=8.</p>
 
 <h3>5.7 Sous-score c7 — Santé mentale : PSS-10 + PHQ-9 + BES (0-8 pts)</h3>
 <p>Le stress chronique (PSS-10) augmente le cortisol plasmatique, favorisant l'adipogenèse viscérale (Björntorp 2001, Obes Rev). La dépression (PHQ-9) est bidirectionnellement associée à l'obésité (Luppino et al., Arch Gen Psychiatry 2010, méta-analyse : OR 1.55 obésité→dépression, OR 1.58 dépression→obésité). L'hyperphagie boulimique (BES) touche 20-30% des patients obèses (Hudson et al., Biol Psychiatry 2007).</p>
@@ -1874,7 +1874,7 @@ de l'exposome. Les particules fines aggravent un terrain inflammatoire préexist
 <h3>8.1 l1 — Activité physique IPAQ (0-3)</h3>
 <p>Référence OMS 2020 : ≥150 min/sem d'activité modérée. Le DPP (2002) a démontré une réduction de 58% de l'incidence du DT2 avec 150 min/sem + perte de poids 7%. Scoring : ≥150=0, 75-149=1, 30-74=2, &lt;30=3.</p>
 
-<h3>8.2 l2 — Alimentation DQI-BMN → PREDIMED-equiv (0-3)</h3>
+<h3>8.2 l2 — Alimentation DQI-COMPASS → PREDIMED-equiv (0-3)</h3>
 <p>10 items nutritionnels cotés 0-4 chacun (ultra-transformés, boissons sucrées, sucres ajoutés, fruits/légumes, portions, structure repas, grignotage, fast-food, cuisine maison, eau). Score brut 0-39 inversé en équivalent PREDIMED 0-14. PREDIMED : régime méditerranéen -30% événements CV (Estruch et al., NEJM 2013, n=7 447).</p>
 
 <h3>8.3 l3 — Alcool AUDIT-C (0-2)</h3>
@@ -1921,7 +1921,7 @@ de l'exposome. Les particules fines aggravent un terrain inflammatoire préexist
 <tr><td>nafld</td><td>NAFLD</td><td>10</td><td>OR 3.22</td><td>Younossi et al., Hepatology 2016</td><td>8 500 000</td><td>dis</td><td>1</td><td>IR hépatique. Prévalence 25% mondiale. GLP-1 réduit stéatose -30/40% (Newsome 2021).</td></tr>
 <tr><td>monw</td><td>Phénotype MONW</td><td>10</td><td>OR 2.38</td><td>Stefan et al., Lancet Diab Endocrinol 2017</td><td>15 études</td><td>phe</td><td>1</td><td>IMC &lt; 25 mais ≥2 critères MetS. Risque sous-estimé. Sensibilité du modèle ++.</td></tr>
 <tr><td>predmt</td><td>Pré-diabète</td><td>8</td><td>HR 2.11</td><td>Huang et al., BMJ 2016</td><td>1 611 339</td><td>dis</td><td>1</td><td>HbA1c 5.7-6.4%. Réversible. GLP-1 prévient DT2 (réduction 80%, STEP 2).</td></tr>
-<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td>ir_occ</td><td>IR occulte <b>(AUTO v3.1.1)</b></td><td>8</td><td>OR 2.12</td><td>McLaughlin et al., Circulation 2005</td><td>n=490</td><td>bio-auto</td><td>1</td><td><b>v3.1.1 : Retirée du déclaratif</b> — le patient ne peut pas savoir qu'il a une IR occulte. Détection automatique via TG/HDL > 3.5 dans le module biologique. +8 pts BMN-K injectés automatiquement, CTI ca ×1.2, GRI +0.55.</td></tr>
+<tr style="background:rgba(239,68,68,.08);border:1px dashed var(--red)"><td>ir_occ</td><td>IR occulte <b>(AUTO v3.1.1)</b></td><td>8</td><td>OR 2.12</td><td>McLaughlin et al., Circulation 2005</td><td>n=490</td><td>bio-auto</td><td>1</td><td><b>v3.1.1 : Retirée du déclaratif</b> — le patient ne peut pas savoir qu'il a une IR occulte. Détection automatique via TG/HDL > 3.5 dans le module biologique. +8 pts COMPASS-K injectés automatiquement, CTI ca ×1.2, GRI +0.55.</td></tr>
 <tr><td>cortis</td><td>Corticoïdes >3 mois</td><td>8</td><td>HR 2.12</td><td>Fardet et al., J Clin Endocrinol Metab 2007</td><td>6 500</td><td>tx</td><td>0</td><td>Adipogenèse viscérale iatrogène. gr = -0.35 (antagonise GLP-1).</td></tr>
 <tr><td>hypo</td><td>Hypothyroïdie</td><td>6</td><td>OR 1.74</td><td>Laurberg et al., Eur Thyroid J 2012</td><td>34 000</td><td>dis</td><td>0</td><td>TSH>4 → métabolisme ralenti -10/15%. À corriger AVANT GLP-1.</td></tr>
 <tr><td>depres</td><td>Dépression traitée</td><td>6</td><td>OR 1.92</td><td>Luppino et al., Arch Gen Psychiatry 2010</td><td>58 745</td><td>tx</td><td>0</td><td>Impact métabolique bidirectionnel. Compliance réduite.</td></tr>
@@ -2034,7 +2034,7 @@ PLANCHERS DE SÉCURITÉ (sensibilité maximale) :<br>
      HbA1c ≥ 8.0% → sf ≥ 70 (diabète mal contrôlé)
 </div>
 
-<p><b>Justification des planchers :</b> Ces garde-fous garantissent que le modèle ne sous-estime JAMAIS un risque biologique avéré, même si le patient déclare peu de symptômes comportementaux. C'est le cœur de la philosophie de sensibilité du SCORE BMN : un HbA1c à 7.5% DOIT classer le patient au minimum en MODÉRÉ-ÉLEVÉ, indépendamment de son score déclaratif.</p>
+<p><b>Justification des planchers :</b> Ces garde-fous garantissent que le modèle ne sous-estime JAMAIS un risque biologique avéré, même si le patient déclare peu de symptômes comportementaux. C'est le cœur de la philosophie de sensibilité du COMPASS : un HbA1c à 7.5% DOIT classer le patient au minimum en MODÉRÉ-ÉLEVÉ, indépendamment de son score déclaratif.</p>
 
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s15">XV. Sous-Index Inflammatoire Indirect (SII) — 7 critères</h1>
@@ -2175,7 +2175,7 @@ PPE = max(0, min(25, PPE_base + Σ modulations))
 <div class="formula">
 rf = exp(0.68 × sf/100) × exp(0.35 × K_norm/100)<br>
 <br>
-K_norm = (BMN-K / 50) × 100<br>
+K_norm = (COMPASS-K / 50) × 100<br>
 cm = max(MK_CM[comorbidité]) — multiplicateur comorbidité spécifique<br>
 MK_CM = {dt2: 1.4, sopk: 1.3, saos: 1.25, mets: 1.5}<br>
 <br>
@@ -2215,7 +2215,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
 
 <p><b>1. Biais de déclaration :</b> Le score déclaratif (65% du poids) repose sur l'auto-évaluation du patient. Les patients sous-estiment typiquement leur consommation alimentaire (-30%, Lichtman et al., NEJM 1992) et surestiment leur activité physique (+50%, Troiano et al., Med Sci Sports Exerc 2008). <b>Atténuation :</b> la biologie (35% du poids) et les planchers de sécurité corrigent partiellement ce biais.</p>
 
-<p><b>2. Absence de validation prospective :</b> Le SCORE BMN n'a pas encore été validé dans une cohorte prospective indépendante. Les poids sont dérivés de méta-analyses publiées, pas d'une régression sur données propres. <b>Atténuation :</b> utilisation de méta-analyses de très grande taille (>100 000 participants pour la majorité des HR/OR).</p>
+<p><b>2. Absence de validation prospective :</b> COMPASS n'a pas encore été validé dans une cohorte prospective indépendante. Les poids sont dérivés de méta-analyses publiées, pas d'une régression sur données propres. <b>Atténuation :</b> utilisation de méta-analyses de très grande taille (>100 000 participants pour la majorité des HR/OR).</p>
 
 <p><b>3. Extrapolation inter-ethnique :</b> Les multiplicateurs ethniques sont dérivés principalement de données mauriciennes (Mauritius NCD Survey) et de cohortes asiatiques (JPHC, Shanghai Health Study). Leur applicabilité à d'autres contextes géographiques nécessite une validation locale.</p>
 
@@ -2330,7 +2330,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
 </p>
 
 <div style="margin-top:30px;padding:20px;background:var(--bg2);border:2px solid var(--accent);border-radius:14px">
-  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — SCORE BMN v3.4</div>
+  <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:8px">FORMULES VERROUILLÉES — COMPASS v3.5</div>
   <div style="font-family:var(--mono);font-size:12px;color:var(--cyan);line-height:2">
     sD = min(100, C + E + O + L)<br>
     C = min(50, round((c1+c2+c3+c4+c5+c6+c7+c8) × (1+ev/100)))<br>
@@ -2376,7 +2376,7 @@ P(obésité à 10 ans) = (prob[4] + prob[5]) × 100
 
 <h3>23.3 Trois phénotypes distingués</h3>
 <table>
-<tr><th>Phénotype</th><th>Critères</th><th>Points BMN-K</th><th>GRI</th><th>CTI ca</th><th>Pertinence clinique</th></tr>
+<tr><th>Phénotype</th><th>Critères</th><th>Points COMPASS-K</th><th>GRI</th><th>CTI ca</th><th>Pertinence clinique</th></tr>
 <tr><td>Dyslipidémie mixte</td><td>TG ≥ 1.7 ET HDL bas</td><td>10</td><td>+0.55</td><td>×1.15</td><td>Phénotype IR fort — excellent répondeur GLP-1</td></tr>
 <tr><td>Hypercholestérolémie isolée</td><td>LDL ≥ 4.1 mmol/L</td><td>6</td><td>+0.20</td><td>×1.05</td><td>Risque CV — moins lié à l'IR métabolique</td></tr>
 <tr><td>Dyslipidémie traitée (statines)</td><td>LDL "normal" sous traitement</td><td>8</td><td>+0.35</td><td>×1.10</td><td>Flag statines → correction LDL × 1.35</td></tr>
@@ -2424,7 +2424,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 </div>
 
 <h3>24.1 Rationale — Lacunes v3.1</h3>
-<p>Le Score BMN v3.1 était limité aux GLP-1 (profils R1-R5). Aucune matrice profil×technique bariatrique. Aucun arbre décisionnel intégrant ballon, endosleeve, chirurgie et associations. Le Module BTM corrige ces lacunes.</p>
+<p>Le Score COMPASS v3.1 était limité aux GLP-1 (profils R1-R5). Aucune matrice profil×technique bariatrique. Aucun arbre décisionnel intégrant ballon, endosleeve, chirurgie et associations. Le Module BTM corrige ces lacunes.</p>
 
 <h3>24.2 Six techniques évaluées</h3>
 <table>
@@ -2601,7 +2601,7 @@ Source : Sniderman 2019, ESC Guidelines 2021
 </div>
 
 <div style="margin-top:30px;text-align:center;font-size:11px;color:var(--dim3)">
-  Document confidentiel — SCORE BMN v3.4 — Bach · Manos · Noël — 4 mars 2026<br>
+  Document confidentiel — COMPASS v3.5 — Bach · Manos · Noël — 4 mars 2026<br>
   93+ références + 62 études BTM | 25 sections | Architecture CLEO + BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0<br>
   v3.4 : +10 MOD BTM · +FNC Köppen (6 zones) · +MultCV · Profils ethniques 12 groupes<br>
   Usage médical restreint — Ne pas diffuser sans autorisation
@@ -2872,7 +2872,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     <div class="compass-icon"><i class="fas fa-compass"></i></div>
     <div>
       <div class="logo-text">COMPASS</div>
-      <div class="logo-sub">Bilan metabolique</div>
+      <div class="logo-sub">Comprehensive Metabolic Profiling &amp; Stratification System</div>
     </div>
   </a>
   <div class="nav-links">
@@ -2889,6 +2889,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <section class="hero">
   <div class="hero-badge"><i class="fas fa-flask-vial"></i> Etude prospective &mdash; Ile Maurice</div>
   <h1>Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</h1>
+  <p style="font-size:13px;font-weight:600;color:var(--dim2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Comprehensive Metabolic Profiling &amp; Stratification System</p>
   <p class="hero-sub">A Maurice, pres d'<strong>1 adulte sur 4</strong> est diabetique et l'obesite progresse dans toutes les communautes. COMPASS est le premier outil adapte a la realite mauricienne : votre origine, votre environnement tropical, votre mode de vie &mdash; un bilan personnalise avec des pistes d'action concretes.</p>
   <div class="hero-btns">
     <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan</a>
