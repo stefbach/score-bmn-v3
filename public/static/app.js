@@ -74,7 +74,8 @@ const BTM_MATRIX={
   'ATCD_BALL' :{BT1:-2,BT2:2,BT3:2,BT4:2,BT5:2,BT6:2,cond:(v)=>v.atcdBallon},
   'REFUS_CHIR':{BT1:3,BT2:3,BT3:-5,BT4:-5,BT5:3,BT6:3,cond:(v)=>v.refusChir}
 };
-const BT_NAMES={BT1:'Ballon Gastrique',BT2:'Endosleeve (ESG)',BT3:'Sleeve Gastrectomie',BT4:'Bypass (RYGB)',BT5:'GLP-1 RA',BT6:'Association'};
+function BT_NAME(k){const m={BT1:'bt_ballon',BT2:'bt_esg',BT3:'bt_sleeve',BT4:'bt_bypass',BT5:'bt_glp1',BT6:'bt_assoc'};return t(m[k]||k);}
+const BT_NAMES=new Proxy({BT1:'Ballon Gastrique',BT2:'Endosleeve (ESG)',BT3:'Sleeve Gastrectomie',BT4:'Bypass (RYGB)',BT5:'GLP-1 RA',BT6:'Association'},{get:(_,k)=>BT_NAME(k)});
 
 // ─── BT-6 Sous-categories efficacite (§4b Dossier v3.4) ───
 const BT6_ASSOC=[
@@ -129,36 +130,33 @@ const BIO=[
 // ─── PSS-10 (Cohen, Kamarck & Mermelstein 1983) ───
 // 10 vrais items, cotes 0 (jamais) a 4 (tres souvent)
 // Items 4,5,7,8 sont INVERSES (score = 4 - reponse)
-const PSS10_ITEMS = [
-  {q: "Au cours du dernier mois, combien de fois avez-vous ete derange(e) par un evenement inattendu ?", inv: false, tip: "Pensez aux imprevu qui vous ont contrarie(e)"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous eu l'impression de ne pas pouvoir controler les choses importantes de votre vie ?", inv: false, tip: "Sentiment de perte de controle"},
-  {q: "Au cours du dernier mois, combien de fois vous etes-vous senti(e) nerveux(se) et stresse(e) ?", inv: false, tip: "Tension, nervosite au quotidien"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous senti que les choses allaient comme vous le vouliez ?", inv: true, tip: "Plus c'est souvent, mieux c'est"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous senti que vous faisiez face efficacement aux changements importants ?", inv: true, tip: "Capacite a gerer les changements"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous eu confiance en votre capacite a gerer vos problemes personnels ?", inv: true, tip: "Confiance en soi face aux difficultes"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous senti que les choses allaient dans le bon sens pour vous ?", inv: true, tip: "Sentiment que ca va bien"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous pense que vous ne pouviez pas assumer toutes les choses que vous deviez faire ?", inv: false, tip: "Submersion, trop de choses a gerer"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous ete capable de maitriser votre enervement ?", inv: true, tip: "Controle de la colere"},
-  {q: "Au cours du dernier mois, combien de fois avez-vous senti que les difficultes s'accumulaient tellement que vous ne pouviez les surmonter ?", inv: false, tip: "Sentiment d'etre deborde(e)"}
+function getPSS10(){return [
+  {q:t('pss_q1'),inv:false,tip:t('pss_tip1')},
+  {q:t('pss_q2'),inv:false,tip:t('pss_tip2')},
+  {q:t('pss_q3'),inv:false,tip:t('pss_tip3')},
+  {q:t('pss_q4'),inv:true,tip:t('pss_tip4')},
+  {q:t('pss_q5'),inv:true,tip:t('pss_tip5')},
+  {q:t('pss_q6'),inv:true,tip:t('pss_tip6')},
+  {q:t('pss_q7'),inv:true,tip:t('pss_tip7')},
+  {q:t('pss_q8'),inv:false,tip:t('pss_tip8')},
+  {q:t('pss_q9'),inv:true,tip:t('pss_tip9')},
+  {q:t('pss_q10'),inv:false,tip:t('pss_tip10')}
+];}
+const PSS10_ITEMS_STATIC = [
+  {inv:false},{inv:false},{inv:false},{inv:true},{inv:true},{inv:true},{inv:true},{inv:false},{inv:true},{inv:false}
 ];
-const PSS_LABELS = ['Jamais','Presque jamais','Parfois','Assez souvent','Tres souvent'];
+function PSS_LABELS_FN(){return [t('pss_0'),t('pss_1'),t('pss_2'),t('pss_3'),t('pss_4')];}
+const PSS_LABELS_STATIC = ['Jamais','Presque jamais','Parfois','Assez souvent','Tres souvent'];
 
 // ─── PHQ-9 (Kroenke, Spitzer & Williams 2001) ───
-const PHQ9_ITEMS = [
-  "Peu d'interet ou de plaisir a faire les choses",
-  "Etre triste, deprime(e) ou desespere(e)",
-  "Difficultes a s'endormir ou a rester endormi(e), ou dormir trop",
-  "Se sentir fatigue(e) ou manquer d'energie",
-  "Peu d'appetit ou manger trop",
-  "Avoir une mauvaise opinion de soi-meme, se sentir nul(le)",
-  "Difficultes a se concentrer (lire, regarder la TV)",
-  "Bouger ou parler tres lentement, ou etre agite(e)",
-  "Penser qu'il vaudrait mieux mourir ou se faire du mal"
-];
-const PHQ_LABELS = ['Jamais','Plusieurs jours','Plus de la moitie du temps','Presque tous les jours'];
+function getPHQ9(){return [t('phq_q1'),t('phq_q2'),t('phq_q3'),t('phq_q4'),t('phq_q5'),t('phq_q6'),t('phq_q7'),t('phq_q8'),t('phq_q9')];}
+const PHQ9_ITEMS_STATIC = ['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+function PHQ_LABELS_FN(){return [t('phq_0'),t('phq_1'),t('phq_2'),t('phq_3')];}
+const PHQ_LABELS_STATIC = ['Jamais','Plusieurs jours','Plus de la moitie du temps','Presque tous les jours'];
 
 // ─── Markov (NEJM 1995 Leibel, NEJM 2011 Sumithran) ───
-const MK_ST=['Poids normal','Surpoids leger','Surpoids installe','Surpoids eleve','Obesite moderee','Obesite severe'];
+function MK_ST_FN(){return [t('mk_normal'),t('mk_surp1'),t('mk_surp2'),t('mk_surp3'),t('mk_ob_mod'),t('mk_ob_sev')];}
+const MK_ST_STATIC=['Poids normal','Surpoids leger','Surpoids installe','Surpoids eleve','Obesite moderee','Obesite severe'];
 const MK_B=[[.82,.14,.03,.01,0,0],[.08,.68,.18,.05,.01,0],[.02,.11,.61,.21,.04,.01],[.01,.04,.14,.56,.21,.04],[0,.01,.03,.12,.65,.19],[0,0,.01,.03,.11,.85]];
 const MK_CM={dt2:1.4,sopk:1.3,saos:1.25,mets:1.5,dyslipi:1.15};
 const CTI_G={dur:.185,yoyo:.249,lep:.21,micro:.18,cort:.195,meta:.2,enf:.24};
@@ -250,7 +248,7 @@ let S={
 const $=id=>document.getElementById(id);
 const h=(el,html)=>{const e=typeof el==='string'?$(el):el;if(e)e.innerHTML=html;};
 function getAge(){if(!S.dob)return 0;const b=new Date(S.dob),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;return Math.max(0,a);}
-function getPssTotal(){let t=0;S.pss.forEach((v,i)=>{t+=PSS10_ITEMS[i].inv?(4-v):v;});return t;}
+function getPssTotal(){let s=0;PSS10_ITEMS_STATIC.forEach((item,i)=>{s+=item.inv?(4-S.pss[i]):S.pss[i];});return s;}
 function getPhqTotal(){return S.phq.reduce((a,b)=>a+b,0);}
 
 // ════════════════════════════════════════════════════════════════
@@ -615,40 +613,45 @@ function sld(label,key,val,min,max,step,unit,ref){
 const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
-    <div class="welc-logo">B</div>
+    <div class="welc-logo">C</div>
     <h1><b>COMPASS</b> v3.5</h1>
-    <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
+    <p class="welc-sub" style="font-size:12px;color:var(--dim2);margin:-8px 0 12px">Comprehensive Metabolic Profiling & Stratification System</p>
+    <p class="welc-desc">${t('welc_desc')}</p>
     <div class="welc-features">
-      <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
-      <div class="welc-feat"><span>GEO</span><span>Donnees en direct</span></div>
+      <div class="welc-feat"><span>IA</span><span>${t('welc_feat_ia')}</span></div>
+      <div class="welc-feat"><span>GEO</span><span>${t('welc_feat_geo')}</span></div>
       <div class="welc-feat"><span>CLEO</span><span>C+E+O+L = sD</span></div>
-      <div class="welc-feat"><span>15</span><span>Biomarqueurs</span></div>
+      <div class="welc-feat"><span>18</span><span>${t('welc_feat_bio')}</span></div>
     </div>
-    <button class="welc-go" onclick="go(1)">Commencer l'evaluation</button>
-    <div class="welc-refs">Ref. OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 | PSS-10 | ISI | BES | AUDIT-C | Lancet 2016 | SCORE2</div>
-    <div class="welc-disclaimer">Cet outil ne remplace pas une consultation medicale. Resultats a usage informatif uniquement.</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin:12px 0">
+      <button class="btn btn-sm${LANG==='fr'?' btn-p':''}" onclick="setLang('fr')" style="min-width:50px">FR</button>
+      <button class="btn btn-sm${LANG==='en'?' btn-p':''}" onclick="setLang('en')" style="min-width:50px">EN</button>
+    </div>
+    <button class="welc-go" onclick="go(1)">${t('start_eval')}</button>
+    <div class="welc-refs">Ref. WHO | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 | PSS-10 | ISI | BES | AUDIT-C | Lancet 2016 | SCORE2</div>
+    <div class="welc-disclaimer">${t('disclaimer')}</div>
   </div>`,
 
   // 1: DOB
   ()=>{const age=getAge();
     let ageRisk='';
-    if(age>=65)ageRisk='<div class="info-badge red">Plus de 65 ans: risque sarcopenique accru. Suivi renforce recommande.</div>';
-    else if(age>=45)ageRisk='<div class="info-badge orange">Plus de 45 ans: le risque metabolique augmente avec l\'age.</div>';
-    else if(age>0&&age<18)ageRisk='<div class="info-badge blue">Mineur: des seuils specifiques pediatriques s\'appliquent.</div>';
-    return `<div class="s-emoji">Date</div>
-    <div class="s-title">Votre date de naissance</div>
-    <div class="s-sub">L'age influence votre metabolisme de base et les seuils de risque. <span class="ref">OMS</span></div>
-    <div class="fc"><div class="fc-label">Date de naissance</div>
+    if(age>=65)ageRisk=`<div class="info-badge red">${t('s1_age65')}</div>`;
+    else if(age>=45)ageRisk=`<div class="info-badge orange">${t('s1_age45')}</div>`;
+    else if(age>0&&age<18)ageRisk=`<div class="info-badge blue">${t('s1_age18')}</div>`;
+    return `<div class="s-emoji">${t('s1_emoji')}</div>
+    <div class="s-title">${t('s1_title')}</div>
+    <div class="s-sub">${t('s1_sub')} <span class="ref">WHO</span></div>
+    <div class="fc"><div class="fc-label">${t('s1_label')}</div>
       <input type="date" class="fc-input" id="inp_dob" value="${S.dob}" onchange="S.dob=this.value;render(S.step,0)"></div>
-    ${age>0?`<div class="age-display"><div class="age-num">${age}</div><div class="age-lbl">ans</div></div>${ageRisk}`:''}
+    ${age>0?`<div class="age-display"><div class="age-num">${age}</div><div class="age-lbl">${t('years')}</div></div>${ageRisk}`:''}
     <div id="aiBox1"></div>`;
   },
 
   // 2: Sex
-  ()=>{const o=[{v:'f',i:'F',t:'Femme',s:'Seuils tour de taille feminins, SOPK, hormones'},{v:'m',i:'M',t:'Homme',s:'Graisse viscerale masculine, seuils specifiques'}];
-    return `<div class="s-emoji">Sexe</div>
-    <div class="s-title">Sexe biologique</div>
-    <div class="s-sub">Les seuils de tour de taille et certaines pathologies different selon le sexe. <span class="ref">IDF 2006</span></div>
+  ()=>{const o=[{v:'f',i:'F',t:t('s2_female'),s:t('s2_female_sub')},{v:'m',i:'M',t:t('s2_male'),s:t('s2_male_sub')}];
+    return `<div class="s-emoji">${t('s2_emoji')}</div>
+    <div class="s-title">${t('s2_title')}</div>
+    <div class="s-sub">${t('s2_sub')} <span class="ref">IDF 2006</span></div>
     <div class="opts">${o.map(x=>`<div class="opt${S.sexe===x.v?' sel':''}" onclick="S.sexe='${x.v}';render(S.step,0)">
       <div class="opt-ico">${x.i}</div><div class="opt-txt"><b>${x.t}</b><small>${x.s}</small></div>
       <div class="opt-chk">${S.sexe===x.v?'OK':''}</div></div>`).join('')}</div>`;
@@ -656,11 +659,12 @@ const SCR=[
 
   // 3: Ethnicity v3.4 (+ MultCV, Metis, Arabe, Autre)
   ()=>{const list=Object.entries(ETH).map(([k,v])=>({k,...v}));
-    return `<div class="s-emoji">Origine</div>
-    <div class="s-title">Origine ethnique</div>
-    <div class="s-sub">Les seuils d'obesite et les risques metaboliques varient significativement selon l'origine. <span class="ref">OMS 2004</span> <span class="ref">IDF 2006</span> <span class="ref">Lancet 2016</span></div>
+    const ethName=k=>t('eth_'+k)||ETH[k]?.n||k;
+    return `<div class="s-emoji">${t('s3_emoji')}</div>
+    <div class="s-title">${t('s3_title')}</div>
+    <div class="s-sub">${t('s3_sub')} <span class="ref">WHO 2004</span> <span class="ref">IDF 2006</span> <span class="ref">Lancet 2016</span></div>
     <div class="opts opts-compact">${list.map(o=>`<div class="opt${S.ethnie===o.k?' sel':''}" onclick="S.ethnie='${o.k}';render(S.step,0)">
-      <div class="opt-txt"><b>${o.n}</b><small>Surpoids des ${o.ow} | Obesite des ${o.ob} | DT2 x${o.dR} | CV x${o.cvR||1}</small></div>
+      <div class="opt-txt"><b>${ethName(o.k)}</b><small>${t('s3_surpoids')} ${o.ow} | ${t('s3_obesite')} ${o.ob} | DT2 x${o.dR} | CV x${o.cvR||1}</small></div>
       <div class="opt-chk">${S.ethnie===o.k?'OK':''}</div></div>`).join('')}</div>`;
   },
 
@@ -672,63 +676,64 @@ const SCR=[
     if(S.imc>=e.ob+5){col='var(--red)';lbl='Obesite severe';pts=10;}
     else if(S.imc>=e.ob){col='var(--orange)';lbl='Obesite';pts=6;}
     else if(S.imc>=e.ow){col='var(--orange)';lbl='Surpoids';pts=3;}
-    return `<div class="s-emoji">Poids</div>
-    <div class="s-title">Poids et Taille</div>
-    <div class="s-sub">IMC calcule avec les seuils specifiques a votre origine (<b>${e.n}</b>). <span class="ref">OMS</span> <span class="ref">WHO Asia-Pacific</span></div>
-    <div class="fc"><div class="fc-label">Poids (kg)</div><input type="number" class="fc-input" value="${S.poids||''}" placeholder="Ex: 72" step="0.1" min="30" max="300" oninput="S.poids=+this.value;render(S.step,0)"></div>
-    <div class="fc"><div class="fc-label">Taille (cm)</div><input type="number" class="fc-input" value="${S.taille||''}" placeholder="Ex: 165" min="100" max="250" oninput="S.taille=+this.value;render(S.step,0)"></div>
+    const ethN4=t('eth_'+(S.ethnie||'eu'))||e.n;
+    return `<div class="s-emoji">${t('s4_emoji')}</div>
+    <div class="s-title">${t('s4_title')}</div>
+    <div class="s-sub">${t('s4_sub')} (<b>${ethN4}</b>). <span class="ref">WHO</span> <span class="ref">WHO Asia-Pacific</span></div>
+    <div class="fc"><div class="fc-label">${t('s4_poids')}</div><input type="number" class="fc-input" value="${S.poids||''}" placeholder="Ex: 72" step="0.1" min="30" max="300" oninput="S.poids=+this.value;render(S.step,0)"></div>
+    <div class="fc"><div class="fc-label">${t('s4_taille')}</div><input type="number" class="fc-input" value="${S.taille||''}" placeholder="Ex: 165" min="100" max="250" oninput="S.taille=+this.value;render(S.step,0)"></div>
     ${S.poids>0&&S.taille>0?`
     <div class="metric-hero"><div class="metric-main" style="color:${col}">${S.imc.toFixed(1)}</div><div class="metric-lbl">IMC -- ${lbl}</div>
       <div class="metric-pts" style="color:${col}">${pts}/10 pts</div></div>
     <div class="mrow">
-      <div class="mbox"><div class="mbox-lbl">Surpoids des</div><div class="mbox-val">${e.ow}</div></div>
-      <div class="mbox"><div class="mbox-lbl">Obesite des</div><div class="mbox-val">${e.ob}</div></div>
-      <div class="mbox"><div class="mbox-lbl">Poids ideal</div><div class="mbox-val">${(22*(S.taille/100)**2).toFixed(0)} kg</div></div>
+      <div class="mbox"><div class="mbox-lbl">${t('s4_surpoids_des')}</div><div class="mbox-val">${e.ow}</div></div>
+      <div class="mbox"><div class="mbox-lbl">${t('s4_obesite_des')}</div><div class="mbox-val">${e.ob}</div></div>
+      <div class="mbox"><div class="mbox-lbl">${t('s4_poids_ideal')}</div><div class="mbox-val">${(22*(S.taille/100)**2).toFixed(0)} kg</div></div>
     </div>`:''}`
   },
 
   // 5: Waist
   ()=>{const e=ETH[S.ethnie]||ETH.eu;const seuil=S.sexe==='f'?e.tf:e.tm;
     const whtr=S.taille>0?(S.tt/S.taille):0;
-    let col='var(--green)',lbl='Normal',pts=0;
-    if(S.tt>seuil+10){col='var(--red)';lbl='Tres eleve';pts=15;}else if(S.tt>seuil+5){col='var(--orange)';lbl='Eleve';pts=11;}else if(S.tt>seuil){col='var(--orange)';lbl='Au-dessus du seuil';pts=7;}
+    let col='var(--green)',lbl=t('s5_normal'),pts=0;
+    if(S.tt>seuil+10){col='var(--red)';lbl=t('s5_vhigh');pts=15;}else if(S.tt>seuil+5){col='var(--orange)';lbl=t('s5_high');pts=11;}else if(S.tt>seuil){col='var(--orange)';lbl=t('s5_above');pts=7;}
     let whtrPts=0;if(whtr>=.6)whtrPts=9;else if(whtr>=.55)whtrPts=6;else if(whtr>=.5)whtrPts=3;
-    return `<div class="s-emoji">Taille</div>
-    <div class="s-title">Tour de taille</div>
-    <div class="s-sub">Meilleur indicateur de graisse viscerale. Seuil ${S.sexe==='f'?'feminin':'masculin'} (${e.n}): <b>${seuil} cm</b>. <span class="ref">IDF</span> <span class="ref">BMJ Open 2016</span></div>
-    <div class="fc"><div class="fc-explain">Comment mesurer: debout, a mi-distance entre la derniere cote et la crete iliaque (au-dessus du nombril), en expirant normalement. Utilisez un metre ruban non elastique.</div>
-    <div class="sld"><div class="sld-big" id="sv_tt">${S.tt||'--'}</div><div class="sld-unit">centimetres</div>
+    return `<div class="s-emoji">${t('s5_emoji')}</div>
+    <div class="s-title">${t('s5_title')}</div>
+    <div class="s-sub">${S.sexe==='f'?t('s5_sub_f'):t('s5_sub_m')} (${e.n}): <b>${seuil} cm</b>. <span class="ref">IDF</span> <span class="ref">BMJ Open 2016</span></div>
+    <div class="fc"><div class="fc-explain">${t('s5_how')}</div>
+    <div class="sld"><div class="sld-big" id="sv_tt">${S.tt||'--'}</div><div class="sld-unit">${t('s5_cm')}</div>
     <input type="range" min="55" max="180" value="${S.tt||80}" step="1" oninput="S.tt=+this.value;render(S.step,0)">
-    <div class="sld-lbl"><span>55</span><span style="color:var(--orange)">${seuil} seuil</span><span>180</span></div></div></div>
+    <div class="sld-lbl"><span>55</span><span style="color:var(--orange)">${seuil} ${t('s5_seuil')}</span><span>180</span></div></div></div>
     ${S.tt>0?`<div class="mrow">
-      <div class="mbox"><div class="mbox-lbl">Tour taille</div><div class="mbox-val" style="color:${col}">${S.tt}</div><div class="mbox-sub">${lbl} | ${pts}/15 pts</div></div>
-      <div class="mbox"><div class="mbox-lbl">WHtR</div><div class="mbox-val" style="color:${whtr>=.5?'var(--orange)':'var(--green)'}">${whtr.toFixed(3)}</div><div class="mbox-sub">seuil 0.50 | ${whtrPts}/9 pts</div></div>
-      <div class="mbox"><div class="mbox-lbl">Seuil</div><div class="mbox-val">${seuil}</div><div class="mbox-sub">${S.sexe==='f'?'Femme':'Homme'} ${e.n.split(' ')[0]}</div></div></div>`:''}`
+      <div class="mbox"><div class="mbox-lbl">${t('s5_tt')}</div><div class="mbox-val" style="color:${col}">${S.tt}</div><div class="mbox-sub">${lbl} | ${pts}/15 pts</div></div>
+      <div class="mbox"><div class="mbox-lbl">WHtR</div><div class="mbox-val" style="color:${whtr>=.5?'var(--orange)':'var(--green)'}">${whtr.toFixed(3)}</div><div class="mbox-sub">${t('s5_seuil')} 0.50 | ${whtrPts}/9 pts</div></div>
+      <div class="mbox"><div class="mbox-lbl">${t('s4_seuil')}</div><div class="mbox-val">${seuil}</div><div class="mbox-sub">${S.sexe==='f'?t('s2_female'):t('s2_male')} ${e.n.split(' ')[0]}</div></div></div>`:''}`
   },
 
   // 6: Family
-  ()=>`<div class="s-emoji">Famille</div>
-    <div class="s-title">Antecedents familiaux</div>
-    <div class="s-sub">La genetique explique 40-70% du risque d'obesite. <span class="ref">Lancet 2016</span> <span class="ref">Diabetologia 2014</span></div>
-    ${sel('Parents en surpoids ou obeses','parent_ob',[['0','Aucun parent concerne'],['1','Un parent en surpoids/obese (risque x3)'],['2','Les deux parents (risque x8)']],'INTERHEART',10)}
-    ${sel('Surpoids dans l\'enfance (avant 12 ans)','enf_ob',[['0','Non, poids normal enfant'],['1','Leger surpoids enfant'],['2','Oui, obese pendant l\'enfance (risque de chronicisation)']],'Lancet 2016',10)}
-    ${sel('Diabete type 2 dans la famille','diab_par',[['0','Aucun parent diabetique'],['1','Un parent diabetique type 2'],['2','Deux parents diabetiques']],'ADA 2024',5)}
-    ${sel('Historique de regimes yoyo (perte puis reprise de poids)','yoyo',[['0','Non (0 a 2 tentatives)'],['1','Oui, 3 regimes ou plus avec reprise de poids']],'NEJM 2011',5)}
+  ()=>`<div class="s-emoji">${t('s6_emoji')}</div>
+    <div class="s-title">${t('s6_title')}</div>
+    <div class="s-sub">${t('s6_sub')} <span class="ref">Lancet 2016</span> <span class="ref">Diabetologia 2014</span></div>
+    ${sel(t('s6_parents'),'parent_ob',[['0',t('s6_p0')],['1',t('s6_p1')],['2',t('s6_p2')]],'INTERHEART',10)}
+    ${sel(t('s6_child'),'enf_ob',[['0',t('s6_c0')],['1',t('s6_c1')],['2',t('s6_c2')]],'Lancet 2016',10)}
+    ${sel(t('s6_diab'),'diab_par',[['0',t('s6_d0')],['1',t('s6_d1')],['2',t('s6_d2')]],'ADA 2024',5)}
+    ${sel(t('s6_yoyo'),'yoyo',[['0',t('s6_y0')],['1',t('s6_y1')]],'NEJM 2011',5)}
     <div id="aiBox6"></div>`,
 
   // 7: Geo + Air + Weather (AUTO)
   ()=>{
     if(!S.geo&&!S.geoLoading)setTimeout(autoDetectGeo,400);
-    return `<div class="s-emoji">Lieu</div>
-    <div class="s-title">Votre lieu de residence</div>
-    <div class="s-sub">La qualite de l'air et la meteo sont detectees automatiquement. Ces facteurs influencent directement votre metabolisme. <span class="ref">CAMS/Copernicus</span> <span class="ref">Open-Meteo</span></div>
+    return `<div class="s-emoji">${t('s7_emoji')}</div>
+    <div class="s-title">${t('s7_title')}</div>
+    <div class="s-sub">${t('s7_sub')} <span class="ref">CAMS/Copernicus</span> <span class="ref">Open-Meteo</span></div>
     <div class="fc">
-      <div class="fc-label">Votre localisation</div>
-      <div id="geoStatus">${S.geo?`<div class="geo-ok">OK ${S.geo.name}</div>`:(S.geoLoading?'<div class="geo-loading"><span class="spinner"></span> Detection en cours...</div>':'')}</div>
+      <div class="fc-label">${t('s7_loc')}</div>
+      <div id="geoStatus">${S.geo?`<div class="geo-ok">OK ${S.geo.name}</div>`:(S.geoLoading?'<div class="geo-loading"><span class="spinner"></span> '+t('s7_detecting')+'</div>':'')}</div>
       <div class="geo-btns">
-        <button class="btn btn-p btn-sm" onclick="autoDetectGeo()">Detecter ma position</button>
+        <button class="btn btn-p btn-sm" onclick="autoDetectGeo()">${t('s7_detect')}</button>
       </div>
-      <div class="geo-or">-- ou recherchez votre ville --</div>
+      <div class="geo-or">${t('s7_or')}</div>
       <div class="geo-search-row">
         <input type="text" class="fc-input" id="geoSearch" placeholder="Ex: Paris, Lyon, Port-Louis..." value="${S.geoCity||''}">
         <button class="btn btn-p btn-sm" onclick="searchCity()">OK</button>
@@ -738,94 +743,95 @@ const SCR=[
   },
 
   // 8: Work profile
-  ()=>`<div class="s-emoji">Travail</div>
-    <div class="s-title">Profil professionnel</div>
-    <div class="s-sub">Votre activite professionnelle influence directement votre risque metabolique: sedentarite, horaires, stress, alimentation au travail. <span class="ref">Biswas 2015</span></div>
-    ${sel('Type d\'activite professionnelle','work_type',[['0','Tres actif physiquement (BTP, agriculture, demenagement)'],['1','Actif (debout, soignant, commerce)'],['2','Mixte (alternance bureau/terrain)'],['3','Plutot assis (bureau avec pauses)'],['4','Bureau 6 a 8h par jour'],['5','Tres sedentaire (+ de 8h assis par jour)'],['6','Teletravail intensif sans pauses']],'',6)}
-    ${sel('Heures de travail par semaine','work_hours',[['0','Moins de 35h'],['1','35 a 40h'],['2','40 a 48h'],['3','48 a 55h'],['4','55 a 65h'],['5','Plus de 65h']],'',5)}
-    <div class="fc"><div class="fc-top"><div class="fc-label">Lieu de travail <span class="ref">Distance auto</span></div></div>
-      <div class="fc-explain">Entrez l'adresse ou la ville de votre travail. La distance sera calculee automatiquement depuis votre domicile.</div>
+  ()=>`<div class="s-emoji">${t('s8_emoji')}</div>
+    <div class="s-title">${t('s8_title')}</div>
+    <div class="s-sub">${t('s8_sub')} <span class="ref">Biswas 2015</span></div>
+    ${sel(t('s8_type'),'work_type',[['0',t('s8_t0')],['1',t('s8_t1')],['2',t('s8_t2')],['3',t('s8_t3')],['4',t('s8_t4')],['5',t('s8_t5')],['6',t('s8_t6')]],'',6)}
+    ${sel(t('s8_hours'),'work_hours',[['0',t('s8_h0')],['1',t('s8_h1')],['2',t('s8_h2')],['3',t('s8_h3')],['4',t('s8_h4')],['5',t('s8_h5')]],'',5)}
+    <div class="fc"><div class="fc-top"><div class="fc-label">${t('s8_work_loc')} <span class="ref">${t('s8_dist_auto')}</span></div></div>
+      <div class="fc-explain">${t('s8_work_explain')}</div>
       <div class="geo-search-row">
-        <input type="text" class="fc-input" id="workSearch" placeholder="Ex: La Defense, Paris ou nom d'entreprise, ville" value="${S.workCity||''}">
-        <button class="btn btn-p btn-sm" onclick="searchWork()">Calculer</button>
+        <input type="text" class="fc-input" id="workSearch" placeholder="Ex: La Defense, Paris" value="${S.workCity||''}">
+        <button class="btn btn-p btn-sm" onclick="searchWork()">${t('s8_calculate')}</button>
       </div></div>
     <div id="workDist">${S.commuteDist?`<div class="dist-result"><div class="dist-val">${S.commuteDist.toFixed(1)} <span>km</span></div><div class="dist-route">${S.geoCity} -> ${S.workCity}</div><div class="dist-score">Score: ${S.work.dist}/5</div></div>`:''}</div>
-    ${sel('Mode de transport principal','work_mode',[['0','Marche ou velo'],['1','Transport en commun'],['2','Voiture < 30 min'],['3','Voiture > 30 min']],'',3)}
-    ${sel('Horaires de travail','work_schedule',[['0','Journee standard (8h-18h)'],['1','Horaires decales'],['2','Travail de nuit occasionnel'],['3','Travail de nuit regulier (OR 1.29 obesite)'],['4','Poste 3x8'],['5','Gardes 24h']],'Lane 2024',5)}
-    ${sel('Posture dominante au travail','work_posture',[['0','Debout et en mouvement'],['1','Alternance assis/debout'],['2','Assis avec pauses regulieres'],['3','Assis plus de 4h sans pause'],['4','Assis plus de 6h immobile']],'',4)}
-    ${sel('Situation vis-a-vis de la retraite','work_retire',[['0','Non concerne (en activite)'],['1','Retraite, actif physiquement'],['2','Retraite sedentaire'],['3','Retraite + prise de poids'],['4','Isolement social'],['5','Isolement + tendance depressive']],'',5)}`,
+    ${sel(t('s8_transport'),'work_mode',[['0',t('s8_tr0')],['1',t('s8_tr1')],['2',t('s8_tr2')],['3',t('s8_tr3')]],'',3)}
+    ${sel(t('s8_schedule'),'work_schedule',[['0',t('s8_sc0')],['1',t('s8_sc1')],['2',t('s8_sc2')],['3',t('s8_sc3')],['4',t('s8_sc4')],['5',t('s8_sc5')]],'Lane 2024',5)}
+    ${sel(t('s8_posture'),'work_posture',[['0',t('s8_po0')],['1',t('s8_po1')],['2',t('s8_po2')],['3',t('s8_po3')],['4',t('s8_po4')]],'',4)}
+    ${sel(t('s8_retire'),'work_retire',[['0',t('s8_r0')],['1',t('s8_r1')],['2',t('s8_r2')],['3',t('s8_r3')],['4',t('s8_r4')],['5',t('s8_r5')]],'',5)}`,
 
   // 9: NUTRITION DETAILLEE (obesite-specifique)
-  ()=>`<div class="s-emoji">Repas</div>
-    <div class="s-title">Habitudes alimentaires</div>
-    <div class="s-sub">Evaluation detaillee de votre alimentation. Chaque question cible un comportement specifique lie a la prise de poids. <span class="ref">NOVA</span> <span class="ref">OMS</span></div>
+  ()=>`<div class="s-emoji">${t('s9_emoji')}</div>
+    <div class="s-title">${t('s9_title')}</div>
+    <div class="s-sub">${t('s9_sub')} <span class="ref">NOVA</span> <span class="ref">OMS</span></div>
     
-    ${sel('Aliments ultra-transformes (plats prepares, snacks industriels, charcuterie, cereales sucrées)','alim_ultra',[['0','Rarement (moins d\'une fois par semaine)'],['1','2 a 3 fois par semaine'],['2','4 a 6 fois par semaine'],['3','Tous les jours ou presque'],['4','Plusieurs fois par jour (base de mon alimentation)']],'NOVA',4)}
+    ${sel(t('s9_ultra'),'alim_ultra',[['0',t('s9_u0')],['1',t('s9_u1')],['2',t('s9_u2')],['3',t('s9_u3')],['4',t('s9_u4')]],'NOVA',4)}
     
-    ${sel('Boissons sucrees (sodas, jus industriels, boissons energisantes, thes sucres)','alim_sucre_boisson',[['0','Jamais ou tres rarement'],['1','1 a 2 fois par semaine'],['2','3 a 5 fois par semaine'],['3','Tous les jours (1 verre)'],['4','Plusieurs par jour']],'OMS',4)}
+    ${sel(t('s9_drinks'),'alim_sucre_boisson',[['0',t('s9_dr0')],['1',t('s9_dr1')],['2',t('s9_dr2')],['3',t('s9_dr3')],['4',t('s9_dr4')]],'OMS',4)}
     
-    ${sel('Sucres ajoutes et desserts (gateaux, bonbons, chocolat, glaces)','alim_sucre_solide',[['0','Rarement (1 fois par semaine max)'],['1','2 a 3 fois par semaine'],['2','Quotidien, une portion'],['3','Quotidien, plusieurs portions'],['4','Grignotage sucre permanent']],'',4)}
+    ${sel(t('s9_sugar'),'alim_sucre_solide',[['0',t('s9_sg0')],['1',t('s9_sg1')],['2',t('s9_sg2')],['3',t('s9_sg3')],['4',t('s9_sg4')]],'',4)}
     
-    ${sel('Fruits et legumes (portions par jour : 1 portion = 1 fruit, 1 bol de legumes)','alim_fibres',[['0','5 portions ou plus par jour (excellent)'],['1','3 a 4 portions par jour'],['2','1 a 2 portions par jour'],['3','Moins d\'une portion par jour'],['4','Presque jamais']],'OMS 5/jour',4)}
+    ${sel(t('s9_fruits'),'alim_fibres',[['0',t('s9_fr0')],['1',t('s9_fr1')],['2',t('s9_fr2')],['3',t('s9_fr3')],['4',t('s9_fr4')]],'OMS 5/jour',4)}
     
-    ${sel('Taille des portions au repas','alim_portions',[['0','Portions normales, j\'arrete quand je n\'ai plus faim'],['1','Portions legerement grandes'],['2','Grandes portions, j\'ai du mal a m\'arreter'],['3','Tres grandes portions, je mange souvent trop'],['4','Je me ressers systematiquement ou mange jusqu\'a la douleur']],'',4)}
+    ${sel(t('s9_portions'),'alim_portions',[['0',t('s9_po0')],['1',t('s9_po1')],['2',t('s9_po2')],['3',t('s9_po3')],['4',t('s9_po4')]],'',4)}
     
-    ${sel('Structure des repas dans la journee','alim_repas',[['0','3 repas reguliers a heures fixes'],['1','3 repas mais horaires irreguliers'],['2','Je saute souvent un repas (surtout le petit-dejeuner)'],['3','Repas completement desorganises'],['4','Pas de vrai repas, je mange en continu']],'',4)}
+    ${sel(t('s9_meals'),'alim_repas',[['0',t('s9_m0')],['1',t('s9_m1')],['2',t('s9_m2')],['3',t('s9_m3')],['4',t('s9_m4')]],'',4)}
     
-    ${sel('Grignotage entre les repas','alim_grignotage',[['0','Jamais ou presque'],['1','Parfois, des collations saines (fruit, yaourt)'],['2','Regulier, souvent des produits sucres ou gras'],['3','Grignotage frequent, souvent par ennui ou stress'],['4','Grignotage permanent, impossible de m\'en passer']],'BES',4)}
+    ${sel(t('s9_snacking'),'alim_grignotage',[['0',t('s9_sn0')],['1',t('s9_sn1')],['2',t('s9_sn2')],['3',t('s9_sn3')],['4',t('s9_sn4')]],'BES',4)}
     
-    ${sel('Restauration rapide / fast-food','alim_fast_food',[['0','Jamais ou exceptionnellement'],['1','1 a 2 fois par mois'],['2','1 fois par semaine'],['3','2 a 3 fois par semaine'],['4','4 fois ou plus par semaine']],'',4)}
+    ${sel(t('s9_fastfood'),'alim_fast_food',[['0',t('s9_ff0')],['1',t('s9_ff1')],['2',t('s9_ff2')],['3',t('s9_ff3')],['4',t('s9_ff4')]],'',4)}
     
-    ${sel('Cuisine maison vs plats prepares','alim_cuisine',[['0','Je cuisine presque tout moi-meme avec des produits frais'],['1','Majorite cuisine maison, parfois des plats prepares'],['2','Moitie-moitie'],['3','Majorite plats prepares ou livraison'],['4','Je ne cuisine presque jamais']],'',4)}
+    ${sel(t('s9_cooking'),'alim_cuisine',[['0',t('s9_ck0')],['1',t('s9_ck1')],['2',t('s9_ck2')],['3',t('s9_ck3')],['4',t('s9_ck4')]],'',4)}
     
-    ${sel('Consommation d\'eau','alim_eau',[['0','1.5L ou plus d\'eau par jour'],['1','1L a 1.5L par jour'],['2','Moins de 1L par jour'],['3','Je bois surtout des boissons sucrees ou du cafe']],'',3)}
+    ${sel(t('s9_water'),'alim_eau',[['0',t('s9_w0')],['1',t('s9_w1')],['2',t('s9_w2')],['3',t('s9_w3')]],'',3)}
     <div id="aiBox9"></div>`,
 
   // 10: Physical activity (IPAQ)
-  ()=>`<div class="s-emoji">Sport</div>
-    <div class="s-title">Activite physique</div>
-    <div class="s-sub">L'OMS recommande au minimum <b>150 minutes par semaine</b> d'activite moderee. <span class="ref">OMS 2020</span> <span class="ref">IPAQ</span></div>
-    ${sld('Activite cardio (marche rapide, course, velo, natation, danse)','ap_cardio',S.ap.cardio,0,300,10,'min/semaine','IPAQ')}
-    ${sld('Renforcement musculaire (musculation, yoga, pilates, exercices au poids du corps)','ap_muscu',S.ap.muscu,0,180,10,'min/semaine','')}
-    ${sld('Marche quotidienne (trajets, courses, promenades)','ap_marche',S.ap.marche,0,120,5,'min/jour','')}
-    ${sld('Temps total assis par jour (bureau, transport, TV, telephone)','assis',S.assis,1,16,.5,'heures/jour','Biswas 2015')}
+  ()=>`<div class="s-emoji">${t('s10_emoji')}</div>
+    <div class="s-title">${t('s10_title')}</div>
+    <div class="s-sub">${t('s10_sub')} <span class="ref">OMS 2020</span> <span class="ref">IPAQ</span></div>
+    ${sld(t('s10_cardio'),'ap_cardio',S.ap.cardio,0,300,10,t('s10_min_sem'),'IPAQ')}
+    ${sld(t('s10_muscu'),'ap_muscu',S.ap.muscu,0,180,10,t('s10_min_sem'),'')}
+    ${sld(t('s10_marche'),'ap_marche',S.ap.marche,0,120,5,t('s10_min_jour'),'')}
+    ${sld(t('s10_assis'),'assis',S.assis,1,16,.5,t('s10_h_jour'),'Biswas 2015')}
     <div id="aiBox10"></div>`,
 
   // 11: Sleep & substances
-  ()=>`<div class="s-emoji">Sommeil</div>
-    <div class="s-title">Sommeil et substances</div>
-    <div class="s-sub">Le manque de sommeil favorise la prise de poids via la ghreline (hormone de la faim). Tabac et alcool aggravent le risque metabolique. <span class="ref">Cappuccio 2008</span></div>
-    ${sld('Duree de sommeil par nuit','sommeil',S.sommeil,3,12,.5,'heures','Cappuccio')}
-    ${sld('Score ISI (Insomnia Severity Index, 0-28)','isi',S.isi,0,28,1,'/ 28','ISI')}
-    <div class="fc"><div class="fc-explain">ISI: 0-7 = pas d\'insomnie | 8-14 = legere | 15-21 = moderee | 22-28 = severe</div></div>
-    ${sel('Tabac','tabac',[['0','Jamais fume'],['1','Arrete depuis plus d\'un an'],['2','Arrete depuis moins d\'un an (risque residuel de prise de poids)'],['3','Moins de 10 cigarettes par jour'],['4','10 cigarettes ou plus par jour']],'Aubin 2012',4)}
-    ${sel('Alcool: frequence','alcool_f',[['0','Jamais'],['1','2 a 4 fois par mois'],['2','2 a 3 fois par semaine'],['3','4 fois ou plus par semaine']],'AUDIT-C',3)}
-    ${sel('Alcool: quantite par occasion','alcool_q',[['0','1 a 2 verres'],['1','3 a 4 verres'],['2','5 a 6 verres'],['3','7 a 9 verres'],['4','10 verres ou plus']],'',4)}`,
+  ()=>`<div class="s-emoji">${t('s11_emoji')}</div>
+    <div class="s-title">${t('s11_title')}</div>
+    <div class="s-sub">${t('s11_sub')} <span class="ref">Cappuccio 2008</span></div>
+    ${sld(t('s11_duree'),'sommeil',S.sommeil,3,12,.5,t('s11_heures'),'Cappuccio')}
+    ${sld(t('s11_isi'),'isi',S.isi,0,28,1,'/ 28','ISI')}
+    <div class="fc"><div class="fc-explain">${t('s11_isi_explain')}</div></div>
+    ${sel(t('s11_tabac'),'tabac',[['0',t('s11_tb0')],['1',t('s11_tb1')],['2',t('s11_tb2')],['3',t('s11_tb3')],['4',t('s11_tb4')]],'Aubin 2012',4)}
+    ${sel(t('s11_alcool_f'),'alcool_f',[['0',t('s11_af0')],['1',t('s11_af1')],['2',t('s11_af2')],['3',t('s11_af3')]],'AUDIT-C',3)}
+    ${sel(t('s11_alcool_q'),'alcool_q',[['0',t('s11_aq0')],['1',t('s11_aq1')],['2',t('s11_aq2')],['3',t('s11_aq3')],['4',t('s11_aq4')]],'',4)}`,
 
   // 12: STRESS PSS-10 (validated items, hierarchical)
   ()=>{
     const pssTotal=getPssTotal();
     let lvl='',col='var(--green)';
-    if(pssTotal>=27){lvl='Stress tres eleve';col='var(--red)';}
-    else if(pssTotal>=20){lvl='Stress eleve';col='var(--orange)';}
-    else if(pssTotal>=14){lvl='Stress modere';col='var(--orange)';}
-    else{lvl='Stress faible';col='var(--green)';}
+    if(pssTotal>=27){lvl=t('stress_vhigh');col='var(--red)';}
+    else if(pssTotal>=20){lvl=t('stress_high');col='var(--orange)';}
+    else if(pssTotal>=14){lvl=t('stress_mod');col='var(--orange)';}
+    else{lvl=t('stress_low');col='var(--green)';}
     
-    let html=`<div class="s-emoji">Stress</div>
-    <div class="s-title">Stress percu (PSS-10)</div>
-    <div class="s-sub">Ce questionnaire valide mesure votre niveau de stress au cours du <b>dernier mois</b>. Le stress chronique favorise la prise de poids via le cortisol. <span class="ref">PSS-10 (Cohen 1983)</span></div>
+    let html=`<div class="s-emoji">${t('s12_emoji')}</div>
+    <div class="s-title">${t('s12_title')}</div>
+    <div class="s-sub">${t('s12_sub')} <span class="ref">PSS-10 (Cohen 1983)</span></div>
     <div class="metric-hero"><div class="metric-main" style="color:${col}">${pssTotal}</div><div class="metric-lbl">${lvl} (sur 40)</div></div>
-    <div class="fc"><div class="fc-explain">Repondez pour chaque situation: 0 = Jamais | 1 = Presque jamais | 2 = Parfois | 3 = Assez souvent | 4 = Tres souvent</div></div>`;
+    <div class="fc"><div class="fc-explain">${t('s12_explain')}</div></div>`;
     
+    const PSS10_ITEMS=getPSS10();
     PSS10_ITEMS.forEach((item,i)=>{
       const val=S.pss[i];
       html+=`<div class="fc pss-item">
-        <div class="fc-top"><div class="fc-label">Question ${i+1}/10 ${item.inv?'<span class="ref">+ = protecteur</span>':''}</div>
+        <div class="fc-top"><div class="fc-label">${t('s12_q_prefix')} ${i+1}/10 ${item.inv?'<span class="ref">${t("s12_protecteur")}</span>':''}</div>
         <div class="fc-score" style="color:${item.inv?(val>=3?'var(--green)':val<=1?'var(--red)':'var(--orange)'):(val>=3?'var(--red)':val<=1?'var(--green)':'var(--orange)')}">${item.inv?(4-val):val}/4</div></div>
         <div class="pss-q">${item.q}</div>
         <div class="pss-tip">${item.tip}</div>
         <div class="pss-opts">
-          ${PSS_LABELS.map((lbl,j)=>`<div class="pss-opt${val===j?' sel':''}" onclick="S.pss[${i}]=${j};calc();render(S.step,0)"><span class="pss-opt-n">${j}</span><span class="pss-opt-l">${lbl}</span></div>`).join('')}
+          ${PSS_LABELS_FN().map((lbl,j)=>`<div class="pss-opt${val===j?' sel':''}" onclick="S.pss[${i}]=${j};calc();render(S.step,0)"><span class="pss-opt-n">${j}</span><span class="pss-opt-l">${lbl}</span></div>`).join('')}
         </div>
       </div>`;
     });
@@ -837,18 +843,19 @@ const SCR=[
   ()=>{
     const phqTotal=getPhqTotal();
     let phqLvl='',phqCol='var(--green)';
-    if(phqTotal>=20){phqLvl='Depression severe';phqCol='var(--red)';}
-    else if(phqTotal>=15){phqLvl='Depression moderement severe';phqCol='var(--orange)';}
-    else if(phqTotal>=10){phqLvl='Depression moderee';phqCol='var(--orange)';}
-    else if(phqTotal>=5){phqLvl='Depression legere';phqCol='var(--accent)';}
-    else{phqLvl='Pas de depression';phqCol='var(--green)';}
+    if(phqTotal>=20){phqLvl=t('dep_sev');phqCol='var(--red)';}
+    else if(phqTotal>=15){phqLvl=t('dep_modsev');phqCol='var(--orange)';}
+    else if(phqTotal>=10){phqLvl=t('dep_mod');phqCol='var(--orange)';}
+    else if(phqTotal>=5){phqLvl=t('dep_mild');phqCol='var(--accent)';}
+    else{phqLvl=t('dep_none');phqCol='var(--green)';}
 
-    let html=`<div class="s-emoji">Mental</div>
-    <div class="s-title">Depression et comportement alimentaire</div>
-    <div class="s-sub">La depression et l'hyperphagie sont des facteurs majeurs de prise de poids. Relation bidirectionnelle avec l'obesite. <span class="ref">PHQ-9 (Kroenke 2001)</span> <span class="ref">BES</span></div>
+    let html=`<div class="s-emoji">${t('s13_emoji')}</div>
+    <div class="s-title">${t('s13_title')}</div>
+    <div class="s-sub">${t('s13_sub')} <span class="ref">PHQ-9 (Kroenke 2001)</span> <span class="ref">BES</span></div>
     <div class="metric-hero"><div class="metric-main" style="color:${phqCol}">${phqTotal}</div><div class="metric-lbl">${phqLvl} (PHQ-9 sur 27)</div></div>
-    <div class="fc"><div class="fc-explain">Au cours des 2 dernieres semaines, a quelle frequence avez-vous ete gene(e) par les problemes suivants?</div></div>`;
+    <div class="fc"><div class="fc-explain">${t('s13_explain')}</div></div>`;
     
+    const PHQ9_ITEMS=getPHQ9();
     PHQ9_ITEMS.forEach((q,i)=>{
       const val=S.phq[i];
       html+=`<div class="fc pss-item">
@@ -856,16 +863,16 @@ const SCR=[
         <div class="fc-score" style="color:${val>=2?'var(--red)':val>=1?'var(--orange)':'var(--green)'}">${val}/3</div></div>
         <div class="pss-q">${q}</div>
         <div class="pss-opts">
-          ${PHQ_LABELS.map((lbl,j)=>`<div class="pss-opt${val===j?' sel':''}" onclick="S.phq[${i}]=${j};calc();render(S.step,0)"><span class="pss-opt-n">${j}</span><span class="pss-opt-l">${lbl}</span></div>`).join('')}
+          ${PHQ_LABELS_FN().map((lbl,j)=>`<div class="pss-opt${val===j?' sel':''}" onclick="S.phq[${i}]=${j};calc();render(S.step,0)"><span class="pss-opt-n">${j}</span><span class="pss-opt-l">${lbl}</span></div>`).join('')}
         </div>
       </div>`;
     });
 
-    html+=`<div class="sec"><div class="sec-tt">Hyperphagie (BES - Binge Eating Scale)</div></div>`;
-    html+=sel('Tendance a l\'hyperphagie / crises de boulimie','bes',[
-      ['0','Aucune crise'],['1','Rarement (moins d\'une fois par mois)'],['2','1 a 3 fois par mois'],
-      ['3','1 fois par semaine'],['4','2 a 3 fois par semaine'],['5','4 a 5 fois par semaine'],
-      ['6','Quasi quotidien'],['7','Quotidien avec sentiment de perte de controle'],['8','Plusieurs fois par jour, perte de controle totale']
+    html+=`<div class="sec"><div class="sec-tt">${t('s13_bes_title')}</div></div>`;
+    html+=sel(t('s13_bes_q'),'bes',[
+      ['0',t('s13_bes0')],['1',t('s13_bes1')],['2',t('s13_bes2')],
+      ['3',t('s13_bes3')],['4',t('s13_bes4')],['5',t('s13_bes5')],
+      ['6',t('s13_bes6')],['7',t('s13_bes7')],['8',t('s13_bes8')]
     ],'BES',8);
     html+=`<div id="aiBox13"></div>`;
     return html;
@@ -889,41 +896,41 @@ const SCR=[
     let dyslipiHtml='';
     if(S.comorbIds.includes('dyslipi')){
       dyslipiHtml=`<div class="sec" style="border:2px solid var(--accent);border-radius:12px;padding:14px;margin:10px 0;background:var(--bg2)">
-        <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:13px">Dyslipidemie — Sous-typage v3.1</div>
-        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14a :</b> De quel type ?</div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:13px">${t('s14_dyslipi_title')}</div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14a :</b> ${t('s14_dq1')}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-          ${['mixte','ldl_isole','ne_sait_pas'].map(t=>{
-            const labels={mixte:'Triglycerides eleves ET HDL bas (mixte)',ldl_isole:'Cholesterol LDL eleve uniquement',ne_sait_pas:'Je ne sais pas / les deux'};
-            const act=S.dyslipi.type===t||(t==='ne_sait_pas'&&!S.dyslipi.type);
-            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiType('${t}')">${labels[t]}</div>`;
+          ${['mixte','ldl_isole','ne_sait_pas'].map(k=>{
+            const labels={mixte:t('s14_d_mixte'),ldl_isole:t('s14_d_ldl'),ne_sait_pas:t('s14_d_unknown')};
+            const act=S.dyslipi.type===k||(k==='ne_sait_pas'&&!S.dyslipi.type);
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiType('${k}')">${labels[k]}</div>`;
           }).join('')}
         </div>
-        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14b :</b> Etes-vous sous traitement ?</div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14b :</b> ${t('s14_dq2')}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-          ${['statines','fibrates','combinaison','autre','non'].map(t=>{
-            const labels={statines:'Statines (Atorvastatine, Rosuvastatine...)',fibrates:'Fibrates (Fenofibrate...)',combinaison:'Combinaison statines + fibrates',autre:'Autre traitement',non:'Non traite(e)'};
-            const act=S.dyslipi.traitement===t||(t==='non'&&!S.dyslipi.traitement);
-            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiTrait('${t}')">${labels[t]}</div>`;
+          ${['statines','fibrates','combinaison','autre','non'].map(k=>{
+            const labels={statines:t('s14_d_stat'),fibrates:t('s14_d_fibr'),combinaison:t('s14_d_combi'),autre:t('s14_d_other'),non:t('s14_d_none')};
+            const act=S.dyslipi.traitement===k||(k==='non'&&!S.dyslipi.traitement);
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiTrait('${k}')">${labels[k]}</div>`;
           }).join('')}
         </div>
-        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14c :</b> Depuis combien de temps ?</div>
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px"><b>Q14c :</b> ${t('s14_dq3')}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${['<1an','1-5ans','>5ans'].map(t=>{
-            const labels={'<1an':'Moins de 1 an','1-5ans':'1 a 5 ans','>5ans':'Plus de 5 ans'};
-            const act=S.dyslipi.duree===t;
-            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiDuree('${t}')">${labels[t]}</div>`;
+          ${['<1an','1-5ans','>5ans'].map(k=>{
+            const labels={'<1an':t('s14_d_lt1'),'1-5ans':t('s14_d_1to5'),'>5ans':t('s14_d_gt5')};
+            const act=S.dyslipi.duree===k;
+            return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiDuree('${k}')">${labels[k]}</div>`;
           }).join('')}
         </div>
-        <div style="font-size:10px;color:var(--dim3);margin-top:8px">v3.1 : Le sous-type determine les points COMPASS-K (6/8/10), la correction bioNorm (LDL×1.35 si statines), et le profil GLP-1.</div>
+        <div style="font-size:10px;color:var(--dim3);margin-top:8px">${t('s14_d_footer')}</div>
       </div>`;
     }
-    return `<div class="s-emoji">Sante</div>
-    <div class="s-title">Comorbidites (v3.4 — 13 declaratives + IR auto)</div>
-    <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score COMPASS-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
-    <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
+    return `<div class="s-emoji">${t('s14_emoji')}</div>
+    <div class="s-title">${t('s14_title')}</div>
+    <div class="s-sub">${t('s14_sub')} <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
+    <div class="sec"><div class="sec-tt">${t('s14_diseases')}</div>${mk(dis)}</div>
     ${dyslipiHtml}
-    <div class="sec"><div class="sec-tt">Phenotypes metaboliques</div>${mk(phe)}</div>
-    <div class="sec"><div class="sec-tt">Traitements aggravants</div>${mk(tx)}</div>
+    <div class="sec"><div class="sec-tt">${t('s14_phenotypes')}</div>${mk(phe)}</div>
+    <div class="sec"><div class="sec-tt">${t('s14_treatments')}</div>${mk(tx)}</div>
     <div id="aiBox14"></div>`;
   },
 
@@ -942,20 +949,20 @@ const SCR=[
     const apT=S.ap.cardio+S.ap.muscu+S.ap.marche*3.5;
     const alimRaw=S.alim.ultra+S.alim.sucre_boisson+S.alim.sucre_solide+S.alim.fibres+S.alim.portions+S.alim.repas+S.alim.grignotage+S.alim.fast_food+S.alim.cuisine+S.alim.eau;
     const siiItems=[
-      {l:'Stress PSS >= 35%', v:(getPssTotal()/40)>=0.35},
-      {l:'Activite < 75 min/sem', v:apT<75},
-      {l:'IMC >= seuil obesite', v:S.imc>=e.ob},
-      {l:'Tabagisme actif', v:S.tabac>=3},
-      {l:'Alimentation desequilibree', v:alimRaw>=20},
-      {l:'Insomnie ISI >= 15', v:S.isi>=15},
-      {l:'Tour taille > seuil', v:S.tt>ttSeuil}
+      {l:t('sii_stress'), v:(getPssTotal()/40)>=0.35},
+      {l:t('sii_activity'), v:apT<75},
+      {l:t('sii_bmi'), v:S.imc>=e.ob},
+      {l:t('sii_smoking'), v:S.tabac>=3},
+      {l:t('sii_diet'), v:alimRaw>=20},
+      {l:t('sii_insomnia'), v:S.isi>=15},
+      {l:t('sii_waist'), v:S.tt>ttSeuil}
     ];
 
     // WRAPPER UNIQUE — empeche les animations rise par enfant de faire clignoter
     let html=`<div class="no-rise-children">
-    <div class="s-emoji">sD</div>
-    <div class="s-title">Score Declaratif & Prescription Biologique</div>
-    <div class="s-sub">Score calcule sans biologie (C+E+O+L). Il definit votre <b>niveau de risque</b> et la <b>prescription biologique</b>. <span class="ref">BSD v4.9</span></div>`;
+    <div class="s-emoji">${t('s15_emoji')}</div>
+    <div class="s-title">${t('s15_title')}</div>
+    <div class="s-sub">${t('s15_sub')} <span class="ref">BSD v4.9</span></div>`;
 
     // ══ HERO SCORE — compact ══
     html+=`<div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:16px;background:${cls.bg};margin:8px 0">
@@ -965,7 +972,7 @@ const SCR=[
       </div>
       <div style="flex:1">
         <div style="font-size:18px;font-weight:700;color:${cls.c};margin-bottom:2px">${S.classDecl}</div>
-        <div style="font-size:11px;color:${cls.c};opacity:.8">Score Declaratif (sans biologie)</div>
+        <div style="font-size:11px;color:${cls.c};opacity:.8">${t('s15_decl')}</div>
         <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
           <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">C ${S.scoreC}/50</span>
           <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.1);color:${cls.c}">E ${S.scoreE}/45</span>
@@ -979,24 +986,24 @@ const SCR=[
     html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:10px;margin:6px 0">
       <span style="font-weight:700;font-size:12px;color:${S.sii>=3?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)'}">SII ${S.sii}/7</span>
       <div style="display:flex;gap:3px;flex:1;flex-wrap:wrap">${siiItems.map(x=>`<span style="width:8px;height:8px;border-radius:50%;background:${x.v?'var(--red)':'var(--green)'}" title="${x.l}"></span>`).join('')}</div>
-      ${S.sii>=2?'<span style="font-size:10px;color:var(--orange);font-weight:600">→ Bio P5 obligatoire</span>':''}
+      ${S.sii>=2?'<span style="font-size:10px;color:var(--orange);font-weight:600">→ '+t('s15_bio_oblig')+'</span>':''}
     </div>`;
 
     // ══ ORDONNANCE BIOLOGIQUE — mise en evidence ══
     html+=`<div style="margin-top:10px;border:2px solid ${bioPrx.color};border-radius:14px;overflow:hidden">
       <div style="background:${bioPrx.color};color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-size:16px;font-weight:800">ORDONNANCE BIOLOGIQUE</div>
+          <div style="font-size:16px;font-weight:800">${t('s15_ordonnance')}</div>
           <div style="font-size:12px;opacity:.9">${bioPrx.tier}</div>
         </div>
         <div style="font-size:24px;font-weight:800">P${S.panelLvl>0?S.panelLvl:'0'}</div>
       </div>
       <div style="padding:12px 16px">
         <div style="font-size:12px;color:var(--dim);margin-bottom:8px">${bioPrx.desc}</div>
-        <div style="font-size:11px;color:var(--dim2);margin-bottom:10px"><b>Logique :</b> sD = ${S.sD} (${S.classDecl}) | SII = ${S.sii}/7 ${S.indepCrit?'| Critere independant':''} → Panel <b>P${S.panelLvl>0?S.panelLvl:'optionnel'}</b></div>`;
+        <div style="font-size:11px;color:var(--dim2);margin-bottom:10px"><b>${t('s15_logique')}</b> sD = ${S.sD} (${S.classDecl}) | SII = ${S.sii}/7 ${S.indepCrit?'| '+t('s15_critere_ind'):''} → ${t('s15_panel')} <b>P${S.panelLvl>0?S.panelLvl:t('s15_optionnel')}</b></div>`;
 
     if(bioPrx.panel.length){
-      html+=`<div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--txt)">Examens a prescrire :</div>
+      html+=`<div style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--txt)">${t('s15_examens')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">`;
       bioPrx.panel.forEach((m,i)=>{
         html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border-radius:6px;font-size:11px">
@@ -1006,18 +1013,18 @@ const SCR=[
       });
       html+=`</div>`;
     } else {
-      html+=`<div style="color:var(--green);font-size:12px;padding:8px;background:var(--green-bg);border-radius:8px">Pas de bilan obligatoire. Envisager P5 si premiere visite ou bilan &gt; 2 ans.</div>`;
+      html+=`<div style="color:var(--green);font-size:12px;padding:8px;background:var(--green-bg);border-radius:8px">${t('s15_pas_bilan')}</div>`;
     }
 
     html+=`<div style="margin-top:10px;padding:8px 10px;background:var(--bg2);border-radius:8px;font-size:11px;color:var(--dim2)">
-          <b>Suivi recommande :</b> ${bioPrx.suivi}
+          <b>${t('s15_suivi')}</b> ${bioPrx.suivi}
         </div>
       </div>
     </div>`;
 
     // Petite note de flux
     html+=`<div style="font-size:10px;color:var(--dim3);margin-top:8px;text-align:center">
-      Etape suivante → Saisie des resultats biologiques → Integration dynamique (sf = wDecl×sD + wBio×bioNorm)
+      ${t('s15_next_step')} (sf = wDecl×sD + wBio×bioNorm)
     </div>`;
 
     html+=`<div id="aiBox15"></div>`;
@@ -1052,9 +1059,9 @@ const SCR=[
     const filled=BIO.filter(m=>S.bioValues[m.id]!==undefined&&S.bioValues[m.id]!==null).length;
 
     let html=`<div class="no-rise-children">
-    <div class="s-emoji">Bio</div>
-    <div class="s-title">Fiche Biologique — Biomarqueurs Prescrits</div>
-    <div class="s-sub">Saisissez les resultats de l'ordonnance prescrite a l'etape precedente, ou utilisez la <b>simulation</b> pour tester un profil biologique.
+    <div class="s-emoji">${t('s16_emoji')}</div>
+    <div class="s-title">${t('s16_title')}</div>
+    <div class="s-sub">${t('s16_sub')}
       <span class="ref">BSD v4.7.1</span></div>`;
 
     // ══ RAPPEL ORDONNANCE ══
@@ -1062,30 +1069,30 @@ const SCR=[
       <div style="min-width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${bioPrx.color};color:#fff;font-weight:800;font-size:14px">P${pl>0?pl:'?'}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700;color:${bioPrx.color}">${bioPrx.tier}</div>
-        <div style="font-size:10px;color:var(--dim2)">${markers.length} biomarqueurs a renseigner | sD = ${S.sD} (${S.classDecl})</div>
+        <div style="font-size:10px;color:var(--dim2)">${markers.length} ${t('s16_renseigner')} | sD = ${S.sD} (${S.classDecl})</div>
       </div>
     </div>`;
 
     // ══ MODULE SIMULATION DE PROFILS ══
     html+=`<div style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">SIMULATION — Profils biologiques</div>
-      <div style="font-size:10px;color:var(--dim2);margin-bottom:8px">Pre-remplir les ${markers.length} biomarqueurs avec un profil type pour estimer l'impact sur le score final.</div>
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">${t('s16_simulation')}</div>
+      <div style="font-size:10px;color:var(--dim2);margin-bottom:8px">${t('s16_sim_desc').replace('${markers.length}',markers.length)}</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
         <button onclick="applyBioProfile('normal')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
-          Normal<br><span style="font-weight:400;font-size:9px;opacity:.8">Tous dans les normes</span>
+          ${t('s16_normal')}<br><span style="font-weight:400;font-size:9px;opacity:.8">${t('s16_norm_sub')}</span>
         </button>
         <button onclick="applyBioProfile('borderline')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
-          Limite<br><span style="font-weight:400;font-size:9px;opacity:.8">Valeurs frontieres</span>
+          ${t('s16_borderline')}<br><span style="font-weight:400;font-size:9px;opacity:.8">${t('s16_bord_sub')}</span>
         </button>
         <button onclick="applyBioProfile('elevated')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--red);background:var(--red-bg);color:var(--red);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
-          Eleve<br><span style="font-weight:400;font-size:9px;opacity:.8">Marqueurs anormaux</span>
+          ${t('s16_elevated')}<br><span style="font-weight:400;font-size:9px;opacity:.8">${t('s16_elev_sub')}</span>
         </button>
         <button onclick="applyBioProfile('critical')" style="padding:10px 8px;border-radius:8px;border:1.5px solid var(--purple);background:var(--purple-bg);color:var(--purple);font-weight:700;font-size:11px;cursor:pointer;font-family:var(--font)">
-          Critique<br><span style="font-weight:400;font-size:9px;opacity:.8">Desequilibre majeur</span>
+          ${t('s16_critical')}<br><span style="font-weight:400;font-size:9px;opacity:.8">${t('s16_crit_sub')}</span>
         </button>
       </div>
       <button onclick="applyBioProfile('reset')" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--dim);font-weight:600;font-size:11px;cursor:pointer;font-family:var(--font)">
-        Effacer tout (reset)
+        ${t('s16_reset')}
       </button>
     </div>`;
 
@@ -1098,10 +1105,10 @@ const SCR=[
           <div style="font-size:9px;color:${cls.c};opacity:.6">/100</div>
         </div>
         <div style="flex:1">
-          <div style="font-size:12px;font-weight:600;color:${cls.c}">bioNorm (${filled}/${markers.length} renseignes)</div>
+          <div style="font-size:12px;font-weight:600;color:${cls.c}">bioNorm (${filled}/${markers.length} ${t('s16_filled')})</div>
           <div style="font-size:9px;color:var(--dim3)">bioNorm = (Σ z_i×w_i / Σ w_i) × 100</div>
           ${S.bInflam>0?`<div style="font-size:9px;color:var(--orange);margin-top:2px">bInflam = ${S.bInflam.toFixed(2)} → E amplifiee +${Math.round(S.bInflam*15)}%</div>`:''}
-          ${S.ir_occ_auto?`<div style="font-size:9px;color:var(--red);margin-top:2px;font-weight:700">★ IR OCCULTE détectée (TG/HDL > 3.5) → +8 pts COMPASS-K auto</div>`:''}
+          ${S.ir_occ_auto?`<div style="font-size:9px;color:var(--red);margin-top:2px;font-weight:700">★ ${t('s16_ir_occ')}</div>`:''}
         </div>
       </div>`;
     }
@@ -1122,7 +1129,7 @@ const SCR=[
             ${m.u?`<span style="font-size:9px;color:var(--dim3)">(${m.u})</span>`:''}
             <span style="font-size:8px;padding:1px 4px;border-radius:3px;background:${tierCol};color:#fff;font-weight:600">P${m.t}</span>
           </div>
-          <div style="font-size:9px;color:var(--dim2)">${m.l} — Normal: <span style="color:var(--green)">${m.nr}</span> | Anormal: <span style="color:var(--red)">${m.ar}</span> | w=${m.w}</div>
+          <div style="font-size:9px;color:var(--dim2)">${m.l} — ${t('s16_normal_lbl')}: <span style="color:var(--green)">${m.nr}</span> | ${t('s16_anormal_lbl')}: <span style="color:var(--red)">${m.ar}</span> | w=${m.w}</div>
           ${hasVal?`<div style="margin-top:4px;display:flex;align-items:center;gap:6px">
             <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
               <div style="width:${Math.round(z*100)}%;height:100%;background:${zCol};border-radius:3px;transition:width .3s"></div>
@@ -1144,13 +1151,13 @@ const SCR=[
       const sfPreview=S.bmn_t;
       const sfCls=getClass(sfPreview);
       html+=`<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;margin-top:8px">
-        <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:4px">Preview score final</div>
+        <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:4px">${t('s16_preview')}</div>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="font-size:20px;font-weight:800;color:${sfCls.c};font-family:'JetBrains Mono',monospace">${sfPreview}/100</div>
           <div style="flex:1;font-size:10px;color:var(--dim2)">
             sf = ${S.wDecl.toFixed(2)}×${S.sD} + ${S.wBio.toFixed(2)}×${S.bmn_b} = ${(S.wDecl*S.sD+S.wBio*S.bmn_b).toFixed(1)}
-            ${Math.abs(S.bmn_b-S.sD)>20?' (reponderation dynamique)':''}<br>
-            Classification: <b style="color:${sfCls.c}">${sfCls.l}</b>
+            ${Math.abs(S.bmn_b-S.sD)>20?' ('+t('s16_reponderation')+')':''}<br>
+            ${t('s16_classification')}: <b style="color:${sfCls.c}">${sfCls.l}</b>
           </div>
         </div>
       </div>`;
@@ -1158,7 +1165,7 @@ const SCR=[
 
     // ══ Methodologie ══
     html+=`<details style="margin-top:10px;background:var(--bg2);border-radius:10px;overflow:hidden">
-      <summary style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--dim2);cursor:pointer">Methodologie BSD v4.7.1</summary>
+      <summary style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--dim2);cursor:pointer">${t('s16_methodo')}</summary>
       <div style="padding:0 14px 10px;font-size:10px;color:var(--dim3);line-height:1.5">
         z-score lineaire borne [0,1] : z = (val-normal)/(anormal-normal), cap a 1<br>
         Poids (w) proportionnels aux HR publies (>3M participants, CTT, ERFC, CKD-PC, ADA)<br>
@@ -1177,58 +1184,58 @@ const SCR=[
   // 17: BTM v3.4 — Questionnaire Bariatrique & Therapeutique
   ()=>{
     const besT=getBesTotal();
-    const besLvl=besT>=27?'Hyperphagie severe':besT>=17?'Hyperphagie moderee':besT>=10?'Legere tendance':'Pas d\'hyperphagie';
+    const besLvl=besT>=27?t('bes_severe'):besT>=17?t('bes_moderate'):besT>=10?t('bes_mild'):t('bes_normal');
     const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
-    let html=`<div class="s-emoji">BTM</div>
-    <div class="s-title">Module Bariatrique & Therapeutique v3.4</div>
-    <div class="s-sub">Scoring matriciel 27 facteurs x 6 techniques. MOD-01 a MOD-10 conformes au Dossier Maitre v3.4. <span class="ref">62+ etudes, >180K patients</span></div>`;
+    let html=`<div class="s-emoji">${t('s17_emoji')}</div>
+    <div class="s-title">${t('s17_title')}</div>
+    <div class="s-sub">${t('s17_sub')} <span class="ref">62+ etudes, >180K patients</span></div>`;
 
     // GERD
-    html+=`<div class="sec"><div class="sec-tt">Reflux gastro-oesophagien (GERD)</div></div>`;
-    html+=`<div class="opts">${[{v:0,l:'Non / pas de reflux'},{v:1,l:'Reflux occasionnel (non traite)'},{v:2,l:'GERD documente / traite (IPP)'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_gerd')}</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:t('s17_gerd0')},{v:1,l:t('s17_gerd1')},{v:2,l:t('s17_gerd2')}].map(o=>
       `<div class="opt${S.btm.gerd===o.v?' sel':''}" onclick="S.btm.gerd=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     if(S.btm.gerd>=2) html+=`<div style="font-size:10px;color:var(--red);margin:4px 12px">⚠ GERD documente → Bypass prioritaire (resolution 87%, Ponce 2021). Sleeve contre-indiquee.</div>`;
 
     // ASA
-    html+=`<div class="sec"><div class="sec-tt">Score ASA (risque chirurgical)</div></div>`;
-    html+=`<div class="opts opts-compact">${[{v:1,l:'ASA 1 — Sain'},{v:2,l:'ASA 2 — Maladie legere'},{v:3,l:'ASA 3 — Maladie severe'},{v:4,l:'ASA 4 — Menace vitale'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_asa')}</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:1,l:t('s17_asa1')},{v:2,l:t('s17_asa2')},{v:3,l:t('s17_asa3')},{v:4,l:t('s17_asa4')}].map(o=>
       `<div class="opt${S.btm.asa===o.v?' sel':''}" onclick="S.btm.asa=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     if(S.btm.asa>=4) html+=`<div style="font-size:10px;color:var(--red);margin:4px 12px">⚠ ASA ≥ 4 → Chirurgie contre-indiquee. Ballon ou GLP-1 uniquement.</div>`;
 
     // ATCD chirurgie bariatrique
-    html+=`<div class="sec"><div class="sec-tt">Antecedent chirurgie bariatrique</div></div>`;
-    html+=`<div class="opts opts-compact">${[{v:'aucun',l:'Aucun'},{v:'ballon',l:'Ballon gastrique'},{v:'sleeve',l:'Sleeve gastrectomie'},{v:'bypass',l:'Bypass gastrique'},{v:'autre',l:'Autre intervention'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_atcd')}</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:'aucun',l:t('s17_atcd0')},{v:'ballon',l:t('s17_atcd_ballon')},{v:'sleeve',l:t('s17_atcd_sleeve')},{v:'bypass',l:t('s17_atcd_bypass')},{v:'autre',l:t('s17_atcd_autre')}].map(o=>
       `<div class="opt${S.btm.atcdChir===o.v?' sel':''}" onclick="S.btm.atcdChir='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     if(S.btm.atcdChir==='sleeve') html+=`<div style="font-size:10px;color:var(--orange);margin:4px 12px">Sleeve anterieure → Bypass revision recommande (+23% EWL, Thereaux 2022)</div>`;
 
     // MOD-08: ATCD Ballon type (Orbera vs Spatz3)
     if(S.btm.atcdChir==='ballon'){
-      html+=`<div class="sec"><div class="sec-tt">Type de ballon anterieur (MOD-08)</div></div>`;
+      html+=`<div class="sec"><div class="sec-tt">${t('s17_ballon_type')}</div></div>`;
       html+=`<div class="opts opts-compact">${[{v:'orbera',l:'Orbera (6 mois)'},{v:'spatz3',l:'Spatz3 (12 mois, ajustable)'},{v:'autre_ballon',l:'Autre / inconnu'}].map(o=>
         `<div class="opt${S.btm.atcdBallonType===o.v?' sel':''}" onclick="S.btm.atcdBallonType='${o.v}';S.btm.atcdBallon=1;render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
       if(S.btm.atcdBallonType==='spatz3') html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">Spatz3 (mecanisme distinct, ajustable) — Re-pose possible. Poids BTM -2 (MOD-08).</div>`;
     }
 
     // NASH
-    html+=`<div class="sec"><div class="sec-tt">Steatohepatite / NASH</div></div>`;
-    html+=`<div class="opts">${[{v:0,l:'Non / non connue'},{v:1,l:'NAFLD / steatose simple'},{v:2,l:'NASH confirmee (biopsie/FibroScan)'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_nash')}</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:t('s17_nash0')},{v:1,l:t('s17_nash1')},{v:2,l:t('s17_nash2')}].map(o=>
       `<div class="opt${S.btm.nash===o.v?' sel':''}" onclick="S.btm.nash=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     if(S.btm.nash>=2) html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">NASH confirmee → ESG prioritaire (62% resolution histologique, Sharaiha 2021)</div>`;
 
     // Comorbidité CV
-    html+=`<div class="sec"><div class="sec-tt">Maladie cardiovasculaire etablie</div></div>`;
-    html+=`<div class="opts">${[{v:0,l:'Non'},{v:1,l:'Oui (IDM, AVC, AOMI, IC...)'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_cv')}</div></div>`;
+    html+=`<div class="opts">${[{v:0,l:t('s17_cv_non')},{v:1,l:t('s17_cv_oui')}].map(o=>
       `<div class="opt${S.btm.comorbCV===o.v?' sel':''}" onclick="S.btm.comorbCV=${o.v};render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
 
     // Refus chirurgie
-    html+=`<div class="sec"><div class="sec-tt">Preference patient</div></div>`;
-    html+=`<div class="opts opts-compact">${[{v:'neutre',l:'Neutre (accepte toute option)'},{v:'refus_chir',l:'Refuse la chirurgie'},{v:'prefer_chir',l:'Prefere la chirurgie'},{v:'prefer_endo',l:'Prefere endoscopie (ESG/Ballon)'},{v:'prefer_med',l:'Prefere le traitement medical'}].map(o=>
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_pref')}</div></div>`;
+    html+=`<div class="opts opts-compact">${[{v:'neutre',l:t('s17_pref0')},{v:'refus_chir',l:t('s17_pref1')},{v:'prefer_chir',l:t('s17_pref2')},{v:'prefer_endo',l:t('s17_pref3')},{v:'prefer_med',l:t('s17_pref4')}].map(o=>
       `<div class="opt${S.btm.prefPatient===o.v?' sel':''}" onclick="S.btm.prefPatient='${o.v}';render(S.step,0)"><span>${o.l}</span></div>`).join('')}</div>`;
     S.btm.refusChir=(S.btm.prefPatient==='refus_chir')?1:0;
 
     // FNC v3.4 — Zone climatique Koppen
-    html+=`<div class="sec"><div class="sec-tt">Zone climatique de residence (FNC v3.4)</div>
-      <div style="font-size:10px;color:var(--dim3)">Normalise le score Exposome selon l'acclimatation climatique. AQI non normalise.</div></div>`;
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_fnc')}</div>
+      <div style="font-size:10px;color:var(--dim3)">${t('s17_fnc_desc')}</div></div>`;
     html+=`<div class="opts opts-compact">${Object.entries(FNC_ZONES).map(([k,z])=>
       `<div class="opt${S.fncZone===k?' sel':''}" onclick="S.fncZone='${k}';render(S.step,0)"><span>${k}: ${z.l}</span></div>`).join('')}</div>`;
     if(S.fncZone!=='Z4'){
@@ -1236,8 +1243,8 @@ const SCR=[
       html+=`<div style="font-size:10px;color:var(--teal);margin:4px 12px">FNC ${S.fncZone} (${fnc.l}) — Temp x${fnc.ft}, UV x${fnc.fu}. Residence: ${S.residenceMois||12} mois.</div>`;
     }
     // Durée de résidence
-    html+=`<div class="sec"><div class="sec-tt">Duree de residence (mois)</div></div>`;
-    html+=`<div class="range-wrap"><input type="range" min="0" max="120" value="${S.residenceMois||12}" oninput="S.residenceMois=+this.value;render(S.step,0)"><span class="range-val">${S.residenceMois||12} mois</span></div>`;
+    html+=`<div class="sec"><div class="sec-tt">${t('s17_residence')}</div></div>`;
+    html+=`<div class="range-wrap"><input type="range" min="0" max="120" value="${S.residenceMois||12}" oninput="S.residenceMois=+this.value;render(S.step,0)"><span class="range-val">${S.residenceMois||12} ${t('s17_mois')}</span></div>`;
     if(S.residenceMois<12) html+=`<div style="font-size:10px;color:var(--orange);margin:4px 12px">Residence < 12 mois — FNC progressif applique (acclimatation partielle).</div>`;
 
     html+=`<div id="aiBox17"></div>`;
@@ -1247,14 +1254,14 @@ const SCR=[
   // 18: BES-16 — Binge Eating Scale complete (Gormally 1982)
   ()=>{
     const besT=getBesTotal();
-    const besLvl=besT>=27?'Hyperphagie severe (BES ≥ 27)':besT>=17?'Hyperphagie moderee (BES 17-26)':besT>=10?'Tendance legere (BES 10-16)':'Normal (BES < 10)';
+    const besLvl=besT>=27?t('bes_severe'):besT>=17?t('bes_moderate'):besT>=10?t('bes_mild'):t('bes_normal');
     const besCol=besT>=27?'var(--red)':besT>=17?'var(--orange)':besT>=10?'var(--accent)':'var(--green)';
-    let html=`<div class="s-emoji">BES</div>
-    <div class="s-title">Binge Eating Scale — 16 items</div>
-    <div class="s-sub">Echelle validee d'hyperphagie boulimique. Score 0-46. <span class="ref">Gormally 1982</span></div>
+    let html=`<div class="s-emoji">${t('s18_emoji')}</div>
+    <div class="s-title">${t('s18_title')}</div>
+    <div class="s-sub">${t('s18_sub')} <span class="ref">Gormally 1982</span></div>
     <div class="metric-hero"><div class="metric-main" style="color:${besCol}">${besT}</div><div class="metric-lbl">${besLvl}</div></div>`;
-    if(besT>=27) html+=`<div style="background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--red);font-weight:600">⚠ BES ≥ 27 : Contre-indication chirurgie bariatrique. Prise en charge TCA prealable obligatoire.</div>`;
-    else if(besT>=17) html+=`<div style="background:rgba(245,158,11,.1);border:1px solid var(--orange);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--orange);font-weight:600">⚠ BES ≥ 17 : Ajout Buproprion-Naltrexone recommande en association.</div>`;
+    if(besT>=27) html+=`<div style="background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--red);font-weight:600">⚠ ${t('bes_ci_chir')}</div>`;
+    else if(besT>=17) html+=`<div style="background:rgba(245,158,11,.1);border:1px solid var(--orange);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:11px;color:var(--orange);font-weight:600">⚠ ${t('bes_bupro')}</div>`;
 
     BES16_ITEMS.forEach((item,i)=>{
       const val=S.bes16[i];
@@ -1279,16 +1286,16 @@ const SCR=[
 
 const NTOT=SCR.length;
 const SECTIONS=[
-  {from:0,to:0,name:'Accueil',ico:'[H]'},{from:1,to:3,name:'Identite',ico:'[ID]'},
-  {from:4,to:5,name:'Mesures',ico:'[M]'},{from:6,to:6,name:'Famille',ico:'[F]'},
-  {from:7,to:7,name:'Lieu',ico:'[G]'},{from:8,to:8,name:'Travail',ico:'[T]'},
-  {from:9,to:9,name:'Nutrition',ico:'[N]'},{from:10,to:11,name:'Mode de vie',ico:'[V]'},
-  {from:12,to:13,name:'Sante mentale',ico:'[S]'},
-  {from:14,to:14,name:'Pathologies',ico:'[P]'},
-  {from:15,to:15,name:'Score & Strategie',ico:'[sD]'},
-  {from:16,to:16,name:'Biologie',ico:'[B]'},
-  {from:17,to:18,name:'BTM Bariatrique',ico:'[BTM]'},
-  {from:19,to:19,name:'Resultat',ico:'[R]'}
+  {from:0,to:0,name:()=>t('sec_accueil'),ico:'[H]'},{from:1,to:3,name:()=>t('sec_identite'),ico:'[ID]'},
+  {from:4,to:5,name:()=>t('sec_mesures'),ico:'[M]'},{from:6,to:6,name:()=>t('sec_famille'),ico:'[F]'},
+  {from:7,to:7,name:()=>t('sec_lieu'),ico:'[G]'},{from:8,to:8,name:()=>t('sec_travail'),ico:'[T]'},
+  {from:9,to:9,name:()=>t('sec_nutrition'),ico:'[N]'},{from:10,to:11,name:()=>t('sec_modevie'),ico:'[V]'},
+  {from:12,to:13,name:()=>t('sec_mental'),ico:'[S]'},
+  {from:14,to:14,name:()=>t('sec_patho'),ico:'[P]'},
+  {from:15,to:15,name:()=>t('sec_score'),ico:'[sD]'},
+  {from:16,to:16,name:()=>t('sec_bio'),ico:'[B]'},
+  {from:17,to:18,name:()=>t('sec_btm'),ico:'[BTM]'},
+  {from:19,to:19,name:()=>t('sec_result'),ico:'[R]'}
 ];
 function getSec(step){return SECTIONS.find(s=>step>=s.from&&step<=s.to)||SECTIONS[0];}
 function toggleCM(id){if(S.comorbIds.includes(id))S.comorbIds=S.comorbIds.filter(x=>x!==id);else S.comorbIds.push(id);
@@ -1315,7 +1322,7 @@ function render(step,dir){
   if(curEl&&dir!==0){curEl.className='scr'+(dir>0?' out-l':' out-r');const old=curEl;setTimeout(()=>old.remove(),300);}
   else if(curEl)curEl.remove();
   wrap.appendChild(el);curEl=el;
-  const sec=getSec(step);h('hdrSec',sec.ico+' '+sec.name);h('hdrStep',`${step}/${NTOT-1}`);
+  const sec=getSec(step);const secName=typeof sec.name==='function'?sec.name():sec.name;h('hdrSec',sec.ico+' '+secName);h('hdrStep',`${step}/${NTOT-1}`);
   const pf=$('pgFill');if(pf)pf.style.width=(step/(NTOT-1)*100)+'%';
   updateBadge();renderNav(step);
   if(step===7&&S.airData)setTimeout(renderGeoResults,50);
@@ -1327,9 +1334,9 @@ function renderNav(step){
   const nav=$('bNav');if(!nav)return;
   if(step===0){nav.innerHTML='';return;}
   const last=step===NTOT-1;
-  nav.innerHTML=`<button class="btn btn-s" onclick="go(${step-1},-1)">Retour</button>
-    ${last?`<button class="btn btn-d btn-sm" onclick="resetAll()">Recommencer</button><button class="btn btn-p btn-sm" onclick="window.print()">Imprimer</button>`
-    :`<button class="btn btn-p" onclick="go(${step+1},1)">Suivant</button>`}`;
+  nav.innerHTML=`<button class="btn btn-s" onclick="go(${step-1},-1)">${t('prev')}</button>
+    ${last?`<button class="btn btn-d btn-sm" onclick="resetAll()">${t('reset_btn')}</button><button class="btn btn-p btn-sm" onclick="window.print()">${t('print_btn')}</button>`
+    :`<button class="btn btn-p" onclick="go(${step+1},1)">${t('next')}</button>`}`;
 }
 
 function updateBadge(){const el=$('hdrScore');if(!el)return;if(S.step<2){el.textContent='';el.style.display='none';return;}calc();el.style.display='';el.textContent=`${S.bmn_c}`;}
@@ -1348,7 +1355,7 @@ function triggerAI(step){
   if(aiScreens[step]){
     const cfg=aiScreens[step];
     const box=$(cfg.id);if(!box)return;
-    box.innerHTML='<div class="ai-loading"><span class="spinner"></span> Analyse IA en cours...</div>';
+    box.innerHTML='<div class="ai-loading"><span class="spinner"></span> '+t('ai_loading')+'</div>';
     requestAI(cfg.q,'Ecran '+step).then(d=>{
       if(d)renderAIBubble(cfg.id,d);
       else{const b=$(cfg.id);if(b)b.innerHTML='';}
@@ -1845,22 +1852,22 @@ function getPanelLvl(){ return S.panelLvl||0; }
 
 // ── Classification couleurs ──
 function getClass(s){
-  if(s<30) return{l:'FAIBLE',c:'var(--green)',bg:'var(--green-bg)',tier:'Surveillance',suivi:'3 ans'};
-  if(s<60) return{l:'MODERE',c:'var(--orange)',bg:'var(--orange-bg)',tier:'Nutrition + AP',suivi:'annuel'};
-  if(s<80) return{l:'ELEVE',c:'var(--red)',bg:'var(--red-bg)',tier:'GLP-1 preventif',suivi:'trimestriel'};
-  return{l:'TRES ELEVE',c:'var(--purple)',bg:'var(--purple-bg)',tier:'Chirurgie / GLP-1 urgent',suivi:'mensuel'};
+  if(s<30) return{l:t('class_low'),c:'var(--green)',bg:'var(--green-bg)',tier:t('tier_low'),suivi:t('suivi_3ans')};
+  if(s<60) return{l:t('class_mod'),c:'var(--orange)',bg:'var(--orange-bg)',tier:t('tier_mod'),suivi:t('suivi_annuel')};
+  if(s<80) return{l:t('class_high'),c:'var(--red)',bg:'var(--red-bg)',tier:t('tier_high'),suivi:t('suivi_trim')};
+  return{l:t('class_vhigh'),c:'var(--purple)',bg:'var(--purple-bg)',tier:t('tier_vhigh'),suivi:t('suivi_mens')};
 }
 function getCTILabel(cti){
-  if(cti<=20) return{l:'Fenetre ouverte',c:'var(--green)',d:'Interventions classiques efficaces'};
-  if(cti<=40) return{l:'Debut chronicisation',c:'var(--orange)',d:'Agir rapidement'};
-  if(cti<=55) return{l:'Chronicite avancee',c:'var(--red)',d:'GLP-1 recommande'};
-  return{l:'Chronicite installee',c:'var(--purple)',d:'Evaluation chirurgicale obligatoire'};
+  if(cti<=20) return{l:t('cti_open'),c:'var(--green)',d:t('cti_open_d')};
+  if(cti<=40) return{l:t('cti_early'),c:'var(--orange)',d:t('cti_early_d')};
+  if(cti<=55) return{l:t('cti_adv'),c:'var(--red)',d:t('cti_adv_d')};
+  return{l:t('cti_inst'),c:'var(--purple)',d:t('cti_inst_d')};
 }
 function getGRILabel(gri){
-  if(gri>=2.5) return{l:'Excellent',c:'var(--green)',d:'Reponse GLP-1 >85%'};
-  if(gri>=1.5) return{l:'Bon',c:'var(--teal)',d:'Reponse GLP-1 60-85%'};
-  if(gri>=0.5) return{l:'Modere',c:'var(--orange)',d:'Reponse GLP-1 incertaine'};
-  return{l:'Faible',c:'var(--red)',d:'GLP-1 peu probable, chirurgie a envisager'};
+  if(gri>=2.5) return{l:t('gri_excellent'),c:'var(--green)',d:t('gri_exc_d')};
+  if(gri>=1.5) return{l:t('gri_bon'),c:'var(--teal)',d:t('gri_bon_d')};
+  if(gri>=0.5) return{l:t('gri_modere'),c:'var(--orange)',d:t('gri_mod_d')};
+  return{l:t('gri_faible'),c:'var(--red)',d:t('gri_fbl_d')};
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2235,34 +2242,33 @@ function getGLP1Profile(){
 function getBioPrescription(){
   const sD=S.sD, sii=S.sii, cls=S.classDecl;
   // P5 = HbA1c, Glycemie, LDL, HDL, CRP hs (+ TSH, NFS)
-  const P5=['HbA1c','Glycemie a jeun','LDL cholesterol','HDL cholesterol','CRP ultrasensible','TSH','NFS'];
-  // P10 = P5 + Trigly, ApoB, HOMA-IR, Creatinine, ASAT/ALAT, Acide urique, Adiponectine, GGT, eGFR
-  const P10=[...P5,'HOMA-IR','Triglycerides','ApoB','Adiponectine','ASAT/ALAT','GGT','Creatinine','Acide urique'];
+  const P5=['HbA1c',t('bio_sucre')+' ('+LANG+')','LDL','HDL','CRP hs','TSH','NFS'];
+  const P10=[...P5,'HOMA-IR',t('bio_graisses')+' (TG)','ApoB',t('bio_hormone_gras')+' (Adipon)',t('bio_foie')+' (ASAT/ALAT)','GGT',t('bio_goutte')+' (Creat)',t('bio_goutte')+' (Urate)'];
   // P15 = P10 + Lp(a), Leptine, FibroScan/CAP, TG/HDL ratio, Cortisol salivaire, Testosterone/AMH si SOPK
-  const P15=[...P10,'Leptine','Ratio TG/HDL','FibroScan / CAP','Cortisol salivaire','Testosterone/AMH (si SOPK)'];
+  const P15=[...P10,t('bio_satiete')+' (Leptine)','TG/HDL','FibroScan/CAP','Cortisol','Testosterone/AMH'];
   let tier,panel,color,desc,suivi;
   if(cls==='FAIBLE'){
     if(sii>=2||S.indepCrit){
-      tier='Panel 5 — OBLIGATOIRE'; panel=P5; color='var(--accent)';
-      desc='SII = '+sii+'/7'+(S.indepCrit?' + critere independant':'')+'. Bilan de depistage recommande.';
-      suivi='Controle dans 2 ans';
+      tier=t('prx_p5_oblig'); panel=P5; color='var(--accent)';
+      desc='SII = '+sii+'/7'+(S.indepCrit?' + '+t('s15_critere_ind'):'')+'. '+t('s15_examens');
+      suivi=t('prx_ctrl_2ans');
     } else {
-      tier='OPTIONNEL'; panel=[]; color='var(--green)';
-      desc='Score declaratif faible (sD = '+sD+') et SII < 2. Bilan optionnel. Recommande si 1ere visite ou dernier bilan > 2 ans.';
-      suivi='Controle dans 3 ans';
+      tier=t('prx_optionnel'); panel=[]; color='var(--green)';
+      desc='sD = '+sD+' ('+cls+')  SII < 2. '+t('s15_pas_bilan');
+      suivi=t('prx_ctrl_3ans');
     }
   } else if(cls==='MODERE'){
-    tier='Panel 10 — OBLIGATOIRE'; panel=P10; color='var(--orange)';
-    desc='Risque modere (sD = '+sD+'). Bilan metabolique complet incluant marqueurs d\'insulinoresistance et profil lipidique avance.';
-    suivi='Suivi annuel';
+    tier=t('prx_p10_oblig'); panel=P10; color='var(--orange)';
+    desc='sD = '+sD+' ('+cls+'). '+t('prx_p10_oblig');
+    suivi=t('prx_annuel');
   } else if(cls==='ELEVE'){
-    tier='Panel 15 — OBLIGATOIRE'; panel=P15; color='var(--red)';
-    desc='Risque eleve (sD = '+sD+'). Bilan endocrinien complet: hepatique, inflammatoire, hormonal, adipokines.';
-    suivi='Suivi trimestriel';
+    tier=t('prx_p15_oblig'); panel=P15; color='var(--red)';
+    desc='sD = '+sD+' ('+cls+'). '+t('prx_p15_oblig');
+    suivi=t('prx_trim');
   } else {
-    tier='Panel 15 + BEF — OBLIGATOIRE'; panel=P15; color='var(--purple)';
-    desc='Risque tres eleve (sD = '+sD+'). Bilan complet + BioEmergencyFloor actif. Prise en charge urgente.';
-    suivi='Suivi mensuel - equipe specialisee';
+    tier=t('prx_p15bef'); panel=P15; color='var(--purple)';
+    desc='sD = '+sD+' ('+cls+'). '+t('prx_p15bef');
+    suivi=t('prx_mens');
   }
   return{tier,panel,color,desc,suivi,sii,sD,cls};
 }
@@ -2521,7 +2527,7 @@ function doRetro(){
   const el=$('retro');if(!el)return;
   el.innerHTML=fl.length
     ?fl.map(f=>`<div class="retro-alert" style="border-left-color:${f.c}"><span style="color:${f.c}">${f.t}</span></div>`).join('')
-    :'<div class="retro-ok">Pas d\'incoherence detectee.</div>';
+    :'<div class="retro-ok">'+t('s16_retro_ok')+'</div>';
 }
 
 // ── SIMULATION PROFILS BIOLOGIQUES ──
@@ -2605,7 +2611,7 @@ function renderFinal(){
     <div style="flex:1">
       <div style="font-size:20px;font-weight:800;color:${cls.c}">${cls.l}</div>
       <div style="font-size:12px;color:${cls.c};opacity:.8;margin:2px 0">${cls.tier}</div>
-      <div style="font-size:10px;color:${cls.c};opacity:.6">${hasBio?'sf = '+S.wDecl.toFixed(2)+'×sD + '+S.wBio.toFixed(2)+'×bioNorm':'sf = sD (sans biologie)'}</div>
+      <div style="font-size:10px;color:${cls.c};opacity:.6">${hasBio?'sf = '+S.wDecl.toFixed(2)+'×sD + '+S.wBio.toFixed(2)+'×bioNorm':'sf = sD ('+t('sans_biologie')+')'}</div>
     </div>
   </div>`;
 
@@ -2618,10 +2624,10 @@ function renderFinal(){
     <div style="font-size:9px;color:var(--dim3)">${sub}</div></div>`;
 
   r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
-    ${gridItem('C',S.scoreC,'/50 clinique','var(--accent)')}
-    ${gridItem('E',S.scoreE,'/45 exposome',S.scoreE>20?'var(--red)':S.scoreE>10?'var(--orange)':'var(--green)')}
-    ${gridItem('O',S.scoreO,'/10 occup.',S.scoreO>=6?'var(--red)':'var(--green)')}
-    ${gridItem('L',S.scoreL,'/10 lifestyle',S.scoreL>=6?'var(--red)':'var(--green)')}
+    ${gridItem('C',S.scoreC,'/50 '+t('clinique'),'var(--accent)')}
+    ${gridItem('E',S.scoreE,'/45 '+t('exposome'),S.scoreE>20?'var(--red)':S.scoreE>10?'var(--orange)':'var(--green)')}
+    ${gridItem('O',S.scoreO,'/10 '+t('occup'),S.scoreO>=6?'var(--red)':'var(--green)')}
+    ${gridItem('L',S.scoreL,'/10 '+t('lifestyle'),S.scoreL>=6?'var(--red)':'var(--green)')}
   </div>`;
 
   r+=`<div style="text-align:center;font-size:11px;color:var(--dim2);margin-bottom:10px">
@@ -2629,16 +2635,16 @@ function renderFinal(){
   </div>`;
 
   r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
-    ${gridItem('sD',S.sD,'/100 declaratif',getClass(S.sD).c)}
-    ${gridItem('Bio',S.bmn_b||'--','/100 biologie',S.bmn_b>0?'var(--teal)':'var(--dim)')}
-    ${gridItem('sf',t,'/100 final',cls.c)}
-    ${gridItem('K',S.bmn_k,'/50 comorb.',S.bmn_k>20?'var(--red)':S.bmn_k>0?'var(--orange)':'var(--green)')}
+    ${gridItem('sD',S.sD,'/100 '+t('declaratif'),getClass(S.sD).c)}
+    ${gridItem('Bio',S.bmn_b||'--','/100 '+t('biologie'),S.bmn_b>0?'var(--teal)':'var(--dim)')}
+    ${gridItem('sf',t,'/100 '+t('final'),cls.c)}
+    ${gridItem('K',S.bmn_k,'/50 '+t('comorb'),S.bmn_k>20?'var(--red)':S.bmn_k>0?'var(--orange)':'var(--green)')}
   </div>`;
 
   r+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
     ${gridItem('CTI',S.cti,ctiInfo.l,ctiInfo.c)}
     ${gridItem('GRI',S.gri.toFixed(1),griInfo.l,griInfo.c)}
-    ${gridItem('SII',S.sii,'/7 inflam.',S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)')}
+    ${gridItem('SII',S.sii,'/7 '+t('inflam'),S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)')}
     ${gridItem('P(Ob)',pObes+'%','10 ans',parseFloat(pObes)>50?'var(--red)':parseFloat(pObes)>25?'var(--orange)':'var(--green)')}
   </div>`;
 
@@ -2655,10 +2661,10 @@ function renderFinal(){
       <div style="width:${Math.min(S.cti,100)}%;height:100%;background:${ctiInfo.c};border-radius:3px;transition:width .5s"></div>
     </div>
     <div style="font-size:10px;color:var(--dim3)">
-      <b>Interpretation :</b> ${S.cti<=20?'Fenetre therapeutique ouverte. Les interventions classiques (nutrition, AP, pharmacologie) ont une efficacite maximale. Agir maintenant.':
-      S.cti<=40?'Debut de chronicisation. L\'efficacite des interventions diminue progressivement. Pharmacologie (GLP-1) a considerer rapidement.':
-      S.cti<=55?'Chronicite avancee. Les mecanismes adaptatifs (leptinoresistance, reponse metabolique) sont installes. GLP-1 haute dose recommande. Chirurgie a evaluer.':
-      'Chronicite installee. Resistance majeure aux interventions conservatrices. Evaluation chirurgicale bariatrique obligatoire. Set-point durablement modifie.'}
+      <b>${t('interpretation')} :</b> ${S.cti<=20?t('cti_interp_open'):
+      S.cti<=40?t('cti_interp_early'):
+      S.cti<=55?t('cti_interp_adv'):
+      t('cti_interp_inst')}
     </div>
   </div>`;
 
@@ -2691,13 +2697,13 @@ function renderFinal(){
 
     <!-- Axes radar simplifie -->
     <div style="padding:10px 16px;background:var(--bg2)">
-      <div style="font-size:10px;font-weight:700;color:var(--dim2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Axes du phenotypage</div>
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${t('axes_title')}</div>
       ${[
-        {n:'Insulinoresistance (IR)',v:ax.irScore,max:10,good:true,c:'var(--teal)'},
-        {n:'Chronicite / Resistance',v:ax.chronScore,max:10,good:false,c:'var(--red)'},
-        {n:'Inflammation',v:ax.inflamScore,max:10,good:true,c:'var(--orange)'},
-        {n:'Psycho-comportemental',v:ax.psychoScore,max:10,good:false,c:'var(--purple)'},
-        {n:'Iatrogene',v:ax.iatroScore,max:5,good:false,c:'var(--red)'}
+        {n:t('axe_ir'),v:ax.irScore,max:10,good:true,c:'var(--teal)'},
+        {n:t('axe_chron'),v:ax.chronScore,max:10,good:false,c:'var(--red)'},
+        {n:t('axe_inflam'),v:ax.inflamScore,max:10,good:true,c:'var(--orange)'},
+        {n:t('axe_psycho'),v:ax.psychoScore,max:10,good:false,c:'var(--purple)'},
+        {n:t('axe_iatro'),v:ax.iatroScore,max:5,good:false,c:'var(--red)'}
       ].map(a=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <div style="min-width:130px;font-size:10px;color:var(--dim)">${a.n}</div>
         <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
@@ -2712,40 +2718,40 @@ function renderFinal(){
     ${gp.code!=='CI'&&gp.code!=='R5'?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px">Perte de poids estimee (PPE)</div>
+          <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px">${t('ppe_title')}</div>
           <div style="font-size:10px;color:var(--dim3)">Ref: STEP 1-5 (Semaglutide) | SURMOUNT 1-4 (Tirzepatide)</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:22px;font-weight:900;color:${gp.color}">~${glp1.ppeEstimate}%</div>
-          <div style="font-size:9px;color:var(--dim3)">du poids initial</div>
+          <div style="font-size:9px;color:var(--dim3)">${t('ppe_du_poids')}</div>
         </div>
       </div>
-      ${S.poids>0?`<div style="font-size:10px;color:var(--dim);margin-top:4px">Soit environ <b style="color:var(--txt)">-${Math.round(S.poids*glp1.ppeEstimate/100)} kg</b> sur 12-18 mois (poids actuel: ${S.poids} kg → cible ~${Math.round(S.poids*(1-glp1.ppeEstimate/100))} kg)</div>`:''}
+      ${S.poids>0?`<div style="font-size:10px;color:var(--dim);margin-top:4px">${t('ppe_soit')} <b style="color:var(--txt)">-${Math.round(S.poids*glp1.ppeEstimate/100)} kg</b> ${t('ppe_sur')} ${S.poids} kg → ${t('ppe_cible')} ~${Math.round(S.poids*(1-glp1.ppeEstimate/100))} kg)</div>`:''}
     </div>`:''}
 
     <!-- Molecule recommandee -->
     ${gp.molecule?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
-      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Prescription GLP-1 recommandee</div>
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${t('rx_title')}</div>
       <div style="display:flex;gap:8px;margin-bottom:6px">
         <div style="flex:1;padding:8px;border-radius:8px;border:1px solid ${gp.color};background:${gp.bgColor}">
           <div style="font-size:11px;font-weight:700;color:${gp.color}">${gp.molecule}</div>
-          ${gp.doseInit&&gp.doseInit!=='N/A'?`<div style="font-size:9px;color:var(--dim);margin-top:2px">Initiation: <b>${gp.doseInit}</b></div>`:''}
-          ${gp.doseCible&&gp.doseCible!=='N/A'?`<div style="font-size:9px;color:var(--dim)">Cible: <b>${gp.doseCible}</b></div>`:''}
+          ${gp.doseInit&&gp.doseInit!=='N/A'?`<div style="font-size:9px;color:var(--dim);margin-top:2px">${t('rx_init')}: <b>${gp.doseInit}</b></div>`:''}
+          ${gp.doseCible&&gp.doseCible!=='N/A'?`<div style="font-size:9px;color:var(--dim)">${t('rx_cible')}: <b>${gp.doseCible}</b></div>`:''}
         </div>
       </div>
-      ${gp.moleculeAlt?`<div style="font-size:9px;color:var(--dim3)"><b>Alternative:</b> ${gp.moleculeAlt}</div>`:''}
+      ${gp.moleculeAlt?`<div style="font-size:9px;color:var(--dim3)"><b>${t('rx_alt')}:</b> ${gp.moleculeAlt}</div>`:''}
     </div>`:''}
 
     <!-- Timeline -->
     ${gp.timeline&&gp.timeline!=='N/A'?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Timeline de reponse attendue</div>
+      <div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${t('timeline_title')}</div>
       <div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.timeline.split('|').map(t=>'<div style="padding:2px 0;border-left:2px solid '+gp.color+';padding-left:8px;margin-bottom:2px">'+t.trim()+'</div>').join('')}</div>
     </div>`:''}
 
     <!-- Facteurs d'efficacite -->
     ${glp1.efficacyFactors.length>0?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
       <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
-        Facteurs d'efficacite (${glp1.efficacyFactors.length})
+        ${t('efficacy_title')} (${glp1.efficacyFactors.length})
       </div>
       ${glp1.efficacyFactors.slice(0,6).map(f=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
         <div style="min-width:8px;margin-top:4px;width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
@@ -2759,7 +2765,7 @@ function renderFinal(){
     <!-- Facteurs de resistance -->
     ${glp1.resistanceFactors.length>0?`<div style="padding:10px 16px;border-top:1px solid var(--border)">
       <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">
-        Facteurs de resistance (${glp1.resistanceFactors.length})
+        ${t('resistance_title')} (${glp1.resistanceFactors.length})
       </div>
       ${glp1.resistanceFactors.slice(0,6).map(f=>`<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px">
         <div style="min-width:8px;margin-top:4px;width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
@@ -2772,13 +2778,13 @@ function renderFinal(){
 
     <!-- Maintenance / Alternative -->
     ${gp.maintenance||gp.alternative?`<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2)">
-      ${gp.maintenance?`<div style="margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Maintien / Long terme</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.maintenance}</div></div>`:''}
-      ${gp.alternative?`<div><div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Si echec / Alternative</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.alternative}</div></div>`:''}
+      ${gp.maintenance?`<div style="margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">${t('maintenance_title')}</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.maintenance}</div></div>`:''}
+      ${gp.alternative?`<div><div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">${t('alt_title')}</div><div style="font-size:10px;color:var(--dim);line-height:1.5">${gp.alternative}</div></div>`:''}
     </div>`:''}
 
     <!-- Avertissement bio -->
     ${!glp1.hasBio?`<div style="padding:8px 16px;border-top:1px solid var(--orange);background:rgba(245,158,11,.08)">
-      <div style="font-size:10px;color:var(--orange);font-weight:600">⚠ Profil base sur les donnees declaratives uniquement. La biologie (HOMA-IR, adiponectine, leptine) affinera significativement cette prediction.</div>
+      <div style="font-size:10px;color:var(--orange);font-weight:600">⚠ ${t('bio_warning')}</div>
     </div>`:''}
 
   </div>`;
@@ -2788,7 +2794,7 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   if(hasBio){
     r+=`<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
-      <div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:8px">Integration Biologique — BSD v4.7.1</div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:8px">${t('integration_bio')}</div>
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
         <div style="text-align:center;flex:1"><div style="font-size:10px;color:var(--dim2)">sD</div><div style="font-size:18px;font-weight:700">${S.sD}</div><div style="font-size:9px;color:var(--dim3)">w=${S.wDecl.toFixed(2)}</div></div>
         <div style="font-size:16px;color:var(--dim3)">×</div>
@@ -2797,9 +2803,9 @@ function renderFinal(){
         <div style="text-align:center;flex:1"><div style="font-size:10px;color:var(--dim2)">sf</div><div style="font-size:18px;font-weight:700;color:${cls.c}">${t}</div><div style="font-size:9px;color:var(--dim3)">final</div></div>
       </div>
       <div style="font-size:10px;color:var(--dim3)">
-        ${S.bmn_b>80?'BioEmergencyFloor actif (bio>80 → sf >= '+Math.round(S.bmn_b*0.85)+') | ':''}
-        ${S.bInflam>0?'bInflam = '+S.bInflam.toFixed(2)+' (E amplifiee +'+Math.round(S.bInflam*15)+'%) | ':''}
-        Gap = ${Math.abs(S.bmn_b-S.sD)} → ${Math.abs(S.bmn_b-S.sD)>20?'Reponderation dynamique':'Poids standards'}
+        ${S.bmn_b>80?t('bio_floor')+' (bio>80 → sf >= '+Math.round(S.bmn_b*0.85)+') | ':''}
+        ${S.bInflam>0?'bInflam = '+S.bInflam.toFixed(2)+' ('+t('e_amplifiee')+' +'+Math.round(S.bInflam*15)+'%) | ':''}
+        ${t('gap_label')} = ${Math.abs(S.bmn_b-S.sD)} → ${Math.abs(S.bmn_b-S.sD)>20?t('reponderation_dyn'):t('poids_std')}
       </div>
     </div>`;
   }
@@ -2811,19 +2817,19 @@ function renderFinal(){
     <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
       <div style="font-size:9px;color:var(--dim2)">PSS-10</div>
       <div style="font-size:16px;font-weight:700;color:${pssT>=27?'var(--red)':pssT>=20?'var(--orange)':pssT>=14?'var(--accent)':'var(--green)'}">${pssT}/40</div>
-      <div style="font-size:9px;color:var(--dim3)">${pssT>=27?'Tres eleve':pssT>=20?'Eleve':pssT>=14?'Modere':'Faible'}</div></div>
+      <div style="font-size:9px;color:var(--dim3)">${pssT>=27?t('stress_vhigh'):pssT>=20?t('stress_high'):pssT>=14?t('stress_mod'):t('stress_low')}</div></div>
     <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
       <div style="font-size:9px;color:var(--dim2)">PHQ-9</div>
       <div style="font-size:16px;font-weight:700;color:${phqT>=20?'var(--red)':phqT>=15?'var(--orange)':phqT>=10?'var(--accent)':'var(--green)'}">${phqT}/27</div>
-      <div style="font-size:9px;color:var(--dim3)">${phqT>=20?'Severe':phqT>=15?'Mod-sev.':phqT>=10?'Modere':phqT>=5?'Leger':'Normal'}</div></div>
+      <div style="font-size:9px;color:var(--dim3)">${phqT>=20?t('dep_sev'):phqT>=15?t('dep_modsev'):phqT>=10?t('dep_mod'):phqT>=5?t('dep_mild'):t('dep_none')}</div></div>
     <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
       <div style="font-size:9px;color:var(--dim2)">BES</div>
       <div style="font-size:16px;font-weight:700;color:${S.bes>=5?'var(--red)':S.bes>=3?'var(--orange)':'var(--green)'}">${S.bes}/8</div>
-      <div style="font-size:9px;color:var(--dim3)">${S.bes>=5?'Severe':S.bes>=3?'Modere':'Leger'}</div></div>
+      <div style="font-size:9px;color:var(--dim3)">${S.bes>=5?t('severe'):S.bes>=3?t('modere'):t('leger')}</div></div>
     <div style="flex:1;text-align:center;padding:8px;background:var(--bg2);border-radius:10px">
       <div style="font-size:9px;color:var(--dim2)">SII</div>
       <div style="font-size:16px;font-weight:700;color:${S.sii>=4?'var(--red)':S.sii>=2?'var(--orange)':'var(--green)'}">${S.sii}/7</div>
-      <div style="font-size:9px;color:var(--dim3)">Inflam.</div></div>
+      <div style="font-size:9px;color:var(--dim3)">${t('inflam')}</div></div>
   </div>`;
 
   // ══════════════════════════════════════════════════════
@@ -2831,13 +2837,13 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   r+=`<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:13px;font-weight:700;color:var(--txt)">Projection Markov — 10 ans</div>
+      <div style="font-size:13px;font-weight:700;color:var(--txt)">${t('markov_title')}</div>
       <div style="font-size:16px;font-weight:800;color:${parseFloat(pObes)>50?'var(--red)':parseFloat(pObes)>25?'var(--orange)':'var(--green)'}">${pObes}%</div>
     </div>`;
   mk.prob.forEach((p,i)=>{
     const pct=(p*100).toFixed(1);
     r+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-      <div style="min-width:80px;font-size:10px;color:${colors[i]};font-weight:${i===mk.cs?700:400}">${MK_ST[i]}${i===mk.cs?' •':''}</div>
+      <div style="min-width:80px;font-size:10px;color:${colors[i]};font-weight:${i===mk.cs?700:400}">${MK_ST_FN()[i]}${i===mk.cs?' •':''}</div>
       <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[i]}"></div></div>
       <div style="min-width:35px;font-size:10px;color:${colors[i]};text-align:right;font-weight:600">${pct}%</div></div>`;
   });
@@ -2847,7 +2853,7 @@ function renderFinal(){
   // 8. STRATEGIE THERAPEUTIQUE PERSONNALISEE
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-bottom:10px">
-    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">STRATEGIE THERAPEUTIQUE</div>`;
+    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">${t('strat_title')}</div>`;
   strats.forEach(s=>{
     r+=`<div style="border-left:3px solid ${s.color};padding:10px 12px;margin-bottom:8px;background:var(--bg2);border-radius:0 12px 12px 0">
       <div style="font-size:13px;font-weight:700;color:${s.color};margin-bottom:4px">${s.title}</div>
@@ -2862,11 +2868,11 @@ function renderFinal(){
   // 9. RAPPORT IA STRATEGIQUE — aide au medecin
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-bottom:10px">
-    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">RAPPORT IA — AIDE AU MEDECIN</div>
+    <div style="font-size:14px;font-weight:800;color:var(--txt);margin-bottom:8px;padding:0 4px">${t('ai_report_title')}</div>
     <div id="aiFinal" style="min-height:60px">
       <div style="display:flex;align-items:center;gap:10px;padding:16px;background:var(--bg2);border-radius:12px">
         <span class="spinner"></span>
-        <span style="font-size:12px;color:var(--dim)">Generation du rapport strategique personnalise...</span>
+        <span style="font-size:12px;color:var(--dim)">${t('ai_generating')}</span>
       </div>
     </div>
   </div>`;
@@ -2878,10 +2884,10 @@ function renderFinal(){
     if(ai&&(ai.diagnostic_resume||ai.summary)){
       const tone=ai.tone||'cautious';
       const tc=tone==='urgent'?'var(--red)':tone==='cautious'?'var(--orange)':'var(--green)';
-      const tLabel=tone==='urgent'?'URGENT':tone==='cautious'?'ATTENTION':'FAVORABLE';
+      const tLabel=tone==='urgent'?t('ai_urgent'):tone==='cautious'?t('ai_attention'):t('ai_favorable');
       let h2=`<div style="border:1px solid ${tc};border-radius:12px;overflow:hidden">
         <div style="background:${tc};color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
-          <div style="font-weight:700;font-size:13px">Rapport IA — Claude</div>
+          <div style="font-weight:700;font-size:13px">${t('ai_report_label')}</div>
           <div style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.2)">${tLabel}</div>
         </div>
         <div style="padding:14px">`;
@@ -2891,29 +2897,29 @@ function renderFinal(){
       else if(ai.summary) h2+=`<div style="font-size:12px;color:var(--txt);line-height:1.6;margin-bottom:12px">${ai.summary}</div>`;
 
       // Synthese clinique
-      if(ai.synthese_clinique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">SYNTHESE CLINIQUE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.synthese_clinique}</div></div>`;
+      if(ai.synthese_clinique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">${t('ai_synth_clin')}</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.synthese_clinique}</div></div>`;
 
       // Points positifs
       const pos=ai.points_positifs||ai.positive_points;
-      if(pos?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">POINTS FAVORABLES</div>${pos.map(p2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">+ ${p2}</div>`).join('')}</div>`;
+      if(pos?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">${t('ai_points_pos')}</div>${pos.map(p2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">+ ${p2}</div>`).join('')}</div>`;
 
       // Risques identifies
       const risks=ai.risques_identifies||ai.key_risks;
-      if(risks?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">RISQUES IDENTIFIES</div>${risks.map(r2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">! ${r2}</div>`).join('')}</div>`;
+      if(risks?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">${t('ai_risques')}</div>${risks.map(r2=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">! ${r2}</div>`).join('')}</div>`;
 
       // Plan therapeutique IA
       const plan=ai.plan_therapeutique||ai.priority_actions;
-      if(plan?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">PLAN THERAPEUTIQUE RECOMMANDE</div>${plan.map((a2,i)=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">${i+1}. ${a2}</div>`).join('')}</div>`;
+      if(plan?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">${t('ai_plan')}</div>${plan.map((a2,i)=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">${i+1}. ${a2}</div>`).join('')}</div>`;
 
       // Pharmacologie
-      if(ai.recommandation_pharmacologique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px">PHARMACOLOGIE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.recommandation_pharmacologique}</div></div>`;
+      if(ai.recommandation_pharmacologique) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:4px">${t('ai_pharma')}</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.recommandation_pharmacologique}</div></div>`;
 
       // Suivi propose
-      if(ai.suivi_propose) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">SUIVI PROPOSE</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.suivi_propose}</div></div>`;
+      if(ai.suivi_propose) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">${t('ai_suivi')}</div><div style="font-size:11px;color:var(--dim);line-height:1.5">${ai.suivi_propose}</div></div>`;
 
       // Conseils personnalises
       const tips=ai.conseils_patient||ai.lifestyle_tips;
-      if(tips?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">CONSEILS PATIENT</div>${tips.map(l=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">→ ${l}</div>`).join('')}</div>`;
+      if(tips?.length) h2+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">${t('ai_conseils')}</div>${tips.map(l=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg3)">→ ${l}</div>`).join('')}</div>`;
 
       // Attention medicale
       const med=ai.attention_medicale||ai.medical_attention;
@@ -2922,7 +2928,7 @@ function renderFinal(){
       h2+=`</div></div>`;
       box.innerHTML=h2;
     } else {
-      box.innerHTML=`<div style="padding:12px;background:var(--bg2);border-radius:10px;font-size:11px;color:var(--dim3);text-align:center">Rapport IA non disponible. Verifiez la connexion.</div>`;
+      box.innerHTML=`<div style="padding:12px;background:var(--bg2);border-radius:10px;font-size:11px;color:var(--dim3);text-align:center">${t('ai_unavailable')}</div>`;
     }
   },300);
 
@@ -2930,11 +2936,11 @@ function renderFinal(){
   // 10. QUANTIFICATION DETAILLEE (collapse)
   // ══════════════════════════════════════════════════════
   r+=`<details style="margin-bottom:10px;background:var(--bg2);border-radius:12px;overflow:hidden">
-    <summary style="padding:12px 14px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer">Quantification detaillee (sD = ${S.sD}/100)</summary>
+    <summary style="padding:12px 14px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer">${t('quant_title')} (sD = ${S.sD}/100)</summary>
     <div style="padding:0 14px 14px">`;
   const dd=S.details;
   ['C','E','O','L'].forEach(grp=>{
-    const grpLabel=grp==='C'?'Clinique (C='+S.scoreC+'/50)':grp==='E'?'Exposome (E='+S.scoreE+'/45)':grp==='O'?'Occup. (O='+S.scoreO+'/10)':'Lifestyle (L='+S.scoreL+'/10)';
+    const grpLabel=grp==='C'?t('quant_clinique')+' (C='+S.scoreC+'/50)':grp==='E'?t('quant_exposome')+' (E='+S.scoreE+'/45)':grp==='O'?t('quant_occup')+' (O='+S.scoreO+'/10)':t('quant_lifestyle')+' (L='+S.scoreL+'/10)';
     const grpKeys=Object.keys(dd).filter(k=>dd[k].grp===grp&&!k.startsWith('_'));
     if(grpKeys.length===0)return;
     r+=`<div style="margin:8px 0 4px;font-weight:700;color:var(--accent);font-size:12px">${grpLabel}</div>`;
@@ -2957,18 +2963,18 @@ function renderFinal(){
   const btm=btm_decision();
   if(btm && btm.primary){
     const cmplxCol=['','var(--green)','var(--teal)','var(--orange)','var(--red)','var(--purple)'][btm.complexity]||'var(--accent)';
-    const cmplxLbl=['','Simple','Modere','Complexe','Tres complexe','Maximal'][btm.complexity]||'';
+    const cmplxLbl=['',t('btm_simple'),t('btm_modere'),t('btm_complexe'),t('btm_tres_complexe'),t('btm_maximal')][btm.complexity]||'';
     const besT=getBesTotal();
     const confCol=btm.confiance==='INDICATION CLAIRE'?'var(--green)':btm.confiance==='DISCUSSION PATIENT'?'var(--orange)':'var(--red)';
     r+=`<div style="margin-top:12px;border:2px solid var(--accent);border-radius:14px;overflow:hidden">
       <div style="background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(56,189,248,.1));padding:14px 16px;border-bottom:1px solid rgba(129,140,248,.2)">
-        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. MODULE BTM v3.4 — Recommandation Therapeutique</div>
-        <div style="font-size:10px;color:var(--dim2);margin-top:2px">Bariatric & Therapeutic Module — Scoring matriciel 27 facteurs x 6 techniques — 62+ etudes</div>
+        <div style="font-size:14px;font-weight:800;color:var(--accent)">11. ${t('btm_title')}</div>
+        <div style="font-size:10px;color:var(--dim2);margin-top:2px">${t('btm_sub')}</div>
       </div>
       <div style="padding:12px 14px">
         <!-- 11.1 Score BTM Global + Confiance -->
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-          <div style="font-size:10px;color:var(--dim3)">Complexite</div>
+          <div style="font-size:10px;color:var(--dim3)">${t('btm_complexite')}</div>
           <div style="display:flex;gap:3px">${[1,2,3,4,5].map(i=>`<div style="width:20px;height:8px;border-radius:4px;background:${i<=btm.complexity?cmplxCol:'var(--bg2)'}"></div>`).join('')}</div>
           <div style="font-size:10px;font-weight:700;color:${cmplxCol}">${btm.complexity}/5 — ${cmplxLbl}</div>
           <div style="margin-left:auto;font-size:9px;font-weight:800;color:${confCol};background:${confCol}15;padding:2px 8px;border-radius:6px">${btm.confiance} (delta ${btm.delta_rel}%)</div>
@@ -2976,14 +2982,14 @@ function renderFinal(){
         ${btm.alarmes.length?btm.alarmes.map(a=>`<div style="background:rgba(239,68,68,.15);border:2px solid var(--red);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;font-weight:800;color:var(--red)">⚠ ${a}</div>`).join(''):''}
         <!-- 11.2 Recommandation primaire (MOD-05/09) -->
         <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-          <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:4px">★ Recommandation Primaire</div>
+          <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:4px">★ ${t('btm_reco_prim')}</div>
           <div style="font-size:14px;font-weight:800;color:var(--txt)">${btm.primary.name}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.primary.reason}</div>
           <div style="font-size:10px;color:var(--dim2);margin-top:2px">[${btm.primary.tech}] — Score ${btm.score_brut[btm.primary.tech]||0} pts (${btm.score_pct[btm.primary.tech]||0}%)</div>
         </div>
         <!-- 11.3 Recommandation secondaire + delta -->
         ${btm.secondary?`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px">
-          <div style="font-size:10px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:4px">Alternative / Secondaire (delta relatif: ${btm.delta_rel}%)</div>
+          <div style="font-size:10px;color:var(--cyan);font-weight:700;text-transform:uppercase;margin-bottom:4px">${t('btm_reco_sec')} (delta relatif: ${btm.delta_rel}%)</div>
           <div style="font-size:13px;font-weight:700;color:var(--txt)">${btm.secondary.name}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:2px">${btm.secondary.reason}</div>
         </div>`:''}
@@ -3003,7 +3009,7 @@ function renderFinal(){
           </div>
         </div>
         <!-- Score par technique (MOD-09) -->
-        <details style="margin-bottom:8px"><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">Scores par technique (6 familles)</summary>
+        <details style="margin-bottom:8px"><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">${t('btm_scores_tech')}</summary>
           <div style="margin-top:4px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
             ${['BT1','BT2','BT3','BT4','BT5','BT6'].map(t=>{
               const sc=btm.score_brut[t]||0;const pct=btm.score_pct[t]||0;
@@ -3018,27 +3024,27 @@ function renderFinal(){
         </details>
         <!-- 11.5 Associations + BT-6 type -->
         ${btm.bt6_type?`<div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:8px;padding:8px 12px;margin-bottom:8px">
-          <div style="font-size:10px;color:var(--purple);font-weight:700;margin-bottom:4px">BT-6 Association recommandee</div>
+          <div style="font-size:10px;color:var(--purple);font-weight:700;margin-bottom:4px">${t('btm_bt6_assoc')}</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">${btm.bt6_type.n}</div>
           <div style="font-size:10px;color:var(--dim);margin-top:2px">TBWL 12m: ${btm.bt6_type.tbwl12} | DT2: ${btm.bt6_type.dt2r} | Grade ${btm.bt6_type.grade}</div>
         </div>`:''}
         ${btm.assoc.length?`<div style="margin-bottom:8px">
-          <div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">Associations recommandees</div>
+          <div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">${t('btm_assoc_reco')}</div>
           ${btm.assoc.map(a=>`<div style="font-size:11px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--bg2)">+ ${a}</div>`).join('')}
         </div>`:''}
         <!-- 11.6 Contre-indications -->
         ${btm.contraind.length?`<div style="margin-bottom:8px">
-          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">Contre-indications identifiees</div>
+          <div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:4px">${t('btm_contraind')}</div>
           ${btm.contraind.map(c=>`<div style="font-size:11px;color:var(--red);padding:3px 0">${c}</div>`).join('')}
         </div>`:''}
         <!-- 11.7 Parcours de soins -->
-        ${btm.parcours.length?`<details><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">Parcours de soins optimise (${btm.parcours.length} etapes)</summary>
+        ${btm.parcours.length?`<details><summary style="font-size:10px;color:var(--accent);font-weight:700;cursor:pointer">${t('btm_parcours')} (${btm.parcours.length} ${t('btm_etapes')})</summary>
           <div style="margin-top:6px">${btm.parcours.map((p,i)=>`<div style="font-size:10px;color:var(--dim);padding:3px 0;border-left:2px solid var(--accent);padding-left:8px;margin-left:4px">${p}</div>`).join('')}</div>
         </details>`:''}
         <!-- Notes + FNC -->
         ${btm.notes.length?`<div style="margin-top:6px">${btm.notes.map(n=>`<div style="font-size:10px;color:var(--dim2);padding:2px 0;font-style:italic">${n}</div>`).join('')}</div>`:''}
         <!-- Facteurs actifs -->
-        ${btm.facteurs_actifs.length?`<details style="margin-top:6px"><summary style="font-size:9px;color:var(--dim3);cursor:pointer">${btm.facteurs_actifs.length} facteurs actifs dans le scoring</summary>
+        ${btm.facteurs_actifs.length?`<details style="margin-top:6px"><summary style="font-size:9px;color:var(--dim3);cursor:pointer">${btm.facteurs_actifs.length} ${t('btm_facteurs')}</summary>
           <div style="margin-top:4px;font-size:9px;color:var(--dim3)">${btm.facteurs_actifs.map(f=>f.f).join(', ')}</div>
         </details>`:''}
       </div>
@@ -3049,14 +3055,14 @@ function renderFinal(){
   // 12. REFERENCES
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
-    <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
-    <b>COMPASS v3.5</b> — Comprehensive Metabolic Profiling & Stratification System — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
+    <b>${t('footer_refs')}</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
+    <b>COMPASS v3.5</b> — Comprehensive Metabolic Profiling & Stratification System — ${t('footer_arch')} — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
   </div>`;
 
   return r;
 }
 
-function resetAll(){if(!confirm('Recommencer depuis le debut ?'))return;location.reload();}
+function resetAll(){if(!confirm(t('reset_confirm')))return;location.reload();}
 
 // ─── SWIPE ───
 let tX=0,tY=0,sw=false;
@@ -3076,7 +3082,7 @@ document.addEventListener('keydown',e=>{
 function init(){
   $('app').innerHTML=`<div class="hdr">
     <button class="hdr-back" onclick="if(S.step>0)go(S.step-1,-1)">&#8592;</button>
-    <div class="hdr-center"><div class="hdr-sec" id="hdrSec">[H] Accueil</div><div class="hdr-step" id="hdrStep"></div></div>
+    <div class="hdr-center"><div class="hdr-sec" id="hdrSec">[H] ${t('sec_accueil')}</div><div class="hdr-step" id="hdrStep"></div></div>
     <div class="hdr-score" id="hdrScore" style="display:none"></div></div>
     <div class="pgbar"><div class="pgbar-fill" id="pgFill" style="width:0%"></div></div>
     <div class="scr-wrap" id="scrWrap"></div>

@@ -2633,14 +2633,15 @@ app.get('/', (c) => {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Evaluez votre risque metabolique avec intelligence artificielle.">
-<title>COMPASS &mdash; Bilan metabolique</title>
+<meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Evaluate your metabolic risk with artificial intelligence / Evaluez votre risque metabolique avec intelligence artificielle.">
+<title>COMPASS &mdash; Metabolic Assessment</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="/static/styles.css" rel="stylesheet">
 </head>
 <body>
 <div id="app"></div>
+<script src="/static/i18n.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>`)
@@ -2887,30 +2888,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     </div>
   </a>
   <div class="nav-links">
-    <a href="#pourquoi">Pourquoi ?</a>
-    <a href="#comment">Comment</a>
-    <a href="#analyse">Ce qu'on analyse</a>
+    <a href="#pourquoi" class="i18n-fr">Pourquoi ?</a><a href="#pourquoi" class="i18n-en" style="display:none">Why?</a>
+    <a href="#comment" class="i18n-fr">Comment</a><a href="#comment" class="i18n-en" style="display:none">How</a>
+    <a href="#analyse" class="i18n-fr">Ce qu'on analyse</a><a href="#analyse" class="i18n-en" style="display:none">What we analyze</a>
     <a href="#faq">FAQ</a>
-    <a href="/" class="cta-nav">Faire mon bilan <i class="fas fa-arrow-right" style="font-size:12px"></i></a>
+    <button onclick="setLang(LANG==='fr'?'en':'fr')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--txt);padding:6px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)" id="langToggle">EN</button>
+    <a href="/" class="cta-nav"><span class="i18n-fr">Faire mon bilan</span><span class="i18n-en" style="display:none">Start assessment</span> <i class="fas fa-arrow-right" style="font-size:12px"></i></a>
   </div>
 </div>
 </nav>
 
 <!-- ══════ HERO ══════ -->
 <section class="hero">
-  <div class="hero-badge"><i class="fas fa-flask-vial"></i> Etude prospective &mdash; Ile Maurice</div>
-  <h1>Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</h1>
+  <div class="hero-badge"><i class="fas fa-flask-vial"></i> <span class="i18n-fr">Etude prospective &mdash; Ile Maurice</span><span class="i18n-en" style="display:none">Prospective study &mdash; Mauritius</span></div>
+  <h1><span class="i18n-fr">Comprenez votre <span class="highlight">sante metabolique</span> en 10 minutes</span><span class="i18n-en" style="display:none">Understand your <span class="highlight">metabolic health</span> in 10 minutes</span></h1>
   <p style="font-size:13px;font-weight:600;color:var(--dim2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Comprehensive Metabolic Profiling &amp; Stratification System</p>
-  <p class="hero-sub">A Maurice, pres d'<strong>1 adulte sur 4</strong> est diabetique et l'obesite progresse dans toutes les communautes. COMPASS est le premier outil adapte a la realite mauricienne : votre origine, votre environnement tropical, votre mode de vie &mdash; un bilan personnalise avec des pistes d'action concretes.</p>
+  <p class="hero-sub"><span class="i18n-fr">A Maurice, pres d'<strong>1 adulte sur 4</strong> est diabetique et l'obesite progresse dans toutes les communautes. COMPASS est le premier outil adapte a la realite mauricienne : votre origine, votre environnement tropical, votre mode de vie &mdash; un bilan personnalise avec des pistes d'action concretes.</span><span class="i18n-en" style="display:none">In Mauritius, nearly <strong>1 in 4 adults</strong> is diabetic and obesity is rising across all communities. COMPASS is the first tool adapted to Mauritian reality: your ethnic background, your tropical environment, your lifestyle &mdash; a personalized assessment with concrete action plans.</span></p>
   <div class="hero-btns">
-    <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> Commencer mon bilan</a>
-    <a href="#comment" class="btn btn-secondary"><i class="fas fa-info-circle"></i> En savoir plus</a>
+    <a href="/" class="btn btn-primary"><i class="fas fa-play"></i> <span class="i18n-fr">Commencer mon bilan</span><span class="i18n-en" style="display:none">Start my assessment</span></a>
+    <a href="#comment" class="btn btn-secondary"><i class="fas fa-info-circle"></i> <span class="i18n-fr">En savoir plus</span><span class="i18n-en" style="display:none">Learn more</span></a>
   </div>
   <div class="trust-bar">
-    <div class="trust-item"><div class="t-num">22 807</div><div class="t-label">Personnes dans l'etude</div></div>
-    <div class="trust-item"><div class="t-num">10 min</div><div class="t-label">Pour votre bilan</div></div>
-    <div class="trust-item"><div class="t-num">53</div><div class="t-label">Etudes scientifiques</div></div>
-    <div class="trust-item"><div class="t-num">18</div><div class="t-label">Biomarqueurs analyses</div></div>
+    <div class="trust-item"><div class="t-num">22 807</div><div class="t-label"><span class="i18n-fr">Personnes dans l'etude</span><span class="i18n-en" style="display:none">Study participants</span></div></div>
+    <div class="trust-item"><div class="t-num">10 min</div><div class="t-label"><span class="i18n-fr">Pour votre bilan</span><span class="i18n-en" style="display:none">For your assessment</span></div></div>
+    <div class="trust-item"><div class="t-num">53</div><div class="t-label"><span class="i18n-fr">Etudes scientifiques</span><span class="i18n-en" style="display:none">Scientific studies</span></div></div>
+    <div class="trust-item"><div class="t-num">18</div><div class="t-label"><span class="i18n-fr">Biomarqueurs analyses</span><span class="i18n-en" style="display:none">Biomarkers analyzed</span></div></div>
   </div>
 </section>
 
@@ -2919,40 +2921,40 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <!-- ══════ POURQUOI ══════ -->
 <section class="section" id="pourquoi">
   <div class="section-header">
-    <div class="section-badge badge-blue"><i class="fas fa-lightbulb"></i> Pourquoi COMPASS ?</div>
-    <h2>Parce que votre sante ne se resume<br>pas a un chiffre sur la balance</h2>
-    <p>A Maurice, le diabete, l'obesite et les maladies cardiovasculaires touchent toutes les communautes. Mais les outils existants ne tiennent pas compte de nos specificites. COMPASS est le premier outil concu pour la realite mauricienne.</p>
+    <div class="section-badge badge-blue"><i class="fas fa-lightbulb"></i> <span class="i18n-fr">Pourquoi COMPASS ?</span><span class="i18n-en" style="display:none">Why COMPASS?</span></div>
+    <h2><span class="i18n-fr">Parce que votre sante ne se resume<br>pas a un chiffre sur la balance</span><span class="i18n-en" style="display:none">Because your health is more<br>than a number on a scale</span></h2>
+    <p><span class="i18n-fr">A Maurice, le diabete, l'obesite et les maladies cardiovasculaires touchent toutes les communautes. Mais les outils existants ne tiennent pas compte de nos specificites. COMPASS est le premier outil concu pour la realite mauricienne.</span><span class="i18n-en" style="display:none">In Mauritius, diabetes, obesity and cardiovascular disease affect all communities. But existing tools don't account for our specificities. COMPASS is the first tool designed for Mauritian reality.</span></p>
   </div>
   <div class="why-grid">
     <div class="why-card">
       <div class="card-icon icon-blue"><i class="fas fa-fingerprint"></i></div>
-      <h3>Adapte a notre diversite</h3>
-      <p>Indo-Mauricien, Creole, Sino-Mauricien, Franco-Mauricien&hellip; Les seuils de risque varient considerablement selon l'origine ethnique. Un Indo-Mauricien a un risque de diabete <strong>2 fois superieur</strong> a IMC equivalent. COMPASS integre <strong>12 profils ethniques</strong> avec des seuils adaptes.</p>
+      <h3><span class="i18n-fr">Adapte a notre diversite</span><span class="i18n-en" style="display:none">Adapted to our diversity</span></h3>
+      <p><span class="i18n-fr">Indo-Mauricien, Creole, Sino-Mauricien, Franco-Mauricien&hellip; Les seuils de risque varient considerablement selon l'origine ethnique. Un Indo-Mauricien a un risque de diabete <strong>2 fois superieur</strong> a IMC equivalent. COMPASS integre <strong>12 profils ethniques</strong> avec des seuils adaptes.</span><span class="i18n-en" style="display:none">Indo-Mauritian, Creole, Sino-Mauritian, Franco-Mauritian&hellip; Risk thresholds vary considerably by ethnic origin. An Indo-Mauritian has a <strong>2x higher</strong> diabetes risk at equivalent BMI. COMPASS integrates <strong>12 ethnic profiles</strong> with adapted thresholds.</span></p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-green"><i class="fas fa-tree-city"></i></div>
-      <h3>Notre environnement tropical compte</h3>
-      <p>Chaleur, humidite, qualite de l'air dans les zones industrielles (ex. Plaines Wilhems), trajet quotidien en voiture&hellip; COMPASS integre les donnees environnementales <strong>en temps reel</strong> de votre zone de vie a Maurice avec normalisation climatique tropicale.</p>
+      <h3><span class="i18n-fr">Notre environnement tropical compte</span><span class="i18n-en" style="display:none">Our tropical environment matters</span></h3>
+      <p><span class="i18n-fr">Chaleur, humidite, qualite de l'air dans les zones industrielles (ex. Plaines Wilhems), trajet quotidien en voiture&hellip; COMPASS integre les donnees environnementales <strong>en temps reel</strong> de votre zone de vie a Maurice avec normalisation climatique tropicale.</span><span class="i18n-en" style="display:none">Heat, humidity, air quality in industrial zones (e.g. Plaines Wilhems), daily car commute&hellip; COMPASS integrates <strong>real-time</strong> environmental data from your living area in Mauritius with tropical climate normalization.</span></p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-purple"><i class="fas fa-brain"></i></div>
-      <h3>Le stress quotidien joue un role cle</h3>
-      <p>Pression au travail, embouteillages, rythme de vie qui s'accelere&hellip; Le stress, le manque de sommeil et le moral affectent directement votre metabolisme. COMPASS mesure ces facteurs souvent negliges grace a des questionnaires valides scientifiquement.</p>
+      <h3><span class="i18n-fr">Le stress quotidien joue un role cle</span><span class="i18n-en" style="display:none">Daily stress plays a key role</span></h3>
+      <p><span class="i18n-fr">Pression au travail, embouteillages, rythme de vie qui s'accelere&hellip; Le stress, le manque de sommeil et le moral affectent directement votre metabolisme. COMPASS mesure ces facteurs souvent negliges grace a des questionnaires valides scientifiquement.</span><span class="i18n-en" style="display:none">Work pressure, traffic jams, accelerating pace of life&hellip; Stress, lack of sleep and mood directly affect your metabolism. COMPASS measures these often overlooked factors using scientifically validated questionnaires.</span></p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-orange"><i class="fas fa-capsules"></i></div>
-      <h3>Trouver le bon traitement</h3>
-      <p>Les nouveaux medicaments (GLP-1 : Ozempic, Wegovy, Mounjaro) arrivent a Maurice, mais <strong>30 a 40 % des patients n'y repondent pas bien</strong>. COMPASS estime votre profil de reponse individuel pour guider votre medecin vers le traitement le plus adapte.</p>
+      <h3><span class="i18n-fr">Trouver le bon traitement</span><span class="i18n-en" style="display:none">Finding the right treatment</span></h3>
+      <p><span class="i18n-fr">Les nouveaux medicaments (GLP-1 : Ozempic, Wegovy, Mounjaro) arrivent a Maurice, mais <strong>30 a 40 % des patients n'y repondent pas bien</strong>. COMPASS estime votre profil de reponse individuel pour guider votre medecin vers le traitement le plus adapte.</span><span class="i18n-en" style="display:none">New medications (GLP-1: Ozempic, Wegovy, Mounjaro) are arriving in Mauritius, but <strong>30-40% of patients don't respond well</strong>. COMPASS estimates your individual response profile to guide your doctor toward the most suitable treatment.</span></p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-teal"><i class="fas fa-vial"></i></div>
-      <h3>Vos analyses de sang parlent</h3>
-      <p>Le bilan fonctionne sans analyses biologiques, mais avec elles il est <strong>beaucoup plus precis</strong>. Pourquoi ? Parce que des marqueurs comme l'insulinoresistance (HOMA-IR), l'inflammation (CRP), les graisses dans le sang (triglycerides, HDL) ou la reserve secretoire du pancreas (C-peptide) revelent des desequilibres <strong>invisibles sans prise de sang</strong>. COMPASS integre jusqu'a <strong>18 marqueurs</strong> pour affiner votre profil.</p>
+      <h3><span class="i18n-fr">Vos analyses de sang parlent</span><span class="i18n-en" style="display:none">Your blood tests speak</span></h3>
+      <p><span class="i18n-fr">Le bilan fonctionne sans analyses biologiques, mais avec elles il est <strong>beaucoup plus precis</strong>. Pourquoi ? Parce que des marqueurs comme l'insulinoresistance (HOMA-IR), l'inflammation (CRP), les graisses dans le sang (triglycerides, HDL) ou la reserve secretoire du pancreas (C-peptide) revelent des desequilibres <strong>invisibles sans prise de sang</strong>. COMPASS integre jusqu'a <strong>18 marqueurs</strong> pour affiner votre profil.</span><span class="i18n-en" style="display:none">The assessment works without blood tests, but with them it's <strong>much more accurate</strong>. Why? Because markers like insulin resistance (HOMA-IR), inflammation (CRP), blood fats (triglycerides, HDL) or pancreatic secretory reserve (C-peptide) reveal imbalances <strong>invisible without blood work</strong>. COMPASS integrates up to <strong>18 markers</strong> to refine your profile.</span></p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-red"><i class="fas fa-robot"></i></div>
-      <h3>Un rapport clair par IA</h3>
-      <p>A la fin, vous recevez un rapport en langage simple, redige par intelligence artificielle, avec des <strong>recommandations concretes</strong> a partager avec votre medecin.</p>
+      <h3><span class="i18n-fr">Un rapport clair par IA</span><span class="i18n-en" style="display:none">A clear AI report</span></h3>
+      <p><span class="i18n-fr">A la fin, vous recevez un rapport en langage simple, redige par intelligence artificielle, avec des <strong>recommandations concretes</strong> a partager avec votre medecin.</span><span class="i18n-en" style="display:none">At the end, you receive a report in plain language, written by artificial intelligence, with <strong>concrete recommendations</strong> to share with your doctor.</span></p>
     </div>
   </div>
 </section>
@@ -2963,13 +2965,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <section class="section" id="comment" style="background:var(--bg3);margin:0;max-width:100%;padding-top:100px;padding-bottom:100px">
   <div style="max-width:1100px;margin:0 auto">
     <div class="section-header">
-      <div class="section-badge badge-green"><i class="fas fa-route"></i> Comment ca marche ?</div>
-      <h2>Votre parcours en 6 etapes</h2>
-      <p>Un processus en deux phases pour un bilan metabolique complet, encadre par votre medecin. Vos donnees contribuent anonymement a une etude prospective.</p>
+      <div class="section-badge badge-green"><i class="fas fa-route"></i> <span class="i18n-fr">Comment ca marche ?</span><span class="i18n-en" style="display:none">How does it work?</span></div>
+      <h2><span class="i18n-fr">Votre parcours en 6 etapes</span><span class="i18n-en" style="display:none">Your journey in 6 steps</span></h2>
+      <p><span class="i18n-fr">Un processus en deux phases pour un bilan metabolique complet, encadre par votre medecin. Vos donnees contribuent anonymement a une etude prospective.</span><span class="i18n-en" style="display:none">A two-phase process for a complete metabolic assessment, supervised by your doctor. Your data anonymously contributes to a prospective study.</span></p>
     </div>
 
     <!-- PHASE 1 -->
-    <div class="phase-label phase-1"><i class="fas fa-clipboard-list"></i> Phase 1 &mdash; Questionnaire &amp; prescription</div>
+    <div class="phase-label phase-1"><i class="fas fa-clipboard-list"></i> <span class="i18n-fr">Phase 1 &mdash; Questionnaire &amp; prescription</span><span class="i18n-en" style="display:none">Phase 1 &mdash; Questionnaire &amp; prescription</span></div>
     <div class="journey">
       <div class="tl-step">
         <div class="tl-left">
@@ -2977,7 +2979,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-line"></div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--primary)"><i class="fas fa-user"></i></span> Questionnaire en ligne</h3>
+          <h3><span class="step-icon" style="color:var(--primary)"><i class="fas fa-user"></i></span> <span class="i18n-fr">Questionnaire en ligne</span><span class="i18n-en" style="display:none">Online questionnaire</span></h3>
           <p>Vous remplissez le questionnaire COMPASS : informations de base (age, taille, poids, origine), antecedents familiaux, mode de vie (alimentation, activite physique, sommeil, stress), environnement et situation professionnelle.</p>
           <span class="step-tag tag-time"><i class="fas fa-clock"></i> ~10 minutes</span>
           <div class="highlight-box"><i class="fas fa-chart-bar"></i> A l'issue de cette etape, COMPASS genere un <strong>premier score declaratif</strong> (score sD) base sur vos reponses, avec une classification preliminaire de votre profil de risque.</div>
@@ -2989,10 +2991,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-line"></div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--teal)"><i class="fas fa-user-doctor"></i></span> Consultation medicale &amp; prescription</h3>
-          <p>Vous consultez votre medecin avec votre premier bilan COMPASS. Sur cette base, le medecin evalue la pertinence d'un bilan biologique et vous prescrit les analyses de sang adaptees a votre profil. La <strong>prescription est adaptative</strong> : selon votre niveau de risque, le medecin peut prescrire un panel de 7 a 21 examens, ou aucun si votre profil est a faible risque.</p>
-          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> Avec votre medecin</span>
-          <div class="highlight-box"><i class="fas fa-lightbulb"></i> <strong>Prescription adaptative :</strong> Si votre score declaratif est faible (risque bas, SII &lt; 2), le medecin peut decider qu'aucun bilan biologique n'est necessaire (panel P0). Pour un risque modere, un panel intermediaire (P10). Pour un risque eleve, le panel complet inclut jusqu'a 18 biomarqueurs (C-peptide, FGF21, Glucagon&hellip;).</div>
+          <h3><span class="step-icon" style="color:var(--teal)"><i class="fas fa-user-doctor"></i></span> <span class="i18n-fr">Consultation medicale &amp; prescription</span><span class="i18n-en" style="display:none">Medical consultation &amp; prescription</span></h3>
+          <p><span class="i18n-fr">Vous consultez votre medecin avec votre premier bilan COMPASS. Sur cette base, le medecin evalue la pertinence d'un bilan biologique et vous prescrit les analyses de sang adaptees a votre profil. La <strong>prescription est adaptative</strong> : selon votre niveau de risque, le medecin peut prescrire un panel de 7 a 21 examens, ou aucun si votre profil est a faible risque.</span><span class="i18n-en" style="display:none">You consult your doctor with your first COMPASS assessment. Based on this, the doctor evaluates the relevance of a biological workup and prescribes blood tests adapted to your profile. The <strong>prescription is adaptive</strong>: depending on your risk level, the doctor may prescribe 7 to 21 tests, or none if your profile is low risk.</span></p>
+          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> <span class="i18n-fr">Avec votre medecin</span><span class="i18n-en" style="display:none">With your doctor</span></span>
+          <div class="highlight-box"><i class="fas fa-lightbulb"></i> <strong><span class="i18n-fr">Prescription adaptative :</span><span class="i18n-en" style="display:none">Adaptive prescription:</span></strong> <span class="i18n-fr">Si votre score declaratif est faible (risque bas, SII &lt; 2), le medecin peut decider qu'aucun bilan biologique n'est necessaire (panel P0). Pour un risque modere, un panel intermediaire (P10). Pour un risque eleve, le panel complet inclut jusqu'a 18 biomarqueurs (C-peptide, FGF21, Glucagon&hellip;).</span><span class="i18n-en" style="display:none">If your declarative score is low (low risk, SII &lt; 2), the doctor may decide no biological workup is needed (panel P0). For moderate risk, an intermediate panel (P10). For high risk, the full panel includes up to 18 biomarkers (C-peptide, FGF21, Glucagon&hellip;).</span></div>
         </div>
       </div>
       <div class="tl-step">
@@ -3001,10 +3003,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-line"></div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--green)"><i class="fas fa-vial"></i></span> Prise de sang &amp; resultats</h3>
-          <p>Vous effectuez la prise de sang en laboratoire. A la reception des resultats, vous les saisissez dans COMPASS. L'algorithme integre alors jusqu'a <strong>18 biomarqueurs</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, C-peptide, FGF21, Glucagon&hellip;) pour reveler des desequilibres invisibles sans biologie.</p>
-          <span class="step-tag tag-lab"><i class="fas fa-flask"></i> Laboratoire d'analyses</span>
-          <div class="highlight-box"><i class="fas fa-triangle-exclamation"></i> <strong>Pourquoi c'est important :</strong> l'insulinoresistance, l'inflammation chronique de bas grade et les dyslipidemies ne provoquent souvent <strong>aucun symptome</strong>. Seule la biologie peut les detecter.</div>
+          <h3><span class="step-icon" style="color:var(--green)"><i class="fas fa-vial"></i></span> <span class="i18n-fr">Prise de sang &amp; resultats</span><span class="i18n-en" style="display:none">Blood test &amp; results</span></h3>
+          <p><span class="i18n-fr">Vous effectuez la prise de sang en laboratoire. A la reception des resultats, vous les saisissez dans COMPASS. L'algorithme integre alors jusqu'a <strong>18 biomarqueurs</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, C-peptide, FGF21, Glucagon&hellip;) pour reveler des desequilibres invisibles sans biologie.</span><span class="i18n-en" style="display:none">You complete the blood test at a laboratory. Upon receiving results, you enter them into COMPASS. The algorithm then integrates up to <strong>18 biomarkers</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, C-peptide, FGF21, Glucagon&hellip;) to reveal imbalances invisible without biology.</span></p>
+          <span class="step-tag tag-lab"><i class="fas fa-flask"></i> <span class="i18n-fr">Laboratoire d'analyses</span><span class="i18n-en" style="display:none">Analysis laboratory</span></span>
+          <div class="highlight-box"><i class="fas fa-triangle-exclamation"></i> <strong><span class="i18n-fr">Pourquoi c'est important :</span><span class="i18n-en" style="display:none">Why it matters:</span></strong> <span class="i18n-fr">l'insulinoresistance, l'inflammation chronique de bas grade et les dyslipidemies ne provoquent souvent <strong>aucun symptome</strong>. Seule la biologie peut les detecter.</span><span class="i18n-en" style="display:none">insulin resistance, chronic low-grade inflammation and dyslipidemia often cause <strong>no symptoms</strong>. Only blood tests can detect them.</span></div>
         </div>
       </div>
     </div>
@@ -3015,7 +3017,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     </div>
 
     <!-- PHASE 2 -->
-    <div class="phase-label phase-2"><i class="fas fa-chart-line"></i> Phase 2 &mdash; Analyse complete &amp; restitution</div>
+    <div class="phase-label phase-2"><i class="fas fa-chart-line"></i> <span class="i18n-fr">Phase 2 &mdash; Analyse complete &amp; restitution</span><span class="i18n-en" style="display:none">Phase 2 &mdash; Complete analysis &amp; results</span></div>
     <div class="journey">
       <div class="tl-step">
         <div class="tl-left">
@@ -3023,9 +3025,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-line"></div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--orange)"><i class="fas fa-microchip"></i></span> Analyse COMPASS complete</h3>
-          <p>L'algorithme recalcule votre score final en integrant la biologie au questionnaire : score global sf/100, classification de risque, profil de reponse GLP-1 (7 axes d'evaluation incluant le nouvel axe beta-cellulaire), module bariatrique (si indique) et projection Markov a 10 ans.</p>
-          <span class="step-tag tag-ai"><i class="fas fa-robot"></i> Traitement automatique</span>
+          <h3><span class="step-icon" style="color:var(--orange)"><i class="fas fa-microchip"></i></span> <span class="i18n-fr">Analyse COMPASS complete</span><span class="i18n-en" style="display:none">Complete COMPASS analysis</span></h3>
+          <p><span class="i18n-fr">L'algorithme recalcule votre score final en integrant la biologie au questionnaire : score global sf/100, classification de risque, profil de reponse GLP-1 (7 axes d'evaluation incluant le nouvel axe beta-cellulaire), module bariatrique (si indique) et projection Markov a 10 ans.</span><span class="i18n-en" style="display:none">The algorithm recalculates your final score by integrating biology with the questionnaire: global score sf/100, risk classification, GLP-1 response profile (7 evaluation axes including the new beta-cell axis), bariatric module (if indicated) and 10-year Markov projection.</span></p>
+          <span class="step-tag tag-ai"><i class="fas fa-robot"></i> <span class="i18n-fr">Traitement automatique</span><span class="i18n-en" style="display:none">Automatic processing</span></span>
         </div>
       </div>
       <div class="tl-step">
@@ -3034,9 +3036,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-line"></div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--purple)"><i class="fas fa-file-medical"></i></span> Rapport IA personnalise</h3>
-          <p>COMPASS genere un rapport strategique complet, redige par intelligence artificielle en langage clair. Il inclut votre score, votre profil detaille, les points d'alerte et des recommandations personnalisees adaptees a votre situation clinique.</p>
-          <span class="step-tag tag-ai"><i class="fas fa-sparkles"></i> Generation IA</span>
+          <h3><span class="step-icon" style="color:var(--purple)"><i class="fas fa-file-medical"></i></span> <span class="i18n-fr">Rapport IA personnalise</span><span class="i18n-en" style="display:none">Personalized AI report</span></h3>
+          <p><span class="i18n-fr">COMPASS genere un rapport strategique complet, redige par intelligence artificielle en langage clair. Il inclut votre score, votre profil detaille, les points d'alerte et des recommandations personnalisees adaptees a votre situation clinique.</span><span class="i18n-en" style="display:none">COMPASS generates a complete strategic report, written by artificial intelligence in clear language. It includes your score, detailed profile, alert points and personalized recommendations adapted to your clinical situation.</span></p>
+          <span class="step-tag tag-ai"><i class="fas fa-sparkles"></i> <span class="i18n-fr">Generation IA</span><span class="i18n-en" style="display:none">AI Generation</span></span>
         </div>
       </div>
       <div class="tl-step">
@@ -3044,10 +3046,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
           <div class="tl-num clr-blue">6</div>
         </div>
         <div class="tl-content">
-          <h3><span class="step-icon" style="color:var(--blue)"><i class="fas fa-handshake"></i></span> Restitution avec votre medecin</h3>
-          <p>Vous revenez chez votre medecin avec le rapport COMPASS complet. Il valide les resultats, discute des axes de prise en charge (modifications du mode de vie, traitements, orientation specialisee) et definit avec vous une strategie personnalisee.</p>
-          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> Avec votre medecin</span>
-          <div class="highlight-box"><i class="fas fa-circle-check" style="color:var(--green)"></i> Le rapport COMPASS est concu pour faciliter le dialogue avec votre medecin : langage clair, donnees sourcees, recommandations argumentees.</div>
+          <h3><span class="step-icon" style="color:var(--blue)"><i class="fas fa-handshake"></i></span> <span class="i18n-fr">Restitution avec votre medecin</span><span class="i18n-en" style="display:none">Review with your doctor</span></h3>
+          <p><span class="i18n-fr">Vous revenez chez votre medecin avec le rapport COMPASS complet. Il valide les resultats, discute des axes de prise en charge (modifications du mode de vie, traitements, orientation specialisee) et definit avec vous une strategie personnalisee.</span><span class="i18n-en" style="display:none">You return to your doctor with the complete COMPASS report. They validate the results, discuss care approaches (lifestyle changes, treatments, specialist referral) and define a personalized strategy with you.</span></p>
+          <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> <span class="i18n-fr">Avec votre medecin</span><span class="i18n-en" style="display:none">With your doctor</span></span>
+          <div class="highlight-box"><i class="fas fa-circle-check" style="color:var(--green)"></i> <span class="i18n-fr">Le rapport COMPASS est concu pour faciliter le dialogue avec votre medecin : langage clair, donnees sourcees, recommandations argumentees.</span><span class="i18n-en" style="display:none">The COMPASS report is designed to facilitate dialogue with your doctor: clear language, sourced data, evidence-based recommendations.</span></div>
         </div>
       </div>
     </div>
@@ -3059,37 +3061,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <!-- ══════ CE QU'ON ANALYSE ══════ -->
 <section class="section" id="analyse">
   <div class="section-header">
-    <div class="section-badge badge-purple"><i class="fas fa-microscope"></i> Analyse complete</div>
-    <h2>Un bilan en 4 dimensions</h2>
-    <p>COMPASS croise des informations que les outils classiques ne regardent jamais ensemble.</p>
+    <div class="section-badge badge-purple"><i class="fas fa-microscope"></i> <span class="i18n-fr">Analyse complete</span><span class="i18n-en" style="display:none">Complete analysis</span></div>
+    <h2><span class="i18n-fr">Un bilan en 4 dimensions</span><span class="i18n-en" style="display:none">A 4-dimensional assessment</span></h2>
+    <p><span class="i18n-fr">COMPASS croise des informations que les outils classiques ne regardent jamais ensemble.</span><span class="i18n-en" style="display:none">COMPASS cross-references information that standard tools never look at together.</span></p>
   </div>
   <div class="analyze-grid">
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--red-bg);color:var(--red)"><i class="fas fa-heart-pulse"></i></div>
       <div>
-        <h3>Clinique &amp; antecedents</h3>
-        <p>Morphologie, historique familial, comorbidites (diabete, hypertension, apnee du sommeil&hellip;), traitements en cours. Seuils IMC adaptes a votre communaute (Indo-Mauricien, Creole, Sino-Mauricien&hellip;).</p>
+        <h3><span class="i18n-fr">Clinique &amp; antecedents</span><span class="i18n-en" style="display:none">Clinical &amp; history</span></h3>
+        <p><span class="i18n-fr">Morphologie, historique familial, comorbidites (diabete, hypertension, apnee du sommeil&hellip;), traitements en cours. Seuils IMC adaptes a votre communaute (Indo-Mauricien, Creole, Sino-Mauricien&hellip;).</span><span class="i18n-en" style="display:none">Morphology, family history, comorbidities (diabetes, hypertension, sleep apnea&hellip;), current treatments. BMI thresholds adapted to your community (Indo-Mauritian, Creole, Sino-Mauritian&hellip;).</span></p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--orange-bg);color:var(--orange)"><i class="fas fa-smog"></i></div>
       <div>
-        <h3>Environnement &amp; exposition</h3>
-        <p>Qualite de l'air de votre region (Port-Louis, Curepipe, Flacq&hellip;), climat tropical, exposition a la chaleur, trajet quotidien. Donnees geographiques mauriciennes analysees en temps reel avec normalisation climatique.</p>
+        <h3><span class="i18n-fr">Environnement &amp; exposition</span><span class="i18n-en" style="display:none">Environment &amp; exposure</span></h3>
+        <p><span class="i18n-fr">Qualite de l'air de votre region (Port-Louis, Curepipe, Flacq&hellip;), climat tropical, exposition a la chaleur, trajet quotidien. Donnees geographiques mauriciennes analysees en temps reel avec normalisation climatique.</span><span class="i18n-en" style="display:none">Air quality in your region (Port-Louis, Curepipe, Flacq&hellip;), tropical climate, heat exposure, daily commute. Mauritian geographic data analyzed in real-time with climate normalization.</span></p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--teal-bg);color:var(--teal)"><i class="fas fa-briefcase"></i></div>
       <div>
-        <h3>Vie professionnelle &amp; sociale</h3>
-        <p>Type de travail, horaires, sedentarite au bureau, travail de nuit, longs trajets en voiture, isolement social (notamment chez les retraites)&hellip; Des facteurs courants a Maurice qui influencent directement votre metabolisme.</p>
+        <h3><span class="i18n-fr">Vie professionnelle &amp; sociale</span><span class="i18n-en" style="display:none">Professional &amp; social life</span></h3>
+        <p><span class="i18n-fr">Type de travail, horaires, sedentarite au bureau, travail de nuit, longs trajets en voiture, isolement social (notamment chez les retraites)&hellip; Des facteurs courants a Maurice qui influencent directement votre metabolisme.</span><span class="i18n-en" style="display:none">Type of work, schedules, office sedentariness, night work, long car commutes, social isolation (especially among retirees)&hellip; Common factors in Mauritius that directly influence your metabolism.</span></p>
       </div>
     </div>
     <div class="analyze-card">
       <div class="a-icon" style="background:var(--green-bg);color:var(--green)"><i class="fas fa-utensils"></i></div>
       <div>
-        <h3>Mode de vie &amp; alimentation</h3>
-        <p>Habitudes alimentaires, activite physique, qualite du sommeil, consommation d'alcool, stress quotidien. Des questionnaires courts et valides pour mesurer l'impact reel de votre mode de vie sur votre sante metabolique.</p>
+        <h3><span class="i18n-fr">Mode de vie &amp; alimentation</span><span class="i18n-en" style="display:none">Lifestyle &amp; nutrition</span></h3>
+        <p><span class="i18n-fr">Habitudes alimentaires, activite physique, qualite du sommeil, consommation d'alcool, stress quotidien. Des questionnaires courts et valides pour mesurer l'impact reel de votre mode de vie sur votre sante metabolique.</span><span class="i18n-en" style="display:none">Eating habits, physical activity, sleep quality, alcohol consumption, daily stress. Short validated questionnaires to measure the real impact of your lifestyle on your metabolic health.</span></p>
       </div>
     </div>
   </div>
@@ -3102,16 +3104,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
   <div style="max-width:1100px;margin:0 auto">
     <div class="results-preview">
       <div class="results-text">
-        <div class="section-badge badge-teal" style="margin-bottom:20px"><i class="fas fa-chart-line"></i> Vos resultats</div>
-        <h3>Un bilan clair et des actions concretes</h3>
-        <p>A la fin de l'evaluation, vous recevez un rapport complet, redigé dans un langage simple et comprehensible.</p>
+        <div class="section-badge badge-teal" style="margin-bottom:20px"><i class="fas fa-chart-line"></i> <span class="i18n-fr">Vos resultats</span><span class="i18n-en" style="display:none">Your results</span></div>
+        <h3><span class="i18n-fr">Un bilan clair et des actions concretes</span><span class="i18n-en" style="display:none">A clear assessment and concrete actions</span></h3>
+        <p><span class="i18n-fr">A la fin de l'evaluation, vous recevez un rapport complet, redigé dans un langage simple et comprehensible.</span><span class="i18n-en" style="display:none">At the end of the assessment, you receive a complete report, written in simple and understandable language.</span></p>
         <ul class="result-list">
-          <li><i class="fas fa-check-circle"></i> Score global de sante metabolique sur 100</li>
-          <li><i class="fas fa-check-circle"></i> Classification de votre niveau de risque</li>
-          <li><i class="fas fa-check-circle"></i> Profil personnalise de reponse aux traitements</li>
-          <li><i class="fas fa-check-circle"></i> Recommandations adaptees a votre situation</li>
-          <li><i class="fas fa-check-circle"></i> Rapport IA complet a partager avec votre medecin</li>
-          <li><i class="fas fa-check-circle"></i> Projection a 10 ans de l'evolution de votre profil</li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Score global de sante metabolique sur 100</span><span class="i18n-en" style="display:none">Global metabolic health score out of 100</span></li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Classification de votre niveau de risque</span><span class="i18n-en" style="display:none">Classification of your risk level</span></li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Profil personnalise de reponse aux traitements</span><span class="i18n-en" style="display:none">Personalized treatment response profile</span></li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Recommandations adaptees a votre situation</span><span class="i18n-en" style="display:none">Recommendations adapted to your situation</span></li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Rapport IA complet a partager avec votre medecin</span><span class="i18n-en" style="display:none">Complete AI report to share with your doctor</span></li>
+          <li><i class="fas fa-check-circle"></i> <span class="i18n-fr">Projection a 10 ans de l'evolution de votre profil</span><span class="i18n-en" style="display:none">10-year projection of your profile evolution</span></li>
         </ul>
       </div>
       <div class="results-visual">
@@ -3122,12 +3124,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
               <span class="gauge-label">sur 100</span>
             </div>
           </div>
-          <p style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px">Risque modere</p>
-          <p style="font-size:14px;color:var(--dim);margin-bottom:20px">Exemple de resultat</p>
+          <p style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px"><span class="i18n-fr">Risque modere</span><span class="i18n-en" style="display:none">Moderate risk</span></p>
+          <p style="font-size:14px;color:var(--dim);margin-bottom:20px"><span class="i18n-fr">Exemple de resultat</span><span class="i18n-en" style="display:none">Example result</span></p>
           <div class="gauge-categories">
-            <div class="gauge-cat"><span class="dot low"></span> Faible</div>
-            <div class="gauge-cat"><span class="dot mod"></span> Modere</div>
-            <div class="gauge-cat"><span class="dot high"></span> Eleve</div>
+            <div class="gauge-cat"><span class="dot low"></span> <span class="i18n-fr">Faible</span><span class="i18n-en" style="display:none">Low</span></div>
+            <div class="gauge-cat"><span class="dot mod"></span> <span class="i18n-fr">Modere</span><span class="i18n-en" style="display:none">Moderate</span></div>
+            <div class="gauge-cat"><span class="dot high"></span> <span class="i18n-fr">Eleve</span><span class="i18n-en" style="display:none">High</span></div>
           </div>
         </div>
       </div>
@@ -3140,26 +3142,26 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <!-- ══════ FIABILITE SCIENTIFIQUE ══════ -->
 <section class="section">
   <div class="section-header">
-    <div class="section-badge badge-blue"><i class="fas fa-flask"></i> Base scientifique</div>
-    <h2>Un outil fonde sur la recherche</h2>
-    <p>COMPASS s'appuie sur 53 publications scientifiques internationales et est valide sur 22 807 adultes. L'algorithme integre les specificites des populations sud-asiatiques et insulaires, directement applicables a la realite mauricienne.</p>
+    <div class="section-badge badge-blue"><i class="fas fa-flask"></i> <span class="i18n-fr">Base scientifique</span><span class="i18n-en" style="display:none">Scientific basis</span></div>
+    <h2><span class="i18n-fr">Un outil fonde sur la recherche</span><span class="i18n-en" style="display:none">A research-based tool</span></h2>
+    <p><span class="i18n-fr">COMPASS s'appuie sur 53 publications scientifiques internationales et est valide sur 22 807 adultes. L'algorithme integre les specificites des populations sud-asiatiques et insulaires, directement applicables a la realite mauricienne.</span><span class="i18n-en" style="display:none">COMPASS is based on 53 international scientific publications and validated on 22,807 adults. The algorithm integrates specificities of South Asian and island populations, directly applicable to Mauritian reality.</span></p>
   </div>
   <div class="science-bar">
     <div class="science-stat">
       <div class="s-num">22 807</div>
-      <div class="s-label">Adultes dans l'etude de validation</div>
+      <div class="s-label"><span class="i18n-fr">Adultes dans l'etude de validation</span><span class="i18n-en" style="display:none">Adults in the validation study</span></div>
     </div>
     <div class="science-stat">
       <div class="s-num">87.6%</div>
-      <div class="s-label">Precision de detection<br>(syndrome metabolique)</div>
+      <div class="s-label"><span class="i18n-fr">Precision de detection<br>(syndrome metabolique)</span><span class="i18n-en" style="display:none">Detection accuracy<br>(metabolic syndrome)</span></div>
     </div>
     <div class="science-stat">
       <div class="s-num">53</div>
-      <div class="s-label">Publications scientifiques<br>de reference</div>
+      <div class="s-label"><span class="i18n-fr">Publications scientifiques<br>de reference</span><span class="i18n-en" style="display:none">Scientific reference<br>publications</span></div>
     </div>
     <div class="science-stat">
       <div class="s-num">18</div>
-      <div class="s-label">Marqueurs biologiques<br>analyses</div>
+      <div class="s-label"><span class="i18n-fr">Marqueurs biologiques<br>analyses</span><span class="i18n-en" style="display:none">Biological markers<br>analyzed</span></div>
     </div>
   </div>
 </section>
@@ -3169,51 +3171,51 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <!-- ══════ FAQ ══════ -->
 <section class="section" id="faq">
   <div class="section-header">
-    <div class="section-badge badge-orange"><i class="fas fa-circle-question"></i> Questions frequentes</div>
-    <h2>Vos questions, nos reponses</h2>
+    <div class="section-badge badge-orange"><i class="fas fa-circle-question"></i> <span class="i18n-fr">Questions frequentes</span><span class="i18n-en" style="display:none">FAQ</span></div>
+    <h2><span class="i18n-fr">Vos questions, nos reponses</span><span class="i18n-en" style="display:none">Your questions, our answers</span></h2>
   </div>
   <div class="faq-list">
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        Mes donnees sont-elles conservees ?
+        <span class="i18n-fr">Mes donnees sont-elles conservees ?</span><span class="i18n-en" style="display:none">Is my data kept?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Oui. Vos donnees sont conservees de maniere <strong>anonymisee</strong> dans le cadre d'une <strong>etude prospective</strong> de recherche academique. Elles contribuent a ameliorer la comprehension des facteurs de risque metabolique a grande echelle. Aucune information permettant de vous identifier personnellement n'est partagee.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">Oui. Vos donnees sont conservees de maniere <strong>anonymisee</strong> dans le cadre d'une <strong>etude prospective</strong> de recherche academique. Elles contribuent a ameliorer la comprehension des facteurs de risque metabolique a grande echelle. Aucune information permettant de vous identifier personnellement n'est partagee.</span><span class="i18n-en" style="display:none">Yes. Your data is kept in an <strong>anonymized</strong> manner as part of an academic <strong>prospective study</strong>. It contributes to improving understanding of metabolic risk factors at scale. No personally identifiable information is shared.</span></p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        Est-ce que ca remplace un avis medical ?
+        <span class="i18n-fr">Est-ce que ca remplace un avis medical ?</span><span class="i18n-en" style="display:none">Does it replace medical advice?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Non. COMPASS est un outil d'aide a la comprehension de votre sante metabolique. Il ne pose pas de diagnostic et ne remplace pas une consultation medicale. Les resultats sont a partager avec votre medecin traitant.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">Non. COMPASS est un outil d'aide a la comprehension de votre sante metabolique. Il ne pose pas de diagnostic et ne remplace pas une consultation medicale. Les resultats sont a partager avec votre medecin traitant.</span><span class="i18n-en" style="display:none">No. COMPASS is a tool to help understand your metabolic health. It does not diagnose and does not replace a medical consultation. Results should be shared with your treating physician.</span></p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        Faut-il avoir des analyses de sang ?
+        <span class="i18n-fr">Faut-il avoir des analyses de sang ?</span><span class="i18n-en" style="display:none">Do I need blood tests?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Ce n'est <strong>pas obligatoire</strong> : COMPASS fonctionne avec le questionnaire seul. Cependant, c'est <strong>fortement recommande</strong>. Pourquoi ? Parce que certains desequilibres metaboliques &mdash; comme l'insulinoresistance, l'inflammation chronique de bas grade, les dyslipidemies ou l'epuisement de la reserve beta-cellulaire du pancreas &mdash; ne provoquent <strong>aucun symptome perceptible</strong>. Seule une prise de sang peut les reveler. Avec vos resultats biologiques, COMPASS analyse jusqu'a 18 marqueurs et votre bilan gagne considerablement en precision.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">Ce n'est <strong>pas obligatoire</strong> : COMPASS fonctionne avec le questionnaire seul. Cependant, c'est <strong>fortement recommande</strong>. Pourquoi ? Parce que certains desequilibres metaboliques &mdash; comme l'insulinoresistance, l'inflammation chronique de bas grade, les dyslipidemies ou l'epuisement de la reserve beta-cellulaire du pancreas &mdash; ne provoquent <strong>aucun symptome perceptible</strong>. Seule une prise de sang peut les reveler. Avec vos resultats biologiques, COMPASS analyse jusqu'a 18 marqueurs et votre bilan gagne considerablement en precision.</span><span class="i18n-en" style="display:none">It's <strong>not mandatory</strong>: COMPASS works with the questionnaire alone. However, it's <strong>strongly recommended</strong>. Why? Because certain metabolic imbalances &mdash; like insulin resistance, chronic low-grade inflammation, dyslipidemia or pancreatic beta-cell reserve depletion &mdash; cause <strong>no noticeable symptoms</strong>. Only blood tests can reveal them. With your biological results, COMPASS analyzes up to 18 markers and your assessment gains considerable accuracy.</span></p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        Combien de temps ca prend ?
+        <span class="i18n-fr">Combien de temps ca prend ?</span><span class="i18n-en" style="display:none">How long does it take?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Environ 10 minutes pour le questionnaire complet. Les resultats sont instantanes. Si vous ajoutez vos analyses biologiques, comptez 2-3 minutes de plus.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">Environ 10 minutes pour le questionnaire complet. Les resultats sont instantanes. Si vous ajoutez vos analyses biologiques, comptez 2-3 minutes de plus.</span><span class="i18n-en" style="display:none">About 10 minutes for the complete questionnaire. Results are instant. If you add your biological tests, allow 2-3 more minutes.</span></p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        Qu'est-ce que le &laquo; Score COMPASS &raquo; ?
+        <span class="i18n-fr">Qu'est-ce que le &laquo; Score COMPASS &raquo; ?</span><span class="i18n-en" style="display:none">What is the COMPASS Score?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>C'est un score de 0 a 100 qui resume votre profil de risque metabolique. Il combine vos donnees cliniques, votre environnement, votre mode de vie et, si disponibles, vos analyses biologiques. Plus le score est bas, mieux c'est.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">C'est un score de 0 a 100 qui resume votre profil de risque metabolique. Il combine vos donnees cliniques, votre environnement, votre mode de vie et, si disponibles, vos analyses biologiques. Plus le score est bas, mieux c'est.</span><span class="i18n-en" style="display:none">It's a score from 0 to 100 that summarizes your metabolic risk profile. It combines your clinical data, environment, lifestyle and, if available, your biological tests. The lower the score, the better.</span></p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-        A qui s'adresse COMPASS ?
+        <span class="i18n-fr">A qui s'adresse COMPASS ?</span><span class="i18n-en" style="display:none">Who is COMPASS for?</span>
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>A tout adulte vivant a Maurice, quelle que soit votre communaute d'origine. Que vous soyez en surpoids, diabetique, sous traitement, ou simplement soucieux de votre sante, COMPASS vous fournit un bilan adapte a votre profil ethnique et a votre environnement local.</p></div>
+      <div class="faq-a"><p><span class="i18n-fr">A tout adulte vivant a Maurice, quelle que soit votre communaute d'origine. Que vous soyez en surpoids, diabetique, sous traitement, ou simplement soucieux de votre sante, COMPASS vous fournit un bilan adapte a votre profil ethnique et a votre environnement local.</span><span class="i18n-en" style="display:none">For any adult living in Mauritius, regardless of your community of origin. Whether you are overweight, diabetic, on treatment, or simply health-conscious, COMPASS provides an assessment adapted to your ethnic profile and local environment.</span></p></div>
     </div>
   </div>
 </section>
@@ -3221,10 +3223,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
 <!-- ══════ CTA ══════ -->
 <section style="padding:0 24px 100px">
   <div class="cta-section">
-    <h2>Pret a comprendre votre sante ?</h2>
-    <p>10 minutes pour decouvrir votre profil metabolique personnalise et des recommandations adaptees. Vos donnees contribuent a la recherche.</p>
+    <h2><span class="i18n-fr">Pret a comprendre votre sante ?</span><span class="i18n-en" style="display:none">Ready to understand your health?</span></h2>
+    <p><span class="i18n-fr">10 minutes pour decouvrir votre profil metabolique personnalise et des recommandations adaptees. Vos donnees contribuent a la recherche.</span><span class="i18n-en" style="display:none">10 minutes to discover your personalized metabolic profile and adapted recommendations. Your data contributes to research.</span></p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="/" class="btn btn-white"><i class="fas fa-play"></i> Commencer mon bilan</a>
+      <a href="/" class="btn btn-white"><i class="fas fa-play"></i> <span class="i18n-fr">Commencer mon bilan</span><span class="i18n-en" style="display:none">Start my assessment</span></a>
     </div>
   </div>
 </section>
@@ -3236,29 +3238,40 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
       <div class="footer-brand">
         <div class="f-logo"><i class="fas fa-compass"></i> COMPASS</div>
         <div class="f-full">Comprehensive Metabolic Profiling &amp; Stratification System</div>
-        <p>Etude prospective a Maurice pour mieux comprendre les facteurs de risque metabolique dans notre population. Developpe par Bach, Manos &amp; Noel.</p>
+        <p><span class="i18n-fr">Etude prospective a Maurice pour mieux comprendre les facteurs de risque metabolique dans notre population. Developpe par Bach, Manos &amp; Noel.</span><span class="i18n-en" style="display:none">Prospective study in Mauritius to better understand metabolic risk factors in our population. Developed by Bach, Manos &amp; Noel.</span></p>
       </div>
       <div class="footer-col">
         <h4>Navigation</h4>
-        <a href="/">Faire mon bilan</a>
-        <a href="#pourquoi">Pourquoi COMPASS ?</a>
-        <a href="#comment">Comment ca marche</a>
-        <a href="#faq">Questions frequentes</a>
+        <a href="/"><span class="i18n-fr">Faire mon bilan</span><span class="i18n-en" style="display:none">Start assessment</span></a>
+        <a href="#pourquoi"><span class="i18n-fr">Pourquoi COMPASS ?</span><span class="i18n-en" style="display:none">Why COMPASS?</span></a>
+        <a href="#comment"><span class="i18n-fr">Comment ca marche</span><span class="i18n-en" style="display:none">How it works</span></a>
+        <a href="#faq"><span class="i18n-fr">Questions frequentes</span><span class="i18n-en" style="display:none">FAQ</span></a>
       </div>
       <div class="footer-col">
-        <h4>Pour les professionnels</h4>
-        <a href="/dossier">Dossier technique</a>
+        <h4><span class="i18n-fr">Pour les professionnels</span><span class="i18n-en" style="display:none">For professionals</span></h4>
+        <a href="/dossier"><span class="i18n-fr">Dossier technique</span><span class="i18n-en" style="display:none">Technical dossier</span></a>
         <a href="/dossier-scientifique">Dossier scientifique</a>
         <a href="https://github.com/stefbach/score-bmn-v3" target="_blank">GitHub</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>COMPASS v3.5 &mdash; Outil d'aide a la comprehension. Ne remplace pas un avis medical.</p>
+      <p><span class="i18n-fr">COMPASS v3.5 &mdash; Outil d'aide a la comprehension. Ne remplace pas un avis medical.</span><span class="i18n-en" style="display:none">COMPASS v3.5 &mdash; Understanding aid tool. Does not replace medical advice.</span></p>
       <p>Validation : <a href="https://score-bmn-v3.pages.dev">score-bmn-v3.pages.dev</a></p>
     </div>
   </div>
 </footer>
 
+<script src="/static/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('langToggle');
+  if(btn) btn.textContent = LANG === 'fr' ? 'EN' : 'FR';
+  document.querySelectorAll('.i18n-fr,.i18n-en').forEach(function(el){
+    if(el.classList.contains('i18n-fr')) el.style.display = LANG === 'fr' ? '' : 'none';
+    if(el.classList.contains('i18n-en')) el.style.display = LANG === 'en' ? '' : 'none';
+  });
+});
+</script>
 </body>
 </html>`)
 })
