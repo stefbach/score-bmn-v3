@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.5 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
+// COMPASS v3.5 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
@@ -616,7 +616,7 @@ const SCR=[
   // 0: Welcome
   ()=>`<div class="welc">
     <div class="welc-logo">B</div>
-    <h1>Score <b>BMN</b> v3.4</h1>
+    <h1><b>COMPASS</b> v3.5</h1>
     <p class="welc-desc">Evaluez votre risque metabolique en quelques minutes. Questionnaire valide scientifiquement, enrichi par l'intelligence artificielle et des donnees environnementales en temps reel.</p>
     <div class="welc-features">
       <div class="welc-feat"><span>IA</span><span>Analyse adaptative</span></div>
@@ -914,12 +914,12 @@ const SCR=[
             return `<div class="cm-card${act?' on':''}" style="cursor:pointer;padding:6px 10px;font-size:11px" onclick="setDyslipiDuree('${t}')">${labels[t]}</div>`;
           }).join('')}
         </div>
-        <div style="font-size:10px;color:var(--dim3);margin-top:8px">v3.1 : Le sous-type determine les points BMN-K (6/8/10), la correction bioNorm (LDL×1.35 si statines), et le profil GLP-1.</div>
+        <div style="font-size:10px;color:var(--dim3);margin-top:8px">v3.1 : Le sous-type determine les points COMPASS-K (6/8/10), la correction bioNorm (LDL×1.35 si statines), et le profil GLP-1.</div>
       </div>`;
     }
     return `<div class="s-emoji">Sante</div>
     <div class="s-title">Comorbidites (v3.4 — 13 declaratives + IR auto)</div>
-    <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score BMN-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
+    <div class="s-sub">Selectionnez les maladies et conditions dont vous souffrez ou avez souffert. Cela influence directement votre score COMPASS-K (comorbidites). <span class="ref">ADA 2024</span> <span class="ref">IDF MetS</span> <span class="ref">Framingham</span></div>
     <div class="sec"><div class="sec-tt">Maladies etablies</div>${mk(dis)}</div>
     ${dyslipiHtml}
     <div class="sec"><div class="sec-tt">Phenotypes metaboliques</div>${mk(phe)}</div>
@@ -1101,7 +1101,7 @@ const SCR=[
           <div style="font-size:12px;font-weight:600;color:${cls.c}">bioNorm (${filled}/${markers.length} renseignes)</div>
           <div style="font-size:9px;color:var(--dim3)">bioNorm = (Σ z_i×w_i / Σ w_i) × 100</div>
           ${S.bInflam>0?`<div style="font-size:9px;color:var(--orange);margin-top:2px">bInflam = ${S.bInflam.toFixed(2)} → E amplifiee +${Math.round(S.bInflam*15)}%</div>`:''}
-          ${S.ir_occ_auto?`<div style="font-size:9px;color:var(--red);margin-top:2px;font-weight:700">★ IR OCCULTE détectée (TG/HDL > 3.5) → +8 pts BMN-K auto</div>`:''}
+          ${S.ir_occ_auto?`<div style="font-size:9px;color:var(--red);margin-top:2px;font-weight:700">★ IR OCCULTE détectée (TG/HDL > 3.5) → +8 pts COMPASS-K auto</div>`:''}
         </div>
       </div>`;
     }
@@ -1342,7 +1342,7 @@ function triggerAI(step){
     10:{id:'aiBox10',q:'Activite physique: cardio='+S.ap.cardio+'min/sem, muscu='+S.ap.muscu+'min/sem, marche='+S.ap.marche+'min/j, assis='+S.assis+'h/j. OMS recommande 150min. Analyse.'},
     12:{id:'aiBox12',q:'Stress PSS-10='+getPssTotal()+'/40. Items: '+S.pss.join(',')+'. Impact sur poids et comportement alimentaire?'},
     13:{id:'aiBox13',q:'Depression PHQ-9='+getPhqTotal()+'/27. BES='+S.bes+'/8. Analyse impact bidirectionnel obesite-depression-hyperphagie.'},
-    14:{id:'aiBox14',q:'Comorbidites selectionnees: '+S.comorbIds.join(',')+'. Analyse interactions et impact sur BMN-K.'},
+    14:{id:'aiBox14',q:'Comorbidites selectionnees: '+S.comorbIds.join(',')+'. Analyse interactions et impact sur COMPASS-K.'},
     15:{id:'aiBox15',q:'Score declaratif sD='+S.sD+'/100 ('+S.classDecl+'). C='+S.scoreC+'/50, E='+S.scoreE+'/45, O='+S.scoreO+'/10, L='+S.scoreL+'/10. SII='+S.sii+'/7. Panel=P'+(S.panelLvl||0)+'. CTI='+S.cti+'. GRI='+S.gri.toFixed(1)+'. Analyse la strategie bio et therapeutique.'}
   };
   if(aiScreens[step]){
@@ -1357,7 +1357,7 @@ function triggerAI(step){
 }
 
 // ════════════════════════════════════════════════════════════════
-// MOTEUR DE CALCUL — Score BMN v3.4 — Architecture CLEO + BTM + FNC
+// MOTEUR DE CALCUL — COMPASS v3.5 — Architecture CLEO + BTM + FNC
 // Ref: algorithme.html BSD v4.9 + justification-bio.html BSD v4.7.1
 // ────────────────────────────────────────────────────────────────
 // FLUX:  C(0-50) + E(0-45) + O(0-10) + L(0-10) = sD(0-100)
@@ -1371,7 +1371,7 @@ function triggerAI(step){
 //        → CTI + GRI + Markov
 //
 // IMPORTANT: Garde TOUS les 15 biomarqueurs, 13 comorbidites,
-//            PSS-10, PHQ-9, BES, DQI-BMN, IPAQ, ISI, AUDIT-C
+//            PSS-10, PHQ-9, BES, DQI-COMPASS, IPAQ, ISI, AUDIT-C
 // ════════════════════════════════════════════════════════════════
 function calc(){
   const e=ETH[S.ethnie]||ETH.eu, sex=S.sexe, imc=S.imc, tt=S.tt, taille=S.taille;
@@ -1386,7 +1386,7 @@ function calc(){
   // ════════════════════════════════════════════════════
   // PHASE C — SCORE CLINIQUE (0-50 pts)
   // 8 sous-scores c1…c8, cap 50
-  // Logique BSD v4.9 adaptee aux variables BMN
+  // Logique BSD v4.9 adaptee aux variables COMPASS
   // ════════════════════════════════════════════════════
   let C=0;
 
@@ -1421,8 +1421,8 @@ function calc(){
   d.c3_imc={pts:c3,max:12,label:'c3 — IMC ('+imc?.toFixed(1)+') TT ('+tt+'cm) WHtR ('+whtr.toFixed(2)+') seuils '+e.n.split(' ')[0],ref:'OMS/IDF 2006/BMJ 2016',grp:'C'};
   C+=c3;
 
-  // c4 — Comorbidites (0-10 projete depuis BMN-K)
-  // BMN-K complet (0-50) utilise les 13 comorbidites declaratives (v3.1.1: ir_occ retiree, auto-detectee via bio)
+  // c4 — Comorbidites (0-10 projete depuis COMPASS-K)
+  // COMPASS-K complet (0-50) utilise les 13 comorbidites declaratives (v3.1.1: ir_occ retiree, auto-detectee via bio)
   let k=0, ctiAmp=1;
   const griF=[], griU=[];
   S.comorbIds.forEach(id=>{
@@ -1471,7 +1471,7 @@ function calc(){
 
   // c5 — ATCD familiaux + genetique (0-8)
   // [BSD c6: family<55=2, angor=4, bypass=5, stent=6, IDM/AVC=8]
-  // Adapte BMN: parents obeses, enfance, DT2 familial, yoyo
+  // Adapte COMPASS: parents obeses, enfance, DT2 familial, yoyo
   let c5=0;
   if(S.parent_ob>=2) c5+=4; else if(S.parent_ob>=1) c5+=2;
   if(S.enf_ob>=2) c5+=3; else if(S.enf_ob>=1) c5+=2;
@@ -1570,7 +1570,7 @@ function calc(){
 
   // bInflam (triade inflammatoire) — calcule depuis bio si disponible
   // [BSD: bInflam = moyenne(z_hscrp, z_acr, z_ntprobnp)]
-  // Adapte BMN: on utilise CRP hs + TG/HDL ratio + HOMA-IR comme proxy triade
+  // Adapte COMPASS: on utilise CRP hs + TG/HDL ratio + HOMA-IR comme proxy triade
   let bInflam=0, bInflamN=0;
   if(S.bioValues.crphs!==undefined){
     const v=S.bioValues.crphs;
@@ -1635,14 +1635,14 @@ function calc(){
   if(apT<30) l1=3; else if(apT<75) l1=2; else if(apT<150) l1=1;
   d.l1_ap={pts:l1,max:3,label:'l1 — Activite physique ('+Math.round(apT)+' min/sem)',ref:'IPAQ/OMS 2020',grp:'L'};
 
-  // l2 — Alimentation DQI-BMN → normalise 0-3
+  // l2 — Alimentation DQI-COMPASS → normalise 0-3
   // alimRaw max = 39 (10 items x ~4 max chacun)
   // [BSD: PREDIMED >=9=0, 5-8=1, 3-4=2, <3=3]
   // On inverse: DQI haut = mauvais, donc score haut = mauvais
   let l2=0;
   const predimed_equiv=Math.max(0, 14 - Math.round(alimRaw*14/39)); // conversion en equiv PREDIMED
   if(predimed_equiv<3) l2=3; else if(predimed_equiv<5) l2=2; else if(predimed_equiv<9) l2=1;
-  d.l2_alim={pts:l2,max:3,label:'l2 — Alimentation (DQI-BMN '+alimRaw+'/39, PREDIMED-eq ~'+predimed_equiv+'/14)',ref:'NOVA/PREDIMED/OMS',grp:'L'};
+  d.l2_alim={pts:l2,max:3,label:'l2 — Alimentation (DQI-COMPASS '+alimRaw+'/39, PREDIMED-eq ~'+predimed_equiv+'/14)',ref:'NOVA/PREDIMED/OMS',grp:'L'};
 
   // l3 — Alcool (0-2) [BSD: <=10/sem=0, 10-21=1, >21=2]
   let l3=0;
@@ -1716,7 +1716,7 @@ function calc(){
   S.panelLvl=panelLvl;
 
   // ════════════════════════════════════════════════════
-  // BMN-B : SCORE BIOLOGIE (0-100)
+  // COMPASS-B : SCORE BIOLOGIE (0-100)
   // bioNorm = (Σ(z_i × w_i) / Σ(w_i)) × 100
   // z-score lineaire borne [0,1] pour chaque marqueur
   // Poids conformes a justification-bio.html BSD v4.7.1
@@ -1750,12 +1750,12 @@ function calc(){
   // ════════════════════════════════════════════════════
   // v3.1.1: IR OCCULTE — Détection automatique via biologie
   // Si TG/HDL > 3.5 ET ir_occ non déjà dans comorbIds → injection automatique
-  // Points BMN-K (+8), GRI (+0.55), CTI ca (1.2) — McLaughlin 2005
+  // Points COMPASS-K (+8), GRI (+0.55), CTI ca (1.2) — McLaughlin 2005
   // ════════════════════════════════════════════════════
   S.ir_occ_auto=false;
   if(S.bioValues.tghdl!==undefined && S.bioValues.tghdl>3.5){
     S.ir_occ_auto=true;
-    // Ajouter points BMN-K si pas déjà compté
+    // Ajouter points COMPASS-K si pas déjà compté
     S.bmn_k=Math.min(50, S.bmn_k+8);
     // Recalculer c4 avec K augmenté
     const kNorm_ir=S.bmn_k/50*100;
@@ -2506,7 +2506,7 @@ function doRetro(){
   if(v.leptine>=40) fl.push({c:'var(--orange)',t:'Leptine>=40: resistance a la leptine'});
   // v3.1.1: IR occulte auto-détectée
   if(v.tghdl>3.5)
-    fl.push({c:'var(--red)',t:'★ IR OCCULTE DÉTECTÉE (TG/HDL > 3.5) — Insulinorésistance non diagnostiquée. +8 pts BMN-K automatiques. Ref: McLaughlin 2005, Circulation'});
+    fl.push({c:'var(--red)',t:'★ IR OCCULTE DÉTECTÉE (TG/HDL > 3.5) — Insulinorésistance non diagnostiquée. +8 pts COMPASS-K automatiques. Ref: McLaughlin 2005, Circulation'});
   // v3.1: 5 alertes dyslipidemie
   if(v.tg>=2.3&&v.hdl!==undefined&&v.hdl<0.9&&!S.comorbIds.includes('dyslipi'))
     fl.push({c:'var(--orange)',t:'Dyslipidemie mixte probable non declaree (TG>=2.3 + HDL<0.9). Ref: Framingham/INTERHEART'});
@@ -3050,7 +3050,7 @@ function renderFinal(){
   // ══════════════════════════════════════════════════════
   r+=`<div style="margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px;font-size:9px;color:var(--dim3);line-height:1.5">
     <b>References :</b> OMS | IDF 2006 | ADA 2024 | FINDRISC | IPAQ | PHQ-9 (Kroenke 2001) | PSS-10 (Cohen 1983) | ISI | BES-16 (Gormally 1982) | AUDIT-C | Lancet 2016 | BMJ 2016 WHtR | NEJM 1995 Leibel | NEJM 2011 Sumithran | SCORE2 | INTERHEART | DPP | STEP 1-5 | SURMOUNT 1-4 | STAMPEDE | SM-BOSS | MERIT | SOS Study | Biswas 2015 | Cappuccio 2008<br>
-    <b>Score BMN v3.4</b> — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
+    <b>COMPASS v3.5</b> — Comprehensive Metabolic Profiling & Stratification System — Architecture CLEO (C+E+O+L) — BSD v4.9 + Bio v4.7.1 + BTM v2.0 + FNC v1.0 — Bach | Manos | Noel
   </div>`;
 
   return r;
