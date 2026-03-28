@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-// SCORE BMN v3.4 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
+// SCORE BMN v3.5 — Architecture CLEO (C+E+O+L) + Bio BSD v4.9 + BTM v2.0 + FNC v1.0
 // Open-Meteo · Nominatim · Haversine · Claude AI · IP-Geoloc
 // Ref: OMS, IDF 2006, ADA 2024, IPAQ, PHQ-9, PSS-10, ISI, BES
 // Lancet 2016, SCORE2/Framingham, FINDRISC, DPP, INTERHEART
@@ -119,7 +119,11 @@ const BIO=[
   {id:'ggt',n:'GGT',u:'UI/L',nm:50,ab:80,w:.8,inv:0,t:10,nr:'< 50',ar:'>= 80',l:'Foie / Alcool'},
   {id:'tghdl',n:'Ratio TG/HDL',u:'',nm:2,ab:3.5,w:2,inv:0,t:15,nr:'< 2.0',ar:'>= 3.5',l:'IR cachee'},
   {id:'urate',n:'Acide urique',u:'umol/L',nm:360,ab:420,w:.8,inv:0,t:15,nr:'< 360',ar:'>= 420',l:'Goutte / MetS'},
-  {id:'leptine',n:'Leptine',u:'ng/mL',nm:20,ab:40,w:1.5,inv:0,t:15,nr:'< 20',ar:'>= 40',l:'Hormone satiete'}
+  {id:'leptine',n:'Leptine',u:'ng/mL',nm:20,ab:40,w:1.5,inv:0,t:15,nr:'< 20',ar:'>= 40',l:'Hormone satiete'},
+  // v3.5 — Axe 7 Beta-cell/Secretory (Nauck & Meier 2021, Lund et al., Le TDV et al.)
+  {id:'cpeptide',n:'C-peptide',u:'ng/mL',nm:2.5,ab:0.5,w:1.5,inv:1,t:15,nr:'1.1-4.4',ar:'< 0.5 ou > 6.0',l:'Reserve secretoire beta-cell'},
+  {id:'fgf21',n:'FGF21',u:'pg/mL',nm:150,ab:300,w:1.0,inv:0,t:15,nr:'< 150',ar:'> 300',l:'Stress metabolique chronique'},
+  {id:'glucagon',n:'Glucagon a jeun',u:'pg/mL',nm:60,ab:100,w:1.0,inv:0,t:15,nr:'< 60',ar:'> 100',l:'Dysregulation alpha-cell'}
 ];
 
 // ─── PSS-10 (Cohen, Kamarck & Mermelstein 1983) ───
@@ -1966,13 +1970,55 @@ function getGLP1Profile(){
   if(e.dR>=1.5) demoBonus+=0.5; // Ethnies IR = meilleure reponse
   if(S.comorbIds.includes('sopk')) demoBonus+=0.5; // SOPK = excellente reponse
 
+  // ── AXE 7: Beta-cell / Secretory function (v3.5 — novel axis) ──
+  // C-peptide, FGF21, glucagon a jeun — bidirectionnel (-3 a +5)
+  // Poids: 0.08 si favorable / 0.05 si defavorable (conservateur, donnees humaines FGF21 limitees)
+  // Ref: Nauck & Meier 2021 (C-peptide/HOMA-IR r≈0.6); Lund et al. (glucagon/DT2); Le TDV et al. (FGF21/BMI — murin)
+  let betaCellAxis = 0;
+  const bv = S.bioValues || {};
+
+  // C-peptide : reserve secretoire beta-cell (favorable si preservee)
+  if (bv.cpeptide !== undefined) {
+    if (bv.cpeptide >= 2.0 && bv.cpeptide <= 4.0) betaCellAxis += 2.0;      // Reserve preservee → forte potentialisation incretine
+    else if (bv.cpeptide >= 1.0 && bv.cpeptide < 2.0) betaCellAxis += 1.0;  // Reserve partielle
+    else if (bv.cpeptide < 1.0) betaCellAxis -= 1.5;                         // Epuisement secretoire → reponse GLP-1 reduite
+    else if (bv.cpeptide > 4.0) betaCellAxis -= 0.5;                         // Hypersecretion = IR marquee
+  } else {
+    // Proxy declaratif: DT2 long cours = probable depletion C-peptide
+    if (S.comorbIds.includes('dt2') && (bv.hba1c||0) >= 8) betaCellAxis -= 1.0;
+    else if (S.comorbIds.includes('predmt')) betaCellAxis += 0.5;
+  }
+
+  // FGF21 : stress metabolique chronique (defavorable si eleve)
+  // Note: donnees humaines directes limitees → poids conservateur (0.05)
+  if (bv.fgf21 !== undefined) {
+    if (bv.fgf21 > 300) betaCellAxis -= 1.5;       // FGF21 resistance = stress metabolique severe
+    else if (bv.fgf21 > 150) betaCellAxis -= 0.5;  // Stress modere
+    else betaCellAxis += 0.5;                       // FGF21 normal = bon etat metabolique
+  }
+
+  // Glucagon a jeun : dysregulation alpha-cell (defavorable si eleve)
+  if (bv.glucagon !== undefined) {
+    if (bv.glucagon > 100) betaCellAxis -= 1.5;     // Hyperglucagonemie severe → reduit efficacite GLP-1
+    else if (bv.glucagon > 60) betaCellAxis -= 0.5; // Moderee
+    else betaCellAxis += 0.5;                       // Normal/bas → bonne regulation alpha
+  } else {
+    // Proxy: DT2 avec HbA1c eleve = probable hyperglucagonemie
+    if (S.comorbIds.includes('dt2') && (bv.hba1c||0) >= 7) betaCellAxis -= 0.5;
+  }
+
+  betaCellAxis = Math.max(-3, Math.min(5, betaCellAxis));
+  S.betaCellAxis = betaCellAxis;
+
   // ════════════════════════════════════════════════════
   // SCORE COMPOSITE DE REPONSE GLP-1 (GRS: GLP-1 Response Score)
+  // 7 axes — poids conformes article §2.4 (v3.5)
   // ════════════════════════════════════════════════════
-  // Facteurs positifs: IR + inflammation + demo
-  // Facteurs negatifs: chronicite + psycho + iatrogene
-  const posFactor = irScore*0.35 + inflamScore*0.15 + demoBonus;
-  const negFactor = chronScore*0.20 + psychoScore*0.15 + iatroScore*0.20;
+  // Facteurs positifs: IR (0.30) + inflammation (0.12) + demo + betaCell (0.08 si >= 0)
+  // Facteurs negatifs: chronicite (0.18) + psycho (0.12) + iatrogene (0.15) + betaCell (0.05 si < 0)
+  const betaWeight = betaCellAxis >= 0 ? 0.08 : 0.05;
+  const posFactor = irScore*0.30 + inflamScore*0.12 + demoBonus + (betaCellAxis >= 0 ? betaCellAxis*betaWeight : 0);
+  const negFactor = chronScore*0.18 + psychoScore*0.12 + iatroScore*0.15 + (betaCellAxis < 0 ? Math.abs(betaCellAxis)*betaWeight : 0);
   let grs = posFactor - negFactor;
   // Calibrer sur le GRI existant pour coherence
   grs = (grs + gri) / 2;
@@ -2176,7 +2222,7 @@ function getGLP1Profile(){
     profileCode,
     profile,
     grs:Math.round(grs*100)/100,
-    axes:{irScore:Math.round(irScore*10)/10, chronScore:Math.round(chronScore*10)/10, inflamScore:Math.round(inflamScore*10)/10, psychoScore:Math.round(psychoScore*10)/10, iatroScore:Math.round(iatroScore*10)/10},
+    axes:{irScore:Math.round(irScore*10)/10, chronScore:Math.round(chronScore*10)/10, inflamScore:Math.round(inflamScore*10)/10, psychoScore:Math.round(psychoScore*10)/10, iatroScore:Math.round(iatroScore*10)/10, betaCellAxis:Math.round((betaCellAxis||0)*10)/10},
     efficacyFactors,
     resistanceFactors,
     ppeEstimate,

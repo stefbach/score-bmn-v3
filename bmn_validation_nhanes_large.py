@@ -395,7 +395,7 @@ for c in miss[miss > 0].index:
 print("\n[3/6] Imputation Monte Carlo (MICE)...")
 
 class MICEImputer:
-    def __init__(self, n_imputations=20, n_iterations=10, random_state=42):
+    def __init__(self, n_imputations=25, n_iterations=15, random_state=42):
         self.n_imputations = n_imputations
         self.n_iterations = n_iterations
         self.rng = np.random.RandomState(random_state)
@@ -448,7 +448,7 @@ impute_cols = [
 ]
 impute_cols = [c for c in impute_cols if c in df.columns]
 
-mice = MICEImputer(n_imputations=20, n_iterations=10, random_state=42)
+mice = MICEImputer(n_imputations=25, n_iterations=15, random_state=42)
 imputed_datasets = mice.impute(df, impute_cols)
 print(f"  ✓ {len(imputed_datasets)} jeux de données imputés")
 
