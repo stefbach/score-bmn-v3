@@ -476,7 +476,7 @@ tr:hover{background:rgba(129,140,248,.05)}
   <a href="#s2"><span>2.</span> Architecture generale</a>
   <a href="#s3"><span>3.</span> Profils ethniques (12 profils)</a>
   <a href="#s4"><span>4.</span> Comorbidites (13 declaratives + IR occulte auto)</a>
-  <a href="#s5"><span>5.</span> Biomarqueurs (15 marqueurs)</a>
+  <a href="#s5"><span>5.</span> Biomarqueurs (18 marqueurs)</a>
   <a href="#s6"><span>6.</span> Instruments psychometriques valides</a>
   <a href="#s7"><span>7.</span> Phase C — Score Clinique (0-50)</a>
   <a href="#s8"><span>8.</span> Phase E — Score Exposome (0-45)</a>
@@ -512,7 +512,7 @@ tr:hover{background:rgba(129,140,248,.05)}
 <p>Le <strong>Score COMPASS v3.5</strong> est un algorithme d'evaluation du risque metabolique et d'obesite, concu pour assister le medecin dans sa prise de decision. Il integre :</p>
 <ul style="margin:8px 0 8px 20px;font-size:13px;color:var(--dim)">
   <li><strong>Donnees declaratives</strong> du patient (cliniques, mode de vie, psychometriques)</li>
-  <li><strong>Donnees biologiques</strong> (15 biomarqueurs avec z-scores ponderes)</li>
+  <li><strong>Donnees biologiques</strong> (18 biomarqueurs avec z-scores ponderes)</li>
   <li><strong>Donnees environnementales en temps reel</strong> (qualite de l'air, meteo, UV)</li>
   <li><strong>Intelligence artificielle</strong> (Claude AI) pour rapport strategique personnalise</li>
   <li><strong>Modele predictif de Markov</strong> (projection a 10 ans)</li>
@@ -559,7 +559,7 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
                    |
                    v
           PRESCRIPTION BIOLOGIQUE
-          P0 (optionnel) | P5 (7 marqueurs) | P10 (15 marqueurs) | P15 (20 marqueurs)
+          P0 (optionnel) | P5 (7 marqueurs) | P10 (10 marqueurs) | P15 (18 marqueurs)
                    |
                    v
           +----------------------+
@@ -645,8 +645,8 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <!-- ═══════════════════════════════════════════ -->
 <!-- 5. BIOMARQUEURS -->
 <!-- ═══════════════════════════════════════════ -->
-<h2 id="s5">5. Biomarqueurs (15 marqueurs)</h2>
-<p><strong>Sources :</strong> SCORE2/Framingham, ADA 2024, CTT 2010, ERFC 2010, CKD-PC 2010. Somme totale des poids = <strong>23.2</strong></p>
+<h2 id="s5">5. Biomarqueurs (18 marqueurs)</h2>
+<p><strong>Sources :</strong> SCORE2/Framingham, ADA 2024, CTT 2010, ERFC 2010, CKD-PC 2010, Nauck &amp; Meier 2021. Somme totale des poids = <strong>26.7</strong></p>
 
 <h3>Panel P5 — Depistage (tier = 5)</h3>
 <table>
@@ -670,12 +670,15 @@ PATIENT &rarr; QUESTIONNAIRE (20 ecrans)
 <tr><td><code>ggt</code></td><td>GGT</td><td>UI/L</td><td>50</td><td>80</td><td><b>0.8</b></td><td>Non</td><td>&lt; 50</td><td>&ge; 80</td></tr>
 </table>
 
-<h3>Panel P15 — Endocrinien complet (+3 marqueurs, tier = 15)</h3>
+<h3>Panel P15 — Endocrinien &amp; Beta-cell complet (+6 marqueurs, tier = 15)</h3>
 <table>
 <tr><th>ID</th><th>Nom</th><th>Unite</th><th>Normal</th><th>Anormal</th><th>Poids w</th><th>Inv.</th><th>Plage OK</th><th>Alerte</th></tr>
 <tr><td><code>tghdl</code></td><td>Ratio TG/HDL</td><td>-</td><td>2.0</td><td>3.5</td><td><b>2.0</b></td><td>Non</td><td>&lt; 2.0</td><td>&ge; 3.5</td></tr>
 <tr><td><code>urate</code></td><td>Acide urique</td><td>umol/L</td><td>360</td><td>420</td><td><b>0.8</b></td><td>Non</td><td>&lt; 360</td><td>&ge; 420</td></tr>
 <tr><td><code>leptine</code></td><td>Leptine</td><td>ng/mL</td><td>20</td><td>40</td><td><b>1.5</b></td><td>Non</td><td>&lt; 20</td><td>&ge; 40</td></tr>
+<tr><td><code>cpeptide</code></td><td>C-peptide</td><td>ng/mL</td><td>2.5</td><td>0.5</td><td><b>1.5</b></td><td><span class="badge o">Oui</span></td><td>1.1-4.4</td><td>&lt; 0.5 ou &gt; 6.0</td></tr>
+<tr><td><code>fgf21</code></td><td>FGF21</td><td>pg/mL</td><td>150</td><td>300</td><td><b>1.0</b></td><td>Non</td><td>&lt; 150</td><td>&gt; 300</td></tr>
+<tr><td><code>glucagon</code></td><td>Glucagon a jeun</td><td>pg/mL</td><td>60</td><td>100</td><td><b>1.0</b></td><td>Non</td><td>&lt; 60</td><td>&gt; 100</td></tr>
 </table>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -880,8 +883,8 @@ O = min(10, socScore + actScore)</pre>
 <tr><td>FAIBLE</td><td>&ge;2</td><td>-</td><td><span class="badge a">P5</span></td><td>7</td><td>2 ans</td></tr>
 <tr><td>FAIBLE</td><td>&lt;2</td><td>Oui</td><td><span class="badge a">P5</span></td><td>7</td><td>2 ans</td></tr>
 <tr><td>MODERE</td><td>-</td><td>-</td><td><span class="badge o">P10</span></td><td>15</td><td>Annuel</td></tr>
-<tr><td>ELEVE</td><td>-</td><td>-</td><td><span class="badge r">P15</span></td><td>20</td><td>Trimestriel</td></tr>
-<tr><td>TRES ELEVE</td><td>-</td><td>-</td><td><span class="badge p">P15+BEF</span></td><td>20</td><td>Mensuel</td></tr>
+<tr><td>ELEVE</td><td>-</td><td>-</td><td><span class="badge r">P15</span></td><td>21</td><td>Trimestriel</td></tr>
+<tr><td>TRES ELEVE</td><td>-</td><td>-</td><td><span class="badge p">P15+BEF</span></td><td>21+</td><td>Mensuel</td></tr>
 </table>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -967,7 +970,7 @@ Si gap &gt; 20 : extraW = min(0.30, (gap-20)/100*0.60)
 <p><strong>Objectif :</strong> Aller au-dela du GRI simple pour determiner avec precision <strong>qui va repondre aux GLP-1 et qui ne repondra pas</strong>, avec molecule, dose et perte de poids estimee.</p>
 <p><strong>References :</strong> STEP 1-5 (Semaglutide), SURMOUNT 1-4 (Tirzepatide), SCALE (Liraglutide), Lingvay 2024, Garvey 2023, Jastreboff 2022</p>
 
-<h3>Architecture du moteur — 6 axes de phenotypage</h3>
+<h3>Architecture du moteur — 7 axes de phenotypage</h3>
 <table><tr><th>Axe</th><th>Plage</th><th>Direction</th><th>Description</th></tr>
 <tr><td><b>AXE 1 — Insulinoresistance (IR)</b></td><td>0-10</td><td><span class="badge g">POSITIF</span></td><td>Plus l'IR est forte, meilleure est la reponse. HOMA-IR, adiponectine, TG/HDL, SOPK, NAFLD, MetS</td></tr>
 <tr><td><b>AXE 2 — Chronicite/Resistance</b></td><td>0-10</td><td><span class="badge r">NEGATIF</span></td><td>CTI, yoyo, obesite enfance, leptinoresistance, IMC &gt; 40. Plus c'est chronique, moins le GLP-1 fonctionne seul</td></tr>
@@ -975,12 +978,15 @@ Si gap &gt; 20 : extraW = min(0.30, (gap-20)/100*0.60)
 <tr><td><b>AXE 4 — Psycho-comportemental</b></td><td>0-10</td><td><span class="badge r">NEGATIF</span></td><td>PHQ-9, PSS-10, BES. Depression/stress/BES severes diminuent observance et reponse</td></tr>
 <tr><td><b>AXE 5 — Iatrogene</b></td><td>0-5</td><td><span class="badge r">NEGATIF</span></td><td>Corticoides, antidepresseurs obesogenes, hypothyroidie non controlee</td></tr>
 <tr><td><b>AXE 6 — Demographique</b></td><td>bonus</td><td><span class="badge g">POSITIF</span></td><td>Age 30-65 optimal, sexe feminin, ethnie IR, SOPK</td></tr>
+<tr><td><b>AXE 7 — Beta-cell / Secretoire</b></td><td>-3 a +5</td><td><span class="badge a">BIDIRECTIONNEL</span></td><td>C-peptide, FGF21, Glucagon a jeun. Reserve beta-cell preservee = potentialisation GLP-1 ; epuisement = resistance. Ref: Nauck &amp; Meier 2021, Lund et al. 2016</td></tr>
 </table>
 
 <h3>Score Composite — GRS (GLP-1 Response Score)</h3>
 <div class="formula-box">
-  <div class="f">GRS = (IR&times;0.35 + Inflam&times;0.15 + Demo) &minus; (Chron&times;0.20 + Psycho&times;0.15 + Iatro&times;0.20)</div>
-  <div class="d">GRS final = (GRS_composite + GRI) / 2 &nbsp;&nbsp;|&nbsp;&nbsp; Plage: -3 a +6</div>
+  <div class="f">posFactor = IR&times;0.30 + Inflam&times;0.12 + Demo + (betaCell&ge;0 ? betaCell&times;0.08 : 0)</div>
+  <div class="f">negFactor = Chron&times;0.18 + Psycho&times;0.12 + Iatro&times;0.15 + (betaCell&lt;0 ? |betaCell|&times;0.05 : 0)</div>
+  <div class="f">GRS = (posFactor &minus; negFactor + GRI) / 2</div>
+  <div class="d">GRS final borne [-3, +6] &nbsp;|&nbsp; betaCellAxis [-3, +5] : poids 0.08 (favorable) / 0.05 (defavorable, conservateur)</div>
 </div>
 
 <h3>5 Profils de Reponse + Contre-Indication</h3>
@@ -1624,13 +1630,13 @@ tr:nth-child(even){background:var(--bg2)}
 <a href="#s9">IX. Profils ethniques (12 groupes) : seuils & multiplicateurs</a>
 <a href="#s10">X. Comorbidités (14 items) : HR/OR & méta-analyses</a>
 <a href="#s11">XI. Instruments psychométriques validés (PSS-10, PHQ-9, BES, ISI)</a>
-<a href="#s12">XII. Panel biologique (15 biomarqueurs) : justification de chaque poids</a>
+<a href="#s12">XII. Panel biologique (18 biomarqueurs) : justification de chaque poids</a>
 <a href="#s13">XIII. Formule bioNorm — Méta-analyse des poids</a>
 <a href="#s14">XIV. Intégration déclaratif-biologie : formule sf & repondération dynamique</a>
 <a href="#s15">XV. Sous-index inflammatoire indirect (SII) — 7 critères</a>
 <a href="#s16">XVI. CTI — Chronicity Trajectory Index : composantes & poids γ</a>
 <a href="#s17">XVII. GRI — GLP-1 Response Index : facteurs favorables & défavorables</a>
-<a href="#s18">XVIII. GLP-1 Response Profiling Engine v2.0 — 6 axes & 5 profils</a>
+<a href="#s18">XVIII. GLP-1 Response Profiling Engine v2.0 — 7 axes & 5 profils</a>
 <a href="#s19">XIX. Modèle de Markov à 10 ans — Matrice de transition & calibration</a>
 <a href="#s20">XX. Analyse de sensibilité du modèle</a>
 <a href="#s21">XXI. Limites & biais potentiels</a>
@@ -1643,7 +1649,7 @@ tr:nth-child(even){background:var(--bg2)}
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s1">I. Résumé exécutif & objectifs</h1>
 
-<p>Le <b>COMPASS v3.5</b> (Comprehensive Metabolic Profiling & Stratification System — Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 15 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
+<p>Le <b>COMPASS v3.5</b> (Comprehensive Metabolic Profiling & Stratification System — Bach-Manos-Noël) est un algorithme d'évaluation du risque métabolique et d'obésité conçu pour la pratique clinique de première ligne. Il combine quatre dimensions déclaratives (architecture CLEO : Clinique, Exposome, Occupationnel, Lifestyle) avec un panel biologique de 18 biomarqueurs, une intelligence artificielle médicale (Claude AI), et des données environnementales en temps réel (qualité de l'air, météo, géolocalisation).</p>
 
 <h3>Objectifs du modèle</h3>
 <p>1. <b>Sensibilité maximale</b> : détecter les patients à risque métabolique AVANT l'apparition de l'obésité clinique manifeste, en identifiant les phénotypes métaboliquement obèses à poids normal (MONW) et les insulinorésistances occultes.</p>
@@ -1965,9 +1971,9 @@ SI statines ET durée > 5 ans :<br>
 <p><b>Auteurs :</b> Morin et al., 2001. 7 items, score 0-28. Seuils : 0-7 pas d'insomnie, 8-14 légère, 15-21 modérée, 22-28 sévère. Alpha de Cronbach : 0.90.</p>
 
 <!-- ═══════════════════════════════════════════════ -->
-<h1 id="s12">XII. Panel biologique — 15 biomarqueurs : justification de chaque poids</h1>
+<h1 id="s12">XII. Panel biologique — 18 biomarqueurs : justification de chaque poids</h1>
 
-<p>Les poids (w) sont proportionnels à la force de l'association avec le risque métabolique, extraite des méta-analyses fondatrices. Le poids total est de 23.2 (dénominateur de bioNorm).</p>
+<p>Les poids (w) sont proportionnels à la force de l'association avec le risque métabolique, extraite des méta-analyses fondatrices. Le poids total est de 26.7 (dénominateur de bioNorm).</p>
 
 <table>
 <tr><th>ID</th><th>Biomarqueur</th><th>w</th><th>Normal</th><th>Anormal</th><th>Panel</th><th>Inv</th><th>HR/OR source</th><th>Justification du poids w</th></tr>
@@ -1986,9 +1992,12 @@ SI statines ET durée > 5 ans :<br>
 <tr><td>asat</td><td>Transaminases</td><td>1.0</td><td>&lt;40</td><td>≥60</td><td>P10</td><td>Non</td><td>OR 1.5-2.0 NAFLD (Chalasani 2018)</td><td>Marqueur hépatique. NAFLD screening.</td></tr>
 <tr><td>ggt</td><td>GGT</td><td>0.8</td><td>&lt;50</td><td>≥80</td><td>P10</td><td>Non</td><td>HR 1.20 MetS (Lee 2007, méta n=273 000)</td><td>Marqueur de stéatose/alcool. Poids faible car peu spécifique.</td></tr>
 <tr><td>urate</td><td>Acide urique</td><td>0.8</td><td>&lt;360</td><td>≥420</td><td>P15</td><td>Non</td><td>HR 1.13 MetS (Li 2014, méta n=38 000)</td><td>Associé au MetS et à la goutte. Marqueur de fructose/purines. Poids faible.</td></tr>
+<tr><td>cpeptide</td><td>C-peptide</td><td>1.5</td><td>1.1-4.4</td><td>&lt;0.5 ou &gt;6.0</td><td>P15</td><td>Oui</td><td>r≈0.6 HOMA-IR (Nauck & Meier 2021)</td><td>Réserve sécrétoire bêta-cell. Marqueur clé d'épuisement pancréatique sous DT2. Bidirectionnel.</td></tr>
+<tr><td>fgf21</td><td>FGF21</td><td>1.0</td><td>&lt;150</td><td>&gt;300</td><td>P15</td><td>Non</td><td>OR ∼2.0 stress métabolique (Le TDV et al., données murines)</td><td>Stress métabolique chronique. FGF21-résistance = dysfonction hépatique. Poids conservateur (données humaines limitées).</td></tr>
+<tr><td>glucagon</td><td>Glucagon à jeun</td><td>1.0</td><td>&lt;60</td><td>&gt;100</td><td>P15</td><td>Non</td><td>HR 1.5-2.0 DT2 (Lund et al. 2016)</td><td>Dysrégulation alpha-cell. Hyperglucagonisme = production hépatique de glucose. Poids conservateur.</td></tr>
 </table>
 
-<div class="ok">Poids total Σw = 2.5+2.5+2.0+2.0+2.0+1.8+1.8+1.5+1.5+1.5+1.3+1.0+1.0+0.8+0.8 = <b>23.2</b></div>
+<div class="ok">Poids total Σw = 2.5+2.5+2.0+2.0+2.0+1.8+1.8+1.5+1.5+1.5+1.3+1.0+1.0+0.8+0.8+1.5+1.0+1.0 = <b>26.7</b></div>
 
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s13">XIII. Formule bioNorm — Méta-analyse des poids</h1>
@@ -2111,7 +2120,7 @@ Facteurs DÉFAVORABLES (ε) :<br>
 <!-- ═══════════════════════════════════════════════ -->
 <h1 id="s18">XVIII. GLP-1 Response Profiling Engine v2.0</h1>
 
-<h3>18.1 Les 6 axes d'évaluation</h3>
+<h3>18.1 Les 7 axes d'évaluation</h3>
 <table>
 <tr><th>Axe</th><th>Plage</th><th>Direction</th><th>Marqueurs clés</th><th>Justification</th></tr>
 <tr><td>1. Insulinorésistance (IR)</td><td>0-10</td><td>↑ positif</td><td>HOMA-IR, adiponectine, TG/HDL, SOPK, NAFLD</td><td>STEP 2/SURMOUNT 2 : IR = meilleur prédicteur de réponse GLP-1</td></tr>
@@ -2120,14 +2129,16 @@ Facteurs DÉFAVORABLES (ε) :<br>
 <tr><td>4. Psycho-comportemental</td><td>0-10</td><td>↓ négatif</td><td>PHQ-9, PSS-10, BES, dépression</td><td>Wadden 2021 : compliance réduite si PHQ ≥15</td></tr>
 <tr><td>5. Iatrogène</td><td>0-5</td><td>↓ négatif</td><td>Corticoïdes, antidépresseurs, hypothyroïdie</td><td>Fardet 2007, Gafoor 2018 : antagonisme pharmacologique</td></tr>
 <tr><td>6. Démographique</td><td>bonus</td><td>↑ positif</td><td>Âge 30-65, sexe féminin, ethnie IR</td><td>STEP 1 : femmes répondent +2% de plus ; âge 30-55 optimal</td></tr>
+<tr><td>7. Bêta-cell / Sécrétoire</td><td>-3 à +5</td><td>↕ bidirectionnel</td><td>C-peptide, FGF21, Glucagon à jeun</td><td>Nauck & Meier 2021 : réserve β-cell préservée = potentialisation GLP-1 ; épuisement = résistance. Lund et al. 2016 (glucagon/DT2)</td></tr>
 </table>
 
 <h3>18.2 Score composite GRS</h3>
 <div class="formula">
-posFactor = IR×0.35 + Inflammation×0.15 + demoBonus<br>
-negFactor = Chronicité×0.20 + Psycho×0.15 + Iatrogène×0.20<br>
+posFactor = IR×0.30 + Inflammation×0.12 + demoBonus + (betaCellAxis≥0 ? betaCellAxis×0.08 : 0)<br>
+negFactor = Chronicité×0.18 + Psycho×0.12 + Iatrogène×0.15 + (betaCellAxis&lt;0 ? |betaCellAxis|×0.05 : 0)<br>
 GRS = (posFactor − negFactor + GRI) / 2<br>
-GRS borné [-3, +6]
+GRS borné [-3, +6] | betaCellAxis [-3, +5]<br>
+Poids betaCell : 0.08 (favorable, réserve préservée) / 0.05 (défavorable, conservateur car données FGF21 humaines limitées)
 </div>
 
 <h3>18.3 Les 5 profils + contre-indication</h3>
@@ -2899,7 +2910,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     <div class="trust-item"><div class="t-num">22 807</div><div class="t-label">Personnes dans l'etude</div></div>
     <div class="trust-item"><div class="t-num">10 min</div><div class="t-label">Pour votre bilan</div></div>
     <div class="trust-item"><div class="t-num">53</div><div class="t-label">Etudes scientifiques</div></div>
-    <div class="trust-item"><div class="t-num">15</div><div class="t-label">Biomarqueurs analyses</div></div>
+    <div class="trust-item"><div class="t-num">18</div><div class="t-label">Biomarqueurs analyses</div></div>
   </div>
 </section>
 
@@ -2936,7 +2947,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
     <div class="why-card">
       <div class="card-icon icon-teal"><i class="fas fa-vial"></i></div>
       <h3>Vos analyses de sang parlent</h3>
-      <p>Le bilan fonctionne sans analyses biologiques, mais avec elles il est <strong>beaucoup plus precis</strong>. Pourquoi ? Parce que des marqueurs comme l'insulinoresistance (HOMA-IR), l'inflammation (CRP) ou les graisses dans le sang (triglycerides, HDL) revelent des desequilibres <strong>invisibles sans prise de sang</strong>. COMPASS integre jusqu'a <strong>15 marqueurs</strong> pour affiner votre profil.</p>
+      <p>Le bilan fonctionne sans analyses biologiques, mais avec elles il est <strong>beaucoup plus precis</strong>. Pourquoi ? Parce que des marqueurs comme l'insulinoresistance (HOMA-IR), l'inflammation (CRP), les graisses dans le sang (triglycerides, HDL) ou la reserve secretoire du pancreas (C-peptide) revelent des desequilibres <strong>invisibles sans prise de sang</strong>. COMPASS integre jusqu'a <strong>18 marqueurs</strong> pour affiner votre profil.</p>
     </div>
     <div class="why-card">
       <div class="card-icon icon-red"><i class="fas fa-robot"></i></div>
@@ -2979,9 +2990,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         </div>
         <div class="tl-content">
           <h3><span class="step-icon" style="color:var(--teal)"><i class="fas fa-user-doctor"></i></span> Consultation medicale &amp; prescription</h3>
-          <p>Vous consultez votre medecin avec votre premier bilan COMPASS. Sur cette base, le medecin evalue la pertinence d'un bilan biologique et vous prescrit les analyses de sang adaptees a votre profil (bilan lipidique, glycemie, HbA1c, CRP, bilan hepatique&hellip;).</p>
+          <p>Vous consultez votre medecin avec votre premier bilan COMPASS. Sur cette base, le medecin evalue la pertinence d'un bilan biologique et vous prescrit les analyses de sang adaptees a votre profil. La <strong>prescription est adaptative</strong> : selon votre niveau de risque, le medecin peut prescrire un panel de 7 a 21 examens, ou aucun si votre profil est a faible risque.</p>
           <span class="step-tag tag-doctor"><i class="fas fa-stethoscope"></i> Avec votre medecin</span>
-          <div class="highlight-box"><i class="fas fa-lightbulb"></i> Le medecin peut orienter la prescription en fonction de votre score preliminaire : un profil a risque eleve peut justifier un bilan biologique plus complet (jusqu'a 15 marqueurs).</div>
+          <div class="highlight-box"><i class="fas fa-lightbulb"></i> <strong>Prescription adaptative :</strong> Si votre score declaratif est faible (risque bas, SII &lt; 2), le medecin peut decider qu'aucun bilan biologique n'est necessaire (panel P0). Pour un risque modere, un panel intermediaire (P10). Pour un risque eleve, le panel complet inclut jusqu'a 18 biomarqueurs (C-peptide, FGF21, Glucagon&hellip;).</div>
         </div>
       </div>
       <div class="tl-step">
@@ -2991,7 +3002,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         </div>
         <div class="tl-content">
           <h3><span class="step-icon" style="color:var(--green)"><i class="fas fa-vial"></i></span> Prise de sang &amp; resultats</h3>
-          <p>Vous effectuez la prise de sang en laboratoire. A la reception des resultats, vous les saisissez dans COMPASS. L'algorithme integre alors jusqu'a <strong>15 biomarqueurs</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, transaminases&hellip;) pour reveler des desequilibres invisibles sans biologie.</p>
+          <p>Vous effectuez la prise de sang en laboratoire. A la reception des resultats, vous les saisissez dans COMPASS. L'algorithme integre alors jusqu'a <strong>18 biomarqueurs</strong> (HOMA-IR, HbA1c, triglycerides, HDL, CRP, TSH, C-peptide, FGF21, Glucagon&hellip;) pour reveler des desequilibres invisibles sans biologie.</p>
           <span class="step-tag tag-lab"><i class="fas fa-flask"></i> Laboratoire d'analyses</span>
           <div class="highlight-box"><i class="fas fa-triangle-exclamation"></i> <strong>Pourquoi c'est important :</strong> l'insulinoresistance, l'inflammation chronique de bas grade et les dyslipidemies ne provoquent souvent <strong>aucun symptome</strong>. Seule la biologie peut les detecter.</div>
         </div>
@@ -3013,7 +3024,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         </div>
         <div class="tl-content">
           <h3><span class="step-icon" style="color:var(--orange)"><i class="fas fa-microchip"></i></span> Analyse COMPASS complete</h3>
-          <p>L'algorithme recalcule votre score final en integrant la biologie au questionnaire : score global sf/100, classification de risque, profil de reponse GLP-1, module bariatrique (si indique) et projection Markov a 10 ans.</p>
+          <p>L'algorithme recalcule votre score final en integrant la biologie au questionnaire : score global sf/100, classification de risque, profil de reponse GLP-1 (7 axes d'evaluation incluant le nouvel axe beta-cellulaire), module bariatrique (si indique) et projection Markov a 10 ans.</p>
           <span class="step-tag tag-ai"><i class="fas fa-robot"></i> Traitement automatique</span>
         </div>
       </div>
@@ -3147,7 +3158,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
       <div class="s-label">Publications scientifiques<br>de reference</div>
     </div>
     <div class="science-stat">
-      <div class="s-num">15</div>
+      <div class="s-num">18</div>
       <div class="s-label">Marqueurs biologiques<br>analyses</div>
     </div>
   </div>
@@ -3181,7 +3192,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1
         Faut-il avoir des analyses de sang ?
         <i class="fas fa-chevron-down"></i>
       </div>
-      <div class="faq-a"><p>Ce n'est <strong>pas obligatoire</strong> : COMPASS fonctionne avec le questionnaire seul. Cependant, c'est <strong>fortement recommande</strong>. Pourquoi ? Parce que certains desequilibres metaboliques &mdash; comme l'insulinoresistance, l'inflammation chronique de bas grade ou un desequilibre des graisses dans le sang &mdash; ne provoquent <strong>aucun symptome perceptible</strong>. Seule une prise de sang peut les reveler. Avec vos resultats biologiques, COMPASS analyse jusqu'a 15 marqueurs et votre bilan gagne considerablement en precision.</p></div>
+      <div class="faq-a"><p>Ce n'est <strong>pas obligatoire</strong> : COMPASS fonctionne avec le questionnaire seul. Cependant, c'est <strong>fortement recommande</strong>. Pourquoi ? Parce que certains desequilibres metaboliques &mdash; comme l'insulinoresistance, l'inflammation chronique de bas grade, les dyslipidemies ou l'epuisement de la reserve beta-cellulaire du pancreas &mdash; ne provoquent <strong>aucun symptome perceptible</strong>. Seule une prise de sang peut les reveler. Avec vos resultats biologiques, COMPASS analyse jusqu'a 18 marqueurs et votre bilan gagne considerablement en precision.</p></div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
