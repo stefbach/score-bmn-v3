@@ -2637,12 +2637,12 @@ app.get('/', (c) => {
 <title>COMPASS &mdash; Metabolic Assessment</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="/static/styles.css" rel="stylesheet">
+<link href="/static/styles.css?v=${Date.now()}" rel="stylesheet">
 </head>
 <body>
 <div id="app"></div>
-<script src="/static/i18n.js"></script>
-<script src="/static/app.js"></script>
+<script src="/static/i18n.js?v=${Date.now()}"></script>
+<script src="/static/app.js?v=${Date.now()}"></script>
 </body>
 </html>`)
 })
