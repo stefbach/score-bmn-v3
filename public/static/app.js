@@ -642,8 +642,8 @@ const SCR=[
     <div class="s-title">${t('s1_title')}</div>
     <div class="s-sub">${t('s1_sub')} <span class="ref">WHO</span></div>
     <div class="fc"><div class="fc-label">${t('s1_label')}</div>
-      <input type="date" class="fc-input" id="inp_dob" value="${S.dob}" min="1900-01-01" max="${new Date().toISOString().slice(0,10)}" onchange="const y=new Date(this.value).getFullYear();if(y<1900||y>new Date().getFullYear()){this.value=S.dob||'';return;}S.dob=this.value;render(S.step,0)"></div>
-    ${age>0?`<div class="age-display"><div class="age-num">${age}</div><div class="age-lbl">${t('years')}</div></div>${ageRisk}`:''}
+      <input type="date" class="fc-input" id="inp_dob" value="${S.dob}" min="1900-01-01" max="${new Date().toISOString().slice(0,10)}" onchange="S.dob=this.value;var _y=new Date(this.value).getFullYear();if(_y>=1900&&_y<=new Date().getFullYear()){var _a=getAge(),_r='';if(_a>=65)_r='<div class=\'info-badge red\'>'+t('s1_age65')+'</div>';else if(_a>=45)_r='<div class=\'info-badge orange\'>'+t('s1_age45')+'</div>';else if(_a>0&&_a<18)_r='<div class=\'info-badge blue\'>'+t('s1_age18')+'</div>';document.getElementById('dob-age').innerHTML=_a>0?'<div class=\'age-display\'><div class=\'age-num\'>'+_a+'</div><div class=\'age-lbl\'>'+t('years')+'</div></div>'+_r:'';}else{document.getElementById('dob-age').innerHTML='';}"></div>
+    <div id="dob-age">${age>0?`<div class="age-display"><div class="age-num">${age}</div><div class="age-lbl">${t('years')}</div></div>${ageRisk}`:''}</div>
     <div id="aiBox1"></div>`;
   },
 
