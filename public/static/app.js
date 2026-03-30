@@ -642,7 +642,7 @@ const SCR=[
     <div class="s-title">${t('s1_title')}</div>
     <div class="s-sub">${t('s1_sub')} <span class="ref">WHO</span></div>
     <div class="fc"><div class="fc-label">${t('s1_label')}</div>
-      <input type="date" class="fc-input" id="inp_dob" value="${S.dob}" onchange="S.dob=this.value;render(S.step,0)"></div>
+      <input type="date" class="fc-input" id="inp_dob" value="${S.dob}" min="1900-01-01" max="${new Date().toISOString().slice(0,10)}" onchange="const y=new Date(this.value).getFullYear();if(y<1900||y>new Date().getFullYear()){this.value=S.dob||'';return;}S.dob=this.value;render(S.step,0)"></div>
     ${age>0?`<div class="age-display"><div class="age-num">${age}</div><div class="age-lbl">${t('years')}</div></div>${ageRisk}`:''}
     <div id="aiBox1"></div>`;
   },
