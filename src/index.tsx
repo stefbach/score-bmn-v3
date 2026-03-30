@@ -2632,7 +2632,7 @@ app.get('/', (c) => {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#ffffff">
 <meta name="description" content="COMPASS - Comprehensive Metabolic Profiling & Stratification System. Evaluate your metabolic risk with artificial intelligence / Evaluez votre risque metabolique avec intelligence artificielle.">
 <title>COMPASS &mdash; Metabolic Assessment</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2695;</text></svg>">
