@@ -1248,10 +1248,10 @@ def generate_btm_figures(df, val_results, eligible, subgroup_results, axis_resul
             mean_ppe = np.mean(ppe_vals)
             mean_tbwl = np.mean(tbwl_vals)
             ax.plot(mean_ppe, mean_tbwl, 'o', color=colors[p], markersize=12, markeredgecolor='black', markeredgewidth=1.5)
-    ax.plot([0, 25], [0, 25], 'k--', lw=1, alpha=0.5, label='Calibration parfaite')
-    ax.set_xlabel('PPE (Perte de Poids Estimee, %)', fontsize=12)
-    ax.set_ylabel('TBWL Simule Moyen (%)', fontsize=12)
-    ax.set_title('Calibration PPE vs Reponse Simulee par Profil', fontsize=13, fontweight='bold')
+    ax.plot([0, 25], [0, 25], 'k--', lw=1, alpha=0.5, label='Perfect calibration')
+    ax.set_xlabel('PPE (Predicted Weight Loss, %)', fontsize=12)
+    ax.set_ylabel('Mean Simulated TBWL (%)', fontsize=12)
+    ax.set_title('PPE Calibration vs Simulated Response by Profile', fontsize=13, fontweight='bold')
     ax.legend(fontsize=9)
     ax.set_xlim(-1, 26)
     ax.set_ylim(-2, 30)
@@ -1297,7 +1297,7 @@ def generate_btm_figures(df, val_results, eligible, subgroup_results, axis_resul
 
     # ── Fig BTM-4: Radar Chart (GRS Axes by Profile) ──
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
-    axes_names = ['IR', 'Inflammation', 'Demo', 'Chronicite\n(inv)', 'Psycho\n(inv)', 'Iatrogene\n(inv)']
+    axes_names = ['IR', 'Inflammation', 'Demo', 'Chronicity\n(inv)', 'Psycho\n(inv)', 'Iatrogenic\n(inv)']
     angles = np.linspace(0, 2*np.pi, len(axes_names), endpoint=False).tolist()
     angles += angles[:1]
 
@@ -1319,7 +1319,7 @@ def generate_btm_figures(df, val_results, eligible, subgroup_results, axis_resul
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(axes_names, fontsize=10)
     ax.set_ylim(0, 1)
-    ax.set_title('Profil Multi-Axes GRS par Categorie\n(1=favorable, 0=defavorable)', fontsize=12, fontweight='bold', pad=20)
+    ax.set_title('GRS Multi-Axis Profile by Category\n(1=favorable, 0=unfavorable)', fontsize=12, fontweight='bold', pad=20)
     ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0))
     plt.tight_layout()
     fig.savefig(os.path.join(OUTPUT_DIR, 'fig_btm4_radar_axes.png'), dpi=300, bbox_inches='tight')

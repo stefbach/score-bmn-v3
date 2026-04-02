@@ -2116,13 +2116,14 @@ def generate_publication_figures(scored_datasets, validation_results,
     ax = axes[1]
     # Box plot by classification
     labels_order = ['FAIBLE', 'MODERE', 'ELEVE', 'TRES_ELEVE']
+    labels_display = {'FAIBLE': 'LOW', 'MODERE': 'MODERATE', 'ELEVE': 'HIGH', 'TRES_ELEVE': 'VERY_HIGH'}
     data_by_label = []
     label_names = []
     for lab in labels_order:
         mask = df_valid['label'] == lab
         if mask.sum() > 0:
             data_by_label.append(df_valid.loc[mask, 'MetS'].values)
-            label_names.append(lab)
+            label_names.append(labels_display[lab])
     if data_by_label:
         bp = ax.boxplot(data_by_label, labels=label_names, patch_artist=True)
         colors = ['#2ecc71', '#f39c12', '#e74c3c', '#8e44ad']

@@ -77,7 +77,7 @@ SUPP_FIGURES = {
     "S2": {"file": "fig6_biomarker_heatmap.png", "caption": "Biomarker correlation heatmap (18 biomarkers + sf + bioNorm)."},
     "S3": {"file": "fig8_mc_distributions.png", "caption": "Monte Carlo modeled indicator distributions for 11 imputed variables."},
     "S4": {"file": "fig7_model_comparison.png", "caption": "Comparative discrimination for MetS prediction: BMN v3.5 vs. ML models (Logistic Regression, Random Forest, Gradient Boosting). The BMN v3.5 (AUC = 0.876) achieves lower discrimination than ensemble ML models (AUC ~0.95) but operates under fundamentally different constraints."},
-    "S5": {"file": "fig_btm2_calibration_ppe.png", "caption": "PPE calibration: predicted vs. simulated TBWL by response profile."},
+    "S5": {"file": "fig_btm2_calibration_ppe.png", "caption": "PPE calibration: predicted vs. simulated TBWL, by response profile. Scatter plot with group means (large circles) for R1 (n=314), R2 (n=2714), R3 (n=6,241), R4 (n=3,186). Dashed line indicates perfect calibration."},
     "S6": {"file": "fig5_subgroup_forest.png", "caption": "Subgroup forest plot for BMN MetS prediction AUC by demographic and clinical subgroups."},
     "S7": {"file": "fig_btm8_molecule_outcomes.png", "caption": "Molecule-specific outcomes: simulated TBWL distribution by recommended molecule."},
     "S8": {"file": "fig_btm1_roc_glp1.png", "caption": "BTM ROC curves: GRS/GRI discrimination for simulated GLP-1 responder and super-responder prediction."},
