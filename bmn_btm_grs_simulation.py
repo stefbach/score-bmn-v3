@@ -360,6 +360,31 @@ def compute_grs_axes(row):
 grs_cols = df_glp1.apply(compute_grs_axes, axis=1)
 df_glp1 = pd.concat([df_glp1, grs_cols], axis=1)
 
+# Distribution empirique du GRS (Suppl Methods §M9.4 — verification des bornes)
+grs_p1, grs_p99 = np.percentile(df_glp1['grs'], [1, 99])
+grs_range_summary = {
+    'n': int(len(df_glp1)),
+    'min': round(float(df_glp1['grs'].min()), 3),
+    'max': round(float(df_glp1['grs'].max()), 3),
+    'mean': round(float(df_glp1['grs'].mean()), 3),
+    'std': round(float(df_glp1['grs'].std()), 3),
+    'p1': round(float(grs_p1), 3),
+    'p99': round(float(grs_p99), 3),
+    'clip_floor_binding': bool((df_glp1['grs'] <= -3).any()),
+    'clip_ceiling_binding': bool((df_glp1['grs'] >= 6).any()),
+}
+print(f"  Distribution GRS (NHANES, N={len(df_glp1):,}): "
+      f"min={grs_range_summary['min']}, p1={grs_range_summary['p1']}, "
+      f"p99={grs_range_summary['p99']}, max={grs_range_summary['max']}")
+
+# Export immediat et autonome de la distribution GRS (Suppl Methods §M9.4).
+# Ecrit avant les analyses Monte Carlo / bootstrap en aval afin que cet
+# artefact de reproductibilite soit toujours disponible meme si une etape
+# ulterieure echoue.
+with open(f'{OUTPUT_DIR}/grs_distribution.json', 'w', encoding='utf-8') as f:
+    json.dump(grs_range_summary, f, indent=2, ensure_ascii=False)
+print(f"    ✓ grs_distribution.json")
+
 def assign_profile(row):
     """
     Assigne le profil BTM (R1/R2/R3/R4/R5/CI) conformement a l'algo app.js v3.5.
@@ -853,6 +878,7 @@ results_json = {
             'Prospective validation in GLP-1-treated cohorts required.'
         ),
     },
+    'grs_range': grs_range_summary,
     'table3_profiles': table3_rows,
     'table4_discrimination': {
         'responder_TBWL_10': {
