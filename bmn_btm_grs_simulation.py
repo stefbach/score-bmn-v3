@@ -582,6 +582,11 @@ def bootstrap_auc(y, scores, n_boot=2000, seed=42):
             continue
         aucs.append(roc_auc_score(y[idx], scores[idx]))
     aucs = np.array(aucs)
+    if aucs.size == 0:
+        # Too few positives for any bootstrap resample to contain both classes
+        # (e.g. rare super-responders). Older numpy returned nan here; numpy 2.x
+        # raises on percentile of an empty array. Return nan to preserve behavior.
+        return float('nan'), float('nan')
     return np.percentile(aucs, 2.5), np.percentile(aucs, 97.5)
 
 # AUC GRS pour repondeur (TBWL >= 10%)
