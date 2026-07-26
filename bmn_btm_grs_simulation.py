@@ -92,6 +92,16 @@ CYCLES = {
     '2017-2018': {'suffix': 'J', 'year': 2017},
 }
 
+# hs-CRP : NHANES n'a AUCUN marqueur d'inflammation en 2011-2014 (CRP arrete
+# apres 2009-2010, hs-CRP introduit en 2015-2016). None = table inexistante,
+# axe 3 (inflammation) laisse a 0 sur ces cycles (documente §M9.4), sans
+# interrompre le run. 2015-2018 : HSCRP_I/J (LBXHSCRP, mg/L).
+CRP_TABLE = {'G': None, 'H': None, 'I': 'HSCRP', 'J': 'HSCRP'}
+
+# Insuline : en 2011-2012 elle est incluse dans le fichier GLU_G (colonnes
+# LBXIN/LBDINSI). A partir de 2013-2014 elle a son propre fichier INS_x.
+INS_TABLE = {'G': 'GLU', 'H': 'INS', 'I': 'INS', 'J': 'INS'}
+
 def fetch_nhanes(table_name, suffix, year, max_retries=3):
     url = f"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{year}/DataFiles/{table_name}_{suffix}.XPT"
     for attempt in range(max_retries):
@@ -128,7 +138,10 @@ def process_cycle(cycle_name, tables):
     # Inclusion: age >= 18, examen complet (RIDSTATR=2)
     df = df[(df['age'] >= 18) & (df['ridstatr'] == 2)].copy()
     df['sex'] = df['sex_code'].map({1: 'M', 2: 'F'})
-    ETH_MAP = {1: 'eu', 2: 'eu', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
+    # RIDRETH3: 1=Mexican American, 2=Other Hispanic, 3=NH White, 4=NH Black,
+    # 6=NH Asian, 7=Other/Multi. Hispaniques (1,2) -> 'im' (dR=2.0, seuil 27.5)
+    # conformement a Suppl. Table S2 / IDF 2006.
+    ETH_MAP = {1: 'im', 2: 'im', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
     df['ethnicCode'] = df['race_eth'].map(ETH_MAP).fillna('eu')
     df['cycle'] = cycle_name
 
@@ -153,12 +166,27 @@ def process_cycle(cycle_name, tables):
         df.rename(columns={'LBXSGL': 'glucose_mgdl'}, inplace=True)
         df['glyc'] = df['glucose_mgdl'] / 18.0
 
+    # Glucose a jeun (GLU_x) : requis pour HOMA-IR (BIOPRO/LBXSGL n'est PAS a jeun)
+    glu = tables.get('GLU')
+    if glu is not None:
+        df = safe_merge(df, glu, ['LBXGLU'])
+        df.rename(columns={'LBXGLU': 'glucose_fasting_mgdl'}, inplace=True)
+
+    # Insuline : LBXIN est en uU/mL. LBDINSI est en pmol/L (facteur 6).
     ins = tables.get('INS')
     if ins is not None:
-        df = safe_merge(df, ins, ['LBDINSI'])
-        df.rename(columns={'LBDINSI': 'insulin'}, inplace=True)
-        mask = df['glyc'].notna() & df['insulin'].notna()
-        df.loc[mask, 'homaIR'] = (df.loc[mask, 'glucose_mgdl'] * df.loc[mask, 'insulin']) / 405.0
+        if 'LBXIN' in ins.columns:
+            df = safe_merge(df, ins, ['LBXIN'])
+            df.rename(columns={'LBXIN': 'insulin_uUmL'}, inplace=True)
+        elif 'LBDINSI' in ins.columns:
+            df = safe_merge(df, ins, ['LBDINSI'])
+            df['insulin_uUmL'] = df['LBDINSI'] / 6.0
+            df.drop(columns=['LBDINSI'], inplace=True)
+        if 'glucose_fasting_mgdl' in df.columns and 'insulin_uUmL' in df.columns:
+            mask = df['glucose_fasting_mgdl'].notna() & df['insulin_uUmL'].notna()
+            df.loc[mask, 'homaIR'] = (
+                df.loc[mask, 'glucose_fasting_mgdl'] * df.loc[mask, 'insulin_uUmL']
+            ) / 405.0
 
     trigly = tables.get('TRIGLY')
     if trigly is not None:
@@ -178,8 +206,13 @@ def process_cycle(cycle_name, tables):
 
     hscrp = tables.get('HSCRP')
     if hscrp is not None:
-        df = safe_merge(df, hscrp, ['LBXHSCRP'])
-        df.rename(columns={'LBXHSCRP': 'crphs'}, inplace=True)
+        if 'LBXHSCRP' in hscrp.columns:        # 2015-2018, deja en mg/L
+            df = safe_merge(df, hscrp, ['LBXHSCRP'])
+            df.rename(columns={'LBXHSCRP': 'crphs'}, inplace=True)
+        elif 'LBXCRP' in hscrp.columns:        # 2011-2014, mg/dL -> mg/L
+            df = safe_merge(df, hscrp, ['LBXCRP'])
+            df['crphs'] = df['LBXCRP'] * 10.0
+            df.drop(columns=['LBXCRP'], inplace=True)
 
     bpq = tables.get('BPQ')
     if bpq is not None:
@@ -188,21 +221,50 @@ def process_cycle(cycle_name, tables):
 
     diq = tables.get('DIQ')
     if diq is not None:
-        df = safe_merge(df, diq, ['DIQ010'])
-        df['dt2'] = (df.get('DIQ010', 2) == 1).astype(int)
+        df = safe_merge(df, diq, ['DIQ010', 'DIQ050', 'DIQ070'])
+        # Definition elargie du T2DM (alignement Table 1, ~32-33%) :
+        # diagnostic OU insuline (DIQ050) OU antidiabetique oral (DIQ070)
+        # OU HbA1c >= 6.5% (critere ADA). DIQ010 seul (diagnostic) sous-estime.
+        diagnosed  = (df.get('DIQ010', 2) == 1)
+        on_insulin = (df.get('DIQ050', 2) == 1)
+        on_pills   = (df.get('DIQ070', 2) == 1)
+        by_hba1c   = (df.get('hba1c', pd.Series(0, index=df.index)) >= 6.5)
+        # Glycemie a jeun >= 126 mg/dL (critere ADA). Sous-echantillon a jeun (~44%).
+        by_fpg     = (df.get('glucose_fasting_mgdl', pd.Series(np.nan, index=df.index)) >= 126)
+        df['dt2'] = (diagnosed | on_insulin | on_pills | by_hba1c | by_fpg).fillna(False).astype(int)
     else:
         df['dt2'] = 0
 
-    # MetS outcome (IDF 2006 modifie)
+    # MetS outcome (IDF 2006 modifie) — complete-case rigoureux.
+    # Chaque critere vaut 1 (rempli), 0 (non rempli) ou NaN (composante manquante).
+    # Positif si >= 3 criteres confirmes ; negatif seulement si le meilleur cas
+    # possible (rempli + manquants) reste < 3 ; sinon indetermine (NaN).
+    # Evite le sous-comptage silencieux lie aux triglycerides a jeun (~44%).
     if all(c in df.columns for c in ['waist', 'tg', 'hdl', 'hba1c']):
         waist_thresh = np.where(df['sex'] == 'F', 80, 94)
-        crit_waist = (df['waist'] >= waist_thresh).astype(int)
-        crit_tg = (df['tg'] >= 1.7).astype(int)
-        crit_hdl = np.where(df['sex'] == 'F', (df['hdl'] < 1.29).astype(int), (df['hdl'] < 1.03).astype(int))
-        crit_gluc = ((df.get('hba1c', 5) >= 5.7) | (df.get('dt2', 0) == 1)).astype(int)
-        crit_hta = df.get('hta', pd.Series(0, index=df.index)).fillna(0).astype(int)
-        df['mets_criteria'] = crit_waist + crit_tg + crit_hdl + crit_gluc + crit_hta
-        df['mets_outcome'] = (df['mets_criteria'] >= 3).astype(int)
+        hdl_thresh   = np.where(df['sex'] == 'F', 1.29, 1.03)
+        dt2_ser = df['dt2'] if 'dt2' in df.columns else pd.Series(0, index=df.index)
+
+        crit_waist = np.where(df['waist'].notna(), (df['waist'] >= waist_thresh).astype(float), np.nan)
+        crit_tg    = np.where(df['tg'].notna(),    (df['tg'] >= 1.7).astype(float),             np.nan)
+        crit_hdl   = np.where(df['hdl'].notna(),   (df['hdl'] < hdl_thresh).astype(float),       np.nan)
+        # Glucose : HbA1c >= 5.7 OU T2DM. Determinable si HbA1c mesure OU dt2=1.
+        gluc_met   = ((df['hba1c'] >= 5.7) | (dt2_ser == 1))
+        crit_gluc  = np.where(df['hba1c'].notna() | (dt2_ser == 1), gluc_met.astype(float), np.nan)
+        # HTA (BPQ020) : determinable si la table BPQ est presente.
+        crit_hta   = df['hta'].astype(float).values if 'hta' in df.columns else np.full(len(df), np.nan)
+
+        crits = np.vstack([crit_waist, crit_tg, crit_hdl, crit_gluc, crit_hta])  # 5 x N
+        n_met     = np.nansum(crits, axis=0)            # criteres confirmes remplis
+        n_missing = np.isnan(crits).sum(axis=0)         # composantes manquantes
+        n_best    = n_met + n_missing                   # meilleur scenario possible
+
+        mets = np.full(len(df), np.nan)
+        mets[n_met >= 3] = 1.0                           # positif definitif
+        mets[n_best < 3] = 0.0                           # negatif definitif
+        df['mets_criteria']  = n_met
+        df['mets_missing']   = n_missing
+        df['mets_outcome']   = mets                      # 1 / 0 / NaN (indetermine)
 
     # Obesite
     eth_ob = {'eu': 30, 'af': 30, 'ea': 27.5, 'sa': 27.5, 'im': 27.5}
@@ -214,8 +276,9 @@ def process_cycle(cycle_name, tables):
 # Telecharger et construire le dataset
 TABLES_NEEDED = {
     'DEMO': 'Demographic', 'BMX': 'Anthropometry', 'BIOPRO': 'Biochemistry',
-    'GHB': 'HbA1c', 'TRIGLY': 'Triglycerides', 'HDL': 'HDL', 'INS': 'Insulin',
-    'HSCRP': 'hsCRP', 'BPQ': 'Blood Pressure', 'DIQ': 'Diabetes',
+    'GHB': 'HbA1c', 'GLU': 'Fasting glucose', 'TRIGLY': 'Triglycerides',
+    'HDL': 'HDL', 'INS': 'Insulin', 'HSCRP': 'hsCRP',
+    'BPQ': 'Blood Pressure', 'DIQ': 'Diabetes',
 }
 
 all_dfs = []
@@ -225,12 +288,27 @@ for cycle_name, cycle_info in CYCLES.items():
     print(f"  ── Cycle {cycle_name} ──")
     cycle_tables = {}
     for tbl in TABLES_NEEDED:
-        df_t = fetch_nhanes(tbl, suffix, year)
-        if df_t is not None:
-            cycle_tables[tbl] = df_t
-            print(f"    ✓ {tbl}: {len(df_t):,} obs")
+        # hs-CRP : optionnel (structurellement absent avant 2015)
+        if tbl == 'HSCRP':
+            real_name = CRP_TABLE[suffix]
+            if real_name is None:
+                print(f"    – hs-CRP: non mesure en NHANES {cycle_name} (structurel, axe 3 = 0)")
+                continue
+        elif tbl == 'INS':
+            real_name = INS_TABLE[suffix]   # GLU_G en 2011-2012, INS_x ensuite
         else:
-            print(f"    ✗ {tbl}: non disponible")
+            real_name = tbl
+        df_t = fetch_nhanes(real_name, suffix, year)
+        if df_t is None:
+            if tbl == 'HSCRP':
+                print(f"    – {real_name}_{suffix}: indisponible, inflammation ignoree")
+                continue
+            raise RuntimeError(
+                f"Table {real_name}_{suffix}.XPT indisponible — run interrompu. "
+                f"Relancer plus tard ou telecharger manuellement."
+            )
+        cycle_tables[tbl] = df_t
+        print(f"    ✓ {real_name}_{suffix}: {len(df_t):,} obs")
     proc = process_cycle(cycle_name, cycle_tables)
     if proc is not None:
         all_dfs.append(proc)
@@ -582,6 +660,11 @@ def bootstrap_auc(y, scores, n_boot=2000, seed=42):
             continue
         aucs.append(roc_auc_score(y[idx], scores[idx]))
     aucs = np.array(aucs)
+    if aucs.size == 0:
+        # Too few positives for any bootstrap resample to contain both classes
+        # (e.g. rare super-responders). Older numpy returned nan here; numpy 2.x
+        # raises on percentile of an empty array. Return nan to preserve behavior.
+        return float('nan'), float('nan')
     return np.percentile(aucs, 2.5), np.percentile(aucs, 97.5)
 
 # AUC GRS pour repondeur (TBWL >= 10%)
@@ -692,8 +775,9 @@ for col in axis_cols:
 # Robustesse poids GRS (+/-50%)
 print("\n  Robustesse — perturbation poids GRS (+/-50%):")
 weight_perturb_aucs = []
+rng_perturb = np.random.default_rng(42)   # seed fixe -> Delta AUC reproductible
 for _ in range(100):
-    noise = np.random.default_rng(None).normal(1.0, 0.5, 5)
+    noise = rng_perturb.normal(1.0, 0.5, 5)
     noise = np.clip(noise, 0.5, 1.5)
     grs_perturbed = (
         df_glp1.loc[mask_analysis, 'irScore'].values * 0.30 * noise[0]
@@ -786,10 +870,7 @@ ax3.set_xlabel('1 - Specificite (FPR)', fontsize=12)
 ax3.set_ylabel('Sensibilite (TPR)', fontsize=12)
 ax3.set_title(f'Figure BTM-1 — Courbe ROC GRS pour prediction repondeur\n(TBWL≥10% simule | N={mask_analysis.sum():,} sujets eligibles)', fontsize=11)
 ax3.legend(fontsize=10, loc='lower right')
-ax3.text(0.55, 0.25,
-         f'AUC marginal (0.571) attendu\nsous design anti-circularite\n(25% bruit latent)\nAUC null=0.513 → signal > chance',
-         fontsize=8, color='#475569',
-         bbox=dict(boxstyle='round', facecolor='#f8fafc', alpha=0.8))
+# (encadre statique retire : les AUC sont affichees dynamiquement dans la legende)
 ax3.spines['top'].set_visible(False)
 ax3.spines['right'].set_visible(False)
 plt.tight_layout()

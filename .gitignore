@@ -5,3 +5,6 @@ dist/
 *.pid
 *.log
 .pm2/
+
+# Generated simulation outputs (reproducible, data-pull dependent)
+bmn_btm_simulation/
