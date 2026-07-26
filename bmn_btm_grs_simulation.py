@@ -229,7 +229,9 @@ def process_cycle(cycle_name, tables):
         on_insulin = (df.get('DIQ050', 2) == 1)
         on_pills   = (df.get('DIQ070', 2) == 1)
         by_hba1c   = (df.get('hba1c', pd.Series(0, index=df.index)) >= 6.5)
-        df['dt2'] = (diagnosed | on_insulin | on_pills | by_hba1c).fillna(False).astype(int)
+        # Glycemie a jeun >= 126 mg/dL (critere ADA). Sous-echantillon a jeun (~44%).
+        by_fpg     = (df.get('glucose_fasting_mgdl', pd.Series(np.nan, index=df.index)) >= 126)
+        df['dt2'] = (diagnosed | on_insulin | on_pills | by_hba1c | by_fpg).fillna(False).astype(int)
     else:
         df['dt2'] = 0
 
