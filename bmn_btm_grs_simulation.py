@@ -235,16 +235,36 @@ def process_cycle(cycle_name, tables):
     else:
         df['dt2'] = 0
 
-    # MetS outcome (IDF 2006 modifie)
+    # MetS outcome (IDF 2006 modifie) — complete-case rigoureux.
+    # Chaque critere vaut 1 (rempli), 0 (non rempli) ou NaN (composante manquante).
+    # Positif si >= 3 criteres confirmes ; negatif seulement si le meilleur cas
+    # possible (rempli + manquants) reste < 3 ; sinon indetermine (NaN).
+    # Evite le sous-comptage silencieux lie aux triglycerides a jeun (~44%).
     if all(c in df.columns for c in ['waist', 'tg', 'hdl', 'hba1c']):
         waist_thresh = np.where(df['sex'] == 'F', 80, 94)
-        crit_waist = (df['waist'] >= waist_thresh).astype(int)
-        crit_tg = (df['tg'] >= 1.7).astype(int)
-        crit_hdl = np.where(df['sex'] == 'F', (df['hdl'] < 1.29).astype(int), (df['hdl'] < 1.03).astype(int))
-        crit_gluc = ((df.get('hba1c', 5) >= 5.7) | (df.get('dt2', 0) == 1)).astype(int)
-        crit_hta = df.get('hta', pd.Series(0, index=df.index)).fillna(0).astype(int)
-        df['mets_criteria'] = crit_waist + crit_tg + crit_hdl + crit_gluc + crit_hta
-        df['mets_outcome'] = (df['mets_criteria'] >= 3).astype(int)
+        hdl_thresh   = np.where(df['sex'] == 'F', 1.29, 1.03)
+        dt2_ser = df['dt2'] if 'dt2' in df.columns else pd.Series(0, index=df.index)
+
+        crit_waist = np.where(df['waist'].notna(), (df['waist'] >= waist_thresh).astype(float), np.nan)
+        crit_tg    = np.where(df['tg'].notna(),    (df['tg'] >= 1.7).astype(float),             np.nan)
+        crit_hdl   = np.where(df['hdl'].notna(),   (df['hdl'] < hdl_thresh).astype(float),       np.nan)
+        # Glucose : HbA1c >= 5.7 OU T2DM. Determinable si HbA1c mesure OU dt2=1.
+        gluc_met   = ((df['hba1c'] >= 5.7) | (dt2_ser == 1))
+        crit_gluc  = np.where(df['hba1c'].notna() | (dt2_ser == 1), gluc_met.astype(float), np.nan)
+        # HTA (BPQ020) : determinable si la table BPQ est presente.
+        crit_hta   = df['hta'].astype(float).values if 'hta' in df.columns else np.full(len(df), np.nan)
+
+        crits = np.vstack([crit_waist, crit_tg, crit_hdl, crit_gluc, crit_hta])  # 5 x N
+        n_met     = np.nansum(crits, axis=0)            # criteres confirmes remplis
+        n_missing = np.isnan(crits).sum(axis=0)         # composantes manquantes
+        n_best    = n_met + n_missing                   # meilleur scenario possible
+
+        mets = np.full(len(df), np.nan)
+        mets[n_met >= 3] = 1.0                           # positif definitif
+        mets[n_best < 3] = 0.0                           # negatif definitif
+        df['mets_criteria']  = n_met
+        df['mets_missing']   = n_missing
+        df['mets_outcome']   = mets                      # 1 / 0 / NaN (indetermine)
 
     # Obesite
     eth_ob = {'eu': 30, 'af': 30, 'ea': 27.5, 'sa': 27.5, 'im': 27.5}
