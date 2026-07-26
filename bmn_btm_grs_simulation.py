@@ -848,10 +848,7 @@ ax3.set_xlabel('1 - Specificite (FPR)', fontsize=12)
 ax3.set_ylabel('Sensibilite (TPR)', fontsize=12)
 ax3.set_title(f'Figure BTM-1 — Courbe ROC GRS pour prediction repondeur\n(TBWL≥10% simule | N={mask_analysis.sum():,} sujets eligibles)', fontsize=11)
 ax3.legend(fontsize=10, loc='lower right')
-ax3.text(0.55, 0.25,
-         f'AUC marginal (0.571) attendu\nsous design anti-circularite\n(25% bruit latent)\nAUC null=0.513 → signal > chance',
-         fontsize=8, color='#475569',
-         bbox=dict(boxstyle='round', facecolor='#f8fafc', alpha=0.8))
+# (encadre statique retire : les AUC sont affichees dynamiquement dans la legende)
 ax3.spines['top'].set_visible(False)
 ax3.spines['right'].set_visible(False)
 plt.tight_layout()
