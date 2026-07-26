@@ -221,8 +221,15 @@ def process_cycle(cycle_name, tables):
 
     diq = tables.get('DIQ')
     if diq is not None:
-        df = safe_merge(df, diq, ['DIQ010'])
-        df['dt2'] = (df.get('DIQ010', 2) == 1).astype(int)
+        df = safe_merge(df, diq, ['DIQ010', 'DIQ050', 'DIQ070'])
+        # Definition elargie du T2DM (alignement Table 1, ~32-33%) :
+        # diagnostic OU insuline (DIQ050) OU antidiabetique oral (DIQ070)
+        # OU HbA1c >= 6.5% (critere ADA). DIQ010 seul (diagnostic) sous-estime.
+        diagnosed  = (df.get('DIQ010', 2) == 1)
+        on_insulin = (df.get('DIQ050', 2) == 1)
+        on_pills   = (df.get('DIQ070', 2) == 1)
+        by_hba1c   = (df.get('hba1c', pd.Series(0, index=df.index)) >= 6.5)
+        df['dt2'] = (diagnosed | on_insulin | on_pills | by_hba1c).fillna(False).astype(int)
     else:
         df['dt2'] = 0
 
@@ -746,8 +753,9 @@ for col in axis_cols:
 # Robustesse poids GRS (+/-50%)
 print("\n  Robustesse — perturbation poids GRS (+/-50%):")
 weight_perturb_aucs = []
+rng_perturb = np.random.default_rng(42)   # seed fixe -> Delta AUC reproductible
 for _ in range(100):
-    noise = np.random.default_rng(None).normal(1.0, 0.5, 5)
+    noise = rng_perturb.normal(1.0, 0.5, 5)
     noise = np.clip(noise, 0.5, 1.5)
     grs_perturbed = (
         df_glp1.loc[mask_analysis, 'irScore'].values * 0.30 * noise[0]
