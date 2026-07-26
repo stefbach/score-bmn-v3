@@ -92,6 +92,16 @@ CYCLES = {
     '2017-2018': {'suffix': 'J', 'year': 2017},
 }
 
+# hs-CRP : NHANES n'a AUCUN marqueur d'inflammation en 2011-2014 (CRP arrete
+# apres 2009-2010, hs-CRP introduit en 2015-2016). None = table inexistante,
+# axe 3 (inflammation) laisse a 0 sur ces cycles (documente §M9.4), sans
+# interrompre le run. 2015-2018 : HSCRP_I/J (LBXHSCRP, mg/L).
+CRP_TABLE = {'G': None, 'H': None, 'I': 'HSCRP', 'J': 'HSCRP'}
+
+# Insuline : en 2011-2012 elle est incluse dans le fichier GLU_G (colonnes
+# LBXIN/LBDINSI). A partir de 2013-2014 elle a son propre fichier INS_x.
+INS_TABLE = {'G': 'GLU', 'H': 'INS', 'I': 'INS', 'J': 'INS'}
+
 def fetch_nhanes(table_name, suffix, year, max_retries=3):
     url = f"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{year}/DataFiles/{table_name}_{suffix}.XPT"
     for attempt in range(max_retries):
@@ -128,7 +138,10 @@ def process_cycle(cycle_name, tables):
     # Inclusion: age >= 18, examen complet (RIDSTATR=2)
     df = df[(df['age'] >= 18) & (df['ridstatr'] == 2)].copy()
     df['sex'] = df['sex_code'].map({1: 'M', 2: 'F'})
-    ETH_MAP = {1: 'eu', 2: 'eu', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
+    # RIDRETH3: 1=Mexican American, 2=Other Hispanic, 3=NH White, 4=NH Black,
+    # 6=NH Asian, 7=Other/Multi. Hispaniques (1,2) -> 'im' (dR=2.0, seuil 27.5)
+    # conformement a Suppl. Table S2 / IDF 2006.
+    ETH_MAP = {1: 'im', 2: 'im', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
     df['ethnicCode'] = df['race_eth'].map(ETH_MAP).fillna('eu')
     df['cycle'] = cycle_name
 
@@ -153,12 +166,27 @@ def process_cycle(cycle_name, tables):
         df.rename(columns={'LBXSGL': 'glucose_mgdl'}, inplace=True)
         df['glyc'] = df['glucose_mgdl'] / 18.0
 
+    # Glucose a jeun (GLU_x) : requis pour HOMA-IR (BIOPRO/LBXSGL n'est PAS a jeun)
+    glu = tables.get('GLU')
+    if glu is not None:
+        df = safe_merge(df, glu, ['LBXGLU'])
+        df.rename(columns={'LBXGLU': 'glucose_fasting_mgdl'}, inplace=True)
+
+    # Insuline : LBXIN est en uU/mL. LBDINSI est en pmol/L (facteur 6).
     ins = tables.get('INS')
     if ins is not None:
-        df = safe_merge(df, ins, ['LBDINSI'])
-        df.rename(columns={'LBDINSI': 'insulin'}, inplace=True)
-        mask = df['glyc'].notna() & df['insulin'].notna()
-        df.loc[mask, 'homaIR'] = (df.loc[mask, 'glucose_mgdl'] * df.loc[mask, 'insulin']) / 405.0
+        if 'LBXIN' in ins.columns:
+            df = safe_merge(df, ins, ['LBXIN'])
+            df.rename(columns={'LBXIN': 'insulin_uUmL'}, inplace=True)
+        elif 'LBDINSI' in ins.columns:
+            df = safe_merge(df, ins, ['LBDINSI'])
+            df['insulin_uUmL'] = df['LBDINSI'] / 6.0
+            df.drop(columns=['LBDINSI'], inplace=True)
+        if 'glucose_fasting_mgdl' in df.columns and 'insulin_uUmL' in df.columns:
+            mask = df['glucose_fasting_mgdl'].notna() & df['insulin_uUmL'].notna()
+            df.loc[mask, 'homaIR'] = (
+                df.loc[mask, 'glucose_fasting_mgdl'] * df.loc[mask, 'insulin_uUmL']
+            ) / 405.0
 
     trigly = tables.get('TRIGLY')
     if trigly is not None:
@@ -178,8 +206,13 @@ def process_cycle(cycle_name, tables):
 
     hscrp = tables.get('HSCRP')
     if hscrp is not None:
-        df = safe_merge(df, hscrp, ['LBXHSCRP'])
-        df.rename(columns={'LBXHSCRP': 'crphs'}, inplace=True)
+        if 'LBXHSCRP' in hscrp.columns:        # 2015-2018, deja en mg/L
+            df = safe_merge(df, hscrp, ['LBXHSCRP'])
+            df.rename(columns={'LBXHSCRP': 'crphs'}, inplace=True)
+        elif 'LBXCRP' in hscrp.columns:        # 2011-2014, mg/dL -> mg/L
+            df = safe_merge(df, hscrp, ['LBXCRP'])
+            df['crphs'] = df['LBXCRP'] * 10.0
+            df.drop(columns=['LBXCRP'], inplace=True)
 
     bpq = tables.get('BPQ')
     if bpq is not None:
@@ -214,8 +247,9 @@ def process_cycle(cycle_name, tables):
 # Telecharger et construire le dataset
 TABLES_NEEDED = {
     'DEMO': 'Demographic', 'BMX': 'Anthropometry', 'BIOPRO': 'Biochemistry',
-    'GHB': 'HbA1c', 'TRIGLY': 'Triglycerides', 'HDL': 'HDL', 'INS': 'Insulin',
-    'HSCRP': 'hsCRP', 'BPQ': 'Blood Pressure', 'DIQ': 'Diabetes',
+    'GHB': 'HbA1c', 'GLU': 'Fasting glucose', 'TRIGLY': 'Triglycerides',
+    'HDL': 'HDL', 'INS': 'Insulin', 'HSCRP': 'hsCRP',
+    'BPQ': 'Blood Pressure', 'DIQ': 'Diabetes',
 }
 
 all_dfs = []
@@ -225,12 +259,27 @@ for cycle_name, cycle_info in CYCLES.items():
     print(f"  ── Cycle {cycle_name} ──")
     cycle_tables = {}
     for tbl in TABLES_NEEDED:
-        df_t = fetch_nhanes(tbl, suffix, year)
-        if df_t is not None:
-            cycle_tables[tbl] = df_t
-            print(f"    ✓ {tbl}: {len(df_t):,} obs")
+        # hs-CRP : optionnel (structurellement absent avant 2015)
+        if tbl == 'HSCRP':
+            real_name = CRP_TABLE[suffix]
+            if real_name is None:
+                print(f"    – hs-CRP: non mesure en NHANES {cycle_name} (structurel, axe 3 = 0)")
+                continue
+        elif tbl == 'INS':
+            real_name = INS_TABLE[suffix]   # GLU_G en 2011-2012, INS_x ensuite
         else:
-            print(f"    ✗ {tbl}: non disponible")
+            real_name = tbl
+        df_t = fetch_nhanes(real_name, suffix, year)
+        if df_t is None:
+            if tbl == 'HSCRP':
+                print(f"    – {real_name}_{suffix}: indisponible, inflammation ignoree")
+                continue
+            raise RuntimeError(
+                f"Table {real_name}_{suffix}.XPT indisponible — run interrompu. "
+                f"Relancer plus tard ou telecharger manuellement."
+            )
+        cycle_tables[tbl] = df_t
+        print(f"    ✓ {real_name}_{suffix}: {len(df_t):,} obs")
     proc = process_cycle(cycle_name, cycle_tables)
     if proc is not None:
         all_dfs.append(proc)
