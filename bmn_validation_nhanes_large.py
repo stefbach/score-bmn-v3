@@ -1265,13 +1265,13 @@ mets_neg = df[df['mets_outcome'] == 0]
 print(f"{'Variable':<25} {'Overall (N={:,})'.format(len(df)):<25} {'MetS+ (N={:,})'.format(len(mets_pos)):<25} {'MetS- (N={:,})'.format(len(mets_neg)):<25} {'p':>10}")
 print("-" * 110)
 
-cont_vars = [
+mean_sd_vars = [
     ('Age (years)', 'age'), ('BMI (kg/m²)', 'bmi'), ('Waist (cm)', 'waist'),
-    ('HOMA-IR', 'homaIR'), ('HbA1c (%)', 'hba1c'), ('hs-CRP (mg/L)', 'crphs'),
-    ('HDL (mmol/L)', 'hdl'), ('TG (mmol/L)', 'tg'), ('Glucose (mmol/L)', 'glyc'),
+    ('HbA1c (%)', 'hba1c'), ('hs-CRP (mg/L)', 'crphs'),
+    ('HDL (mmol/L)', 'hdl'), ('Glucose (mmol/L)', 'glyc'),
     ('SCORE BMN sf', 'sf'),
 ]
-for label, col in cont_vars:
+for label, col in mean_sd_vars:
     if col not in df.columns: continue
     overall_n = df[col].notna().sum()
     pos_vals = mets_pos[col].dropna()
@@ -1286,25 +1286,53 @@ for label, col in cont_vars:
           f"{neg_vals.mean():.1f} ± {neg_vals.std():.1f} (n={len(neg_vals):,}){'':<3} "
           f"{p_str:>10}")
 
-cat_vars = [
-    ('Male sex', lambda r: r['sex'] == 'M'),
-    ('Obesity (BMI≥30)', lambda r: r['obesity_outcome'] == 1 if pd.notna(r.get('obesity_outcome')) else False),
-    ('Diabetes (self-report)', lambda r: r.get('diabetes', 0) == 1 if pd.notna(r.get('diabetes')) else False),
-    ('Hypertension', lambda r: r.get('hypertension', 0) == 1 if pd.notna(r.get('hypertension')) else False),
+median_iqr_vars = [
+    ('HOMA-IR', 'homaIR'), ('TG (mmol/L)', 'tg'),
 ]
-for label, cond in cat_vars:
-    overall_n = df.apply(cond, axis=1).sum()
-    pos_n = mets_pos.apply(cond, axis=1).sum()
-    neg_n = mets_neg.apply(cond, axis=1).sum()
-    table = np.array([[pos_n, len(mets_pos) - pos_n], [neg_n, len(mets_neg) - neg_n]])
+for label, col in median_iqr_vars:
+    if col not in df.columns: continue
+    overall_n = df[col].notna().sum()
+    pos_vals = mets_pos[col].dropna()
+    neg_vals = mets_neg[col].dropna()
+    def fmt_median_iqr(s):
+        if len(s) == 0: return "N/A"
+        q1, med, q3 = s.quantile([0.25, 0.50, 0.75])
+        return f"{med:.1f} [{q1:.1f}-{q3:.1f}]"
+    if len(pos_vals) > 1 and len(neg_vals) > 1:
+        _, p = stats.mannwhitneyu(pos_vals, neg_vals, alternative='two-sided')
+        p_str = f"{p:.1e}" if p < 0.001 else f"{p:.4f}"
+    else:
+        p_str = "N/A"
+    print(f"{label:<25} {fmt_median_iqr(df[col].dropna())} (n={overall_n:,}){'':<3} "
+          f"{fmt_median_iqr(pos_vals)} (n={len(pos_vals):,}){'':<3} "
+          f"{fmt_median_iqr(neg_vals)} (n={len(neg_vals):,}){'':<3} "
+          f"{p_str:>10}")
+
+cat_vars = [
+    ('Male sex', 'sex', lambda s: s == 'M'),
+    ('Obesity (BMI≥30)', 'obesity_outcome', lambda s: s == 1),
+    ('T2DM (DIQ010=1)', 'has_diabetes', lambda s: s == 1),
+    ('Hypertension (BPQ020=1)', 'has_hta', lambda s: s == 1),
+]
+for label, col, cond in cat_vars:
+    if col not in df.columns:
+        print(f"{label:<25} column '{col}' not found")
+        continue
+    overall_valid = df[col].notna().sum()
+    overall_n = df[col].apply(cond).sum()
+    pos_valid = mets_pos[col].notna().sum()
+    pos_n = mets_pos[col].apply(cond).sum()
+    neg_valid = mets_neg[col].notna().sum()
+    neg_n = mets_neg[col].apply(cond).sum()
+    table = np.array([[pos_n, pos_valid - pos_n], [neg_n, neg_valid - neg_n]])
     if table.min() > 0 and table.sum() > 0:
         chi2, p, _, _ = stats.chi2_contingency(table)
         p_str = f"{p:.1e}" if p < 0.001 else f"{p:.4f}"
     else:
         p_str = "N/A"
-    print(f"{label:<25} {overall_n:,} ({overall_n/len(df)*100:.1f}%){'':<12} "
-          f"{pos_n:,} ({pos_n/len(mets_pos)*100:.1f}%){'':<12} "
-          f"{neg_n:,} ({neg_n/len(mets_neg)*100:.1f}%){'':<12} "
+    print(f"{label:<25} {overall_n:,}/{overall_valid:,} ({overall_n/overall_valid*100:.1f}%){'':<5} "
+          f"{pos_n:,}/{pos_valid:,} ({pos_n/pos_valid*100:.1f}%){'':<5} "
+          f"{neg_n:,}/{neg_valid:,} ({neg_n/neg_valid*100:.1f}%){'':<5} "
           f"{p_str:>10}")
 
 
