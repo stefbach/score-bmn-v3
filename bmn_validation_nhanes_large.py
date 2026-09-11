@@ -1297,7 +1297,7 @@ for label, cond in cat_vars:
     pos_n = mets_pos.apply(cond, axis=1).sum()
     neg_n = mets_neg.apply(cond, axis=1).sum()
     table = np.array([[pos_n, len(mets_pos) - pos_n], [neg_n, len(mets_neg) - neg_n]])
-    if table.min() >= 0 and table.sum() > 0:
+    if table.min() > 0 and table.sum() > 0:
         chi2, p, _, _ = stats.chi2_contingency(table)
         p_str = f"{p:.1e}" if p < 0.001 else f"{p:.4f}"
     else:
