@@ -1166,11 +1166,154 @@ if old_results:
         except:
             print(f"{label:<35} {'N/A':<25} {'N/A':<25}")
 
+# ═══════════════════════════════════════════════════════════════════════
+# VALIDATION TEMPORELLE : développement 2011-2014 vs validation 2015-2018
+# ═══════════════════════════════════════════════════════════════════════
+
+print("\n═══ VALIDATION TEMPORELLE (dev 2011-2014 vs val 2015-2018) ═══")
+
+dev_mask = df['cycle'].isin(['2011-2012', '2013-2014'])
+val_mask = df['cycle'].isin(['2015-2016', '2017-2018'])
+n_dev = dev_mask.sum()
+n_val = val_mask.sum()
+print(f"  Development cohort: N = {n_dev:,}")
+print(f"  Validation cohort:  N = {n_val:,}")
+
+temporal_results = {}
+for outcome_name, outcome_col in outcomes.items():
+    print(f"\n  ── {outcome_name} ──")
+    for cohort_name, mask in [('Development (2011-2014)', dev_mask), ('Validation (2015-2018)', val_mask)]:
+        valid = mask & df[outcome_col].notna() & df['sf'].notna()
+        y_t = df.loc[valid, outcome_col].values.astype(int)
+        sf_t = df.loc[valid, 'sf'].values / 100.0
+        if len(y_t) < 50 or len(np.unique(y_t)) < 2:
+            print(f"    {cohort_name}: insufficient data")
+            continue
+        auc_t = roc_auc_score(y_t, sf_t)
+        boot_aucs_t = []
+        for b in range(2000):
+            idx = np.random.choice(len(y_t), len(y_t), replace=True)
+            if len(np.unique(y_t[idx])) < 2: continue
+            boot_aucs_t.append(roc_auc_score(y_t[idx], sf_t[idx]))
+        boot_aucs_t = np.array(boot_aucs_t)
+        ci_lo = np.percentile(boot_aucs_t, 2.5)
+        ci_hi = np.percentile(boot_aucs_t, 97.5)
+        print(f"    {cohort_name}: AUC = {auc_t:.4f} [{ci_lo:.4f} - {ci_hi:.4f}] (N={len(y_t):,}, events={y_t.sum():,})")
+        temporal_results[f"{outcome_name}_{cohort_name[:3]}"] = {
+            'AUC': float(auc_t), 'CI': [float(ci_lo), float(ci_hi)],
+            'N': int(len(y_t)), 'events': int(y_t.sum())
+        }
+
+    dev_key = f"{outcome_name}_Dev"
+    val_key = f"{outcome_name}_Val"
+    if dev_key in temporal_results and val_key in temporal_results:
+        attenuation = temporal_results[dev_key]['AUC'] - temporal_results[val_key]['AUC']
+        print(f"    Attenuation: {attenuation*100:+.2f} percentage points")
+
+# ═══════════════════════════════════════════════════════════════════════
+# CALIBRATION AVANCÉE : ICI, E/O ratio, pente de calibration
+# ═══════════════════════════════════════════════════════════════════════
+
+print("\n═══ CALIBRATION AVANCÉE ═══")
+
+for outcome_name, outcome_col in outcomes.items():
+    print(f"\n  ── {outcome_name} ──")
+    valid = df[outcome_col].notna() & df['sf'].notna()
+    y_cal = df.loc[valid, outcome_col].values.astype(int)
+    sf_cal = df.loc[valid, 'sf'].values / 100.0
+
+    # ICI (Integrated Calibration Index)
+    from sklearn.isotonic import IsotonicRegression
+    iso = IsotonicRegression(out_of_bounds='clip')
+    cal_probs = iso.fit_transform(sf_cal, y_cal)
+    ici = np.mean(np.abs(cal_probs - sf_cal))
+    print(f"    ICI = {ici:.4f}")
+
+    # E/O ratio
+    expected = sf_cal.sum()
+    observed = y_cal.sum()
+    eo_ratio = expected / observed if observed > 0 else float('inf')
+    print(f"    E/O ratio = {eo_ratio:.3f} (Expected={expected:.0f}, Observed={observed})")
+
+    # Calibration slope (logistic recalibration)
+    log_odds = np.log(np.clip(sf_cal, 1e-6, 1-1e-6) / (1 - np.clip(sf_cal, 1e-6, 1-1e-6)))
+    X_slope = sm.add_constant(log_odds)
+    try:
+        logit_model = sm.Logit(y_cal, X_slope).fit(disp=0)
+        cal_intercept = logit_model.params[0]
+        cal_slope = logit_model.params[1]
+        print(f"    Calibration intercept = {cal_intercept:.4f}")
+        print(f"    Calibration slope = {cal_slope:.4f}")
+    except:
+        cal_intercept = float('nan')
+        cal_slope = float('nan')
+        print(f"    Calibration slope: convergence failure")
+
+    results[outcome_name]['ICI'] = float(ici)
+    results[outcome_name]['EO_ratio'] = float(eo_ratio)
+    results[outcome_name]['cal_intercept'] = float(cal_intercept)
+    results[outcome_name]['cal_slope'] = float(cal_slope)
+
+# ═══════════════════════════════════════════════════════════════════════
+# TABLE 1 ÉTENDUE : colonnes MetS+ / MetS- avec p-values
+# ═══════════════════════════════════════════════════════════════════════
+
+print("\n═══ TABLE 1 ÉTENDUE (MetS+ vs MetS-) ═══")
+
+mets_pos = df[df['mets_outcome'] == 1]
+mets_neg = df[df['mets_outcome'] == 0]
+print(f"{'Variable':<25} {'Overall (N={:,})'.format(len(df)):<25} {'MetS+ (N={:,})'.format(len(mets_pos)):<25} {'MetS- (N={:,})'.format(len(mets_neg)):<25} {'p':>10}")
+print("-" * 110)
+
+cont_vars = [
+    ('Age (years)', 'age'), ('BMI (kg/m²)', 'bmi'), ('Waist (cm)', 'waist'),
+    ('HOMA-IR', 'homaIR'), ('HbA1c (%)', 'hba1c'), ('hs-CRP (mg/L)', 'crphs'),
+    ('HDL (mmol/L)', 'hdl'), ('TG (mmol/L)', 'tg'), ('Glucose (mmol/L)', 'glyc'),
+    ('SCORE BMN sf', 'sf'),
+]
+for label, col in cont_vars:
+    if col not in df.columns: continue
+    overall_n = df[col].notna().sum()
+    pos_vals = mets_pos[col].dropna()
+    neg_vals = mets_neg[col].dropna()
+    if len(pos_vals) > 1 and len(neg_vals) > 1:
+        _, p = stats.mannwhitneyu(pos_vals, neg_vals, alternative='two-sided')
+        p_str = f"{p:.1e}" if p < 0.001 else f"{p:.4f}"
+    else:
+        p_str = "N/A"
+    print(f"{label:<25} {df[col].mean():.1f} ± {df[col].std():.1f} (n={overall_n:,}){'':<3} "
+          f"{pos_vals.mean():.1f} ± {pos_vals.std():.1f} (n={len(pos_vals):,}){'':<3} "
+          f"{neg_vals.mean():.1f} ± {neg_vals.std():.1f} (n={len(neg_vals):,}){'':<3} "
+          f"{p_str:>10}")
+
+cat_vars = [
+    ('Male sex', lambda r: r['sex'] == 'M'),
+    ('Obesity (BMI≥30)', lambda r: r['obesity_outcome'] == 1 if pd.notna(r.get('obesity_outcome')) else False),
+    ('Diabetes (self-report)', lambda r: r.get('diabetes', 0) == 1 if pd.notna(r.get('diabetes')) else False),
+    ('Hypertension', lambda r: r.get('hypertension', 0) == 1 if pd.notna(r.get('hypertension')) else False),
+]
+for label, cond in cat_vars:
+    overall_n = df.apply(cond, axis=1).sum()
+    pos_n = mets_pos.apply(cond, axis=1).sum()
+    neg_n = mets_neg.apply(cond, axis=1).sum()
+    table = np.array([[pos_n, len(mets_pos) - pos_n], [neg_n, len(mets_neg) - neg_n]])
+    if table.min() >= 0 and table.sum() > 0:
+        chi2, p, _, _ = stats.chi2_contingency(table)
+        p_str = f"{p:.1e}" if p < 0.001 else f"{p:.4f}"
+    else:
+        p_str = "N/A"
+    print(f"{label:<25} {overall_n:,} ({overall_n/len(df)*100:.1f}%){'':<12} "
+          f"{pos_n:,} ({pos_n/len(mets_pos)*100:.1f}%){'':<12} "
+          f"{neg_n:,} ({neg_n/len(mets_neg)*100:.1f}%){'':<12} "
+          f"{p_str:>10}")
+
+
 # Sauvegarder
 save_results = {}
 for k, v in results.items():
     save_results[k] = {kk: vv for kk, vv in v.items()
                       if kk not in ['fpr', 'tpr', 'model_probs']}
+save_results['temporal_validation'] = temporal_results
 with open(f'{OUTPUT_DIR}/results_large.json', 'w') as f:
     json.dump(save_results, f, indent=2)
 
