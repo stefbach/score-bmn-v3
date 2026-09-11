@@ -138,7 +138,7 @@ def process_cycle(cycle_name, tables):
         return None
 
     # Colonnes démographiques (noms stables entre cycles)
-    df = demo[['SEQN', 'RIDAGEYR', 'RIAGENDR']].copy()
+    df = demo[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'RIDSTATR']].copy()
 
     # Ethnicité : RIDRETH3 (2011+) ou RIDRETH1 (fallback)
     if 'RIDRETH3' in demo.columns:
@@ -148,8 +148,8 @@ def process_cycle(cycle_name, tables):
     else:
         df['race_eth'] = np.nan
 
-    df.columns = ['SEQN', 'age', 'sex_code', 'race_eth']
-    df = df[df['age'] >= 18].copy()
+    df.columns = ['SEQN', 'age', 'sex_code', 'ridstatr', 'race_eth']
+    df = df[(df['age'] >= 18) & (df['ridstatr'] == 2)].copy()
 
     df['sex'] = df['sex_code'].map({1: 'M', 2: 'F'})
     ETH_MAP = {1: 'im', 2: 'im', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
