@@ -719,8 +719,8 @@ for outcome_name, outcome_col in outcomes.items():
         model_probs[model_name] = probs
         print(f"    {model_name}: AUC = {auc_val:.4f}")
 
-    model_aucs['SCORE BMN v3.0'] = auc_main
-    model_probs['SCORE BMN v3.0'] = sf_prob
+    model_aucs['SCORE BMN v3.5'] = auc_main
+    model_probs['SCORE BMN v3.5'] = sf_prob
 
     # NRI
     print("    [NRI]")
@@ -883,10 +883,10 @@ for outcome_name, res in results.items():
     # FIGURE 1: ROC
     fig, ax = plt.subplots(1, 1, figsize=(8, 7))
     ax.plot(res['fpr'], res['tpr'], 'b-', linewidth=2.5,
-            label=f"SCORE BMN v3.0 (AUC={res['AUC_BMN']:.3f})")
+            label=f"SCORE BMN v3.5 (AUC={res['AUC_BMN']:.3f})")
     colors = {'Logistic Regression': '#e74c3c', 'Random Forest': '#2ecc71', 'Gradient Boosting': '#f39c12'}
     for model_name, auc_val in res['AUC_models'].items():
-        if model_name == 'SCORE BMN v3.0': continue
+        if model_name == 'SCORE BMN v3.5': continue
         probs = np.array(res['model_probs'][model_name])
         fpr_m, tpr_m, _ = roc_curve(y_out, probs)
         ax.plot(fpr_m, tpr_m, '--', color=colors.get(model_name, 'gray'), linewidth=1.5,
@@ -897,13 +897,15 @@ for outcome_name, res in results.items():
     ax.set_title(f'ROC Curves — {outcome_name}\nNHANES 2011-2018 Pooled (N={res["N"]:,})')
     ax.legend(loc='lower right', fontsize=9)
     fig.savefig(f'{OUTPUT_DIR}/fig1_roc_{tag}.png')
+    fig.savefig(f'{OUTPUT_DIR}/fig1_roc_{tag}.tiff', format='tiff',
+                pil_kwargs={{'compression': 'tiff_lzw'}})
     plt.close(fig)
-    print(f"  ✓ fig1_roc_{tag}.png")
+    print(f"  ✓ fig1_roc_{tag}.png + .tiff")
 
     # FIGURE 2: Calibration
     fig, ax = plt.subplots(1, 1, figsize=(7, 7))
     frac_pos, mean_pred = calibration_curve(y_out, sf_out, n_bins=10, strategy='quantile')
-    ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.0')
+    ax.plot(mean_pred, frac_pos, 'bo-', linewidth=2, markersize=8, label='SCORE BMN v3.5')
     ax.plot([0, 1], [0, 1], 'k--', alpha=0.4, label='Perfect calibration')
     probs_lr = np.array(res['model_probs']['Logistic Regression'])
     frac_lr, mean_lr = calibration_curve(y_out, probs_lr, n_bins=10, strategy='quantile')
@@ -913,8 +915,10 @@ for outcome_name, res in results.items():
     ax.set_title(f'Calibration — {outcome_name}\nHL p={res["HL_p"]:.3f}')
     ax.legend(loc='upper left')
     fig.savefig(f'{OUTPUT_DIR}/fig2_calibration_{tag}.png')
+    fig.savefig(f'{OUTPUT_DIR}/fig2_calibration_{tag}.tiff', format='tiff',
+                pil_kwargs={{'compression': 'tiff_lzw'}})
     plt.close(fig)
-    print(f"  ✓ fig2_calibration_{tag}.png")
+    print(f"  ✓ fig2_calibration_{tag}.png + .tiff")
 
     # FIGURE 3: Distribution
     fig, ax = plt.subplots(1, 1, figsize=(9, 5))
@@ -925,7 +929,7 @@ for outcome_name, res in results.items():
             label=f'{outcome_name} (n={int((y_out==1).sum()):,})')
     ax.axvline(30, color='orange', linestyle='--', alpha=0.7, label='Seuil 30')
     ax.axvline(60, color='red', linestyle='--', alpha=0.7, label='Seuil 60')
-    ax.set_xlabel('SCORE BMN v3.0 (sf)')
+    ax.set_xlabel('SCORE BMN v3.5 (sf)')
     ax.set_ylabel('Density')
     ax.set_title(f'Distribution — {outcome_name} (N={res["N"]:,})')
     ax.legend(fontsize=9)
