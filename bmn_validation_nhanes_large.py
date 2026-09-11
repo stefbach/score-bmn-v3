@@ -898,7 +898,7 @@ for outcome_name, res in results.items():
     ax.legend(loc='lower right', fontsize=9)
     fig.savefig(f'{OUTPUT_DIR}/fig1_roc_{tag}.png')
     fig.savefig(f'{OUTPUT_DIR}/fig1_roc_{tag}.tiff', format='tiff',
-                pil_kwargs={{'compression': 'tiff_lzw'}})
+                pil_kwargs={'compression': 'tiff_lzw'})
     plt.close(fig)
     print(f"  ✓ fig1_roc_{tag}.png + .tiff")
 
@@ -916,7 +916,7 @@ for outcome_name, res in results.items():
     ax.legend(loc='upper left')
     fig.savefig(f'{OUTPUT_DIR}/fig2_calibration_{tag}.png')
     fig.savefig(f'{OUTPUT_DIR}/fig2_calibration_{tag}.tiff', format='tiff',
-                pil_kwargs={{'compression': 'tiff_lzw'}})
+                pil_kwargs={'compression': 'tiff_lzw'})
     plt.close(fig)
     print(f"  ✓ fig2_calibration_{tag}.png + .tiff")
 
