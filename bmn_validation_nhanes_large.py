@@ -152,7 +152,7 @@ def process_cycle(cycle_name, tables):
     df = df[df['age'] >= 18].copy()
 
     df['sex'] = df['sex_code'].map({1: 'M', 2: 'F'})
-    ETH_MAP = {1: 'eu', 2: 'eu', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
+    ETH_MAP = {1: 'im', 2: 'im', 3: 'eu', 4: 'af', 6: 'ea', 7: 'eu'}
     df['ethnicCode'] = df['race_eth'].map(ETH_MAP).fillna('eu')
     df['cycle'] = cycle_name
 
