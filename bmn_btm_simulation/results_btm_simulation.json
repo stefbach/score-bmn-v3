@@ -193,7 +193,7 @@
     "betaCellAxis": 0.479
   },
   "mc_robustness": {
-    "weight_perturbation_50pct_delta_auc": 0.084,
+    "weight_perturbation_50pct_delta_auc": 0.071,
     "robust": true
   }
 }
