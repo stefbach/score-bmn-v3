@@ -581,6 +581,8 @@ def bootstrap_auc(y, scores, n_boot=2000, seed=42):
         if len(np.unique(y[idx])) < 2:
             continue
         aucs.append(roc_auc_score(y[idx], scores[idx]))
+    if len(aucs) == 0:
+        return (float('nan'), float('nan'))
     aucs = np.array(aucs)
     return np.percentile(aucs, 2.5), np.percentile(aucs, 97.5)
 
