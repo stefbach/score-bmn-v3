@@ -1,0 +1,199 @@
+{
+  "metadata": {
+    "script": "bmn_btm_grs_simulation.py",
+    "version": "Score BMN v3.5",
+    "article": "Bach S, Manos T, Noel P — 2026",
+    "design": "Anti-circularity Monte Carlo (25% latent noise, seed=42)",
+    "n_sim_per_subject": 1000,
+    "n_subjects_glp1_eligible": 12733,
+    "n_subjects_total_nhanes": 22807,
+    "warning": "SIMULATION-BASED ONLY. Not observed treatment outcomes. All BTM/GRS results represent internal consistency analysis. Prospective validation in GLP-1-treated cohorts required."
+  },
+  "table3_profiles": [
+    {
+      "Profile": "R1",
+      "n": 153,
+      "pct": 1.2,
+      "resp_rate": 97.7,
+      "super_resp_rate": 17.3,
+      "mean_tbwl": 16.8
+    },
+    {
+      "Profile": "R2",
+      "n": 3045,
+      "pct": 23.9,
+      "resp_rate": 79.1,
+      "super_resp_rate": 0.7,
+      "mean_tbwl": 12.5
+    },
+    {
+      "Profile": "R3",
+      "n": 8049,
+      "pct": 63.2,
+      "resp_rate": 36.5,
+      "super_resp_rate": 0.0,
+      "mean_tbwl": 8.9
+    },
+    {
+      "Profile": "R4",
+      "n": 1208,
+      "pct": 9.5,
+      "resp_rate": 20.9,
+      "super_resp_rate": 0.0,
+      "mean_tbwl": 7.9
+    },
+    {
+      "Profile": "CI",
+      "n": 278,
+      "pct": 2.2,
+      "resp_rate": 0.0,
+      "super_resp_rate": 0.0,
+      "mean_tbwl": 3.5
+    }
+  ],
+  "table4_discrimination": {
+    "responder_TBWL_10": {
+      "auc": 0.986,
+      "ci_low": 0.984,
+      "ci_high": 0.988,
+      "n": 12455,
+      "interpretation": "Marginal AUC expected under anti-circularity design"
+    },
+    "super_responder_TBWL_20": {
+      "auc": NaN,
+      "ci_low": NaN,
+      "ci_high": NaN,
+      "interpretation": "Residual circularity from shared biomarker inputs — not interpretable"
+    },
+    "baseline_LR": {
+      "auc": 0.587,
+      "features": [
+        "bmi",
+        "age",
+        "sex",
+        "homaIR"
+      ]
+    },
+    "null_model": {
+      "auc": 0.502,
+      "ci_low": 0.491,
+      "ci_high": 0.514
+    }
+  },
+  "table5_subgroups": [
+    {
+      "subgroup": "Male",
+      "n": 5867,
+      "auc": 0.991,
+      "ci_low": 0.989,
+      "ci_high": 0.993,
+      "resp_rate": 24.1
+    },
+    {
+      "subgroup": "Female",
+      "n": 6588,
+      "auc": 0.986,
+      "ci_low": 0.984,
+      "ci_high": 0.988,
+      "resp_rate": 30.8
+    },
+    {
+      "subgroup": "Age 18-39",
+      "n": 4050,
+      "auc": 0.987,
+      "ci_low": 0.985,
+      "ci_high": 0.99,
+      "resp_rate": 23.2
+    },
+    {
+      "subgroup": "Age 40-59",
+      "n": 4259,
+      "auc": 0.99,
+      "ci_low": 0.988,
+      "ci_high": 0.992,
+      "resp_rate": 34.6
+    },
+    {
+      "subgroup": "Age >= 60",
+      "n": 4146,
+      "auc": 0.981,
+      "ci_low": 0.977,
+      "ci_high": 0.985,
+      "resp_rate": 24.9
+    },
+    {
+      "subgroup": "BMI 27-30",
+      "n": 4096,
+      "auc": 0.994,
+      "ci_low": 0.992,
+      "ci_high": 0.995,
+      "resp_rate": 29.4
+    },
+    {
+      "subgroup": "BMI 30-35",
+      "n": 4546,
+      "auc": 0.983,
+      "ci_low": 0.98,
+      "ci_high": 0.986,
+      "resp_rate": 28.8
+    },
+    {
+      "subgroup": "BMI 35-40",
+      "n": 2129,
+      "auc": 0.97,
+      "ci_low": 0.963,
+      "ci_high": 0.977,
+      "resp_rate": 28.6
+    },
+    {
+      "subgroup": "BMI >= 40",
+      "n": 1684,
+      "auc": 0.995,
+      "ci_low": 0.992,
+      "ci_high": 0.998,
+      "resp_rate": 19.0
+    },
+    {
+      "subgroup": "T2DM Yes",
+      "n": 1995,
+      "auc": 0.987,
+      "ci_low": 0.981,
+      "ci_high": 0.992,
+      "resp_rate": 41.4
+    },
+    {
+      "subgroup": "T2DM No",
+      "n": 10460,
+      "auc": 0.986,
+      "ci_low": 0.985,
+      "ci_high": 0.988,
+      "resp_rate": 25.0
+    },
+    {
+      "subgroup": "MetS Yes",
+      "n": 5326,
+      "auc": 0.986,
+      "ci_low": 0.984,
+      "ci_high": 0.989,
+      "resp_rate": 32.8
+    },
+    {
+      "subgroup": "MetS No",
+      "n": 7129,
+      "auc": 0.986,
+      "ci_low": 0.983,
+      "ci_high": 0.988,
+      "resp_rate": 23.8
+    }
+  ],
+  "axis_sensitivity": {
+    "irScore": 0.928,
+    "chronScore": 0.467,
+    "inflamScore": 0.666,
+    "betaCellAxis": 0.479
+  },
+  "mc_robustness": {
+    "weight_perturbation_50pct_delta_auc": 0.084,
+    "robust": true
+  }
+}
