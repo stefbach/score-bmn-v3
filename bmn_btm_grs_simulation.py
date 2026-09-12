@@ -693,9 +693,10 @@ for col in axis_cols:
 
 # Robustesse poids GRS (+/-50%)
 print("\n  Robustesse — perturbation poids GRS (+/-50%):")
+rng_robust = np.random.default_rng(42)
 weight_perturb_aucs = []
 for _ in range(100):
-    noise = np.random.default_rng(None).normal(1.0, 0.5, 5)
+    noise = rng_robust.normal(1.0, 0.5, 5)
     noise = np.clip(noise, 0.5, 1.5)
     grs_perturbed = (
         df_glp1.loc[mask_analysis, 'irScore'].values * 0.30 * noise[0]
